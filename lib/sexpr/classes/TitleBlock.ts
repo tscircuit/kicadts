@@ -1,13 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
-
-const quoteSExprString = (value: string): string => {
-  return `"${value
-    .replace(/\\/g, "\\\\")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r")
-    .replace(/\t/g, "\\t")}"`
-}
+import { quoteSExprString } from "../utils/quoteSExprString"
 
 type TitleBlockStringProperty =
   | TitleBlockTitle

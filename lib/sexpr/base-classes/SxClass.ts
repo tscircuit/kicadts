@@ -8,6 +8,11 @@ export abstract class SxClass {
   static token: string
 
   /**
+   * Set to true for classes that need access to the raw (unparsed) argument list
+   */
+  static rawArgs = false
+
+  /**
    * Token strings are sometimes re-used (e.g. a "type" token) but the class
    * varies based on the parent token
    */
@@ -101,9 +106,9 @@ export abstract class SxClass {
           `Class "${classToken}" not registered via SxClass.register`,
         )
       }
-      const paramArray = SxClass.parsePrimitiveSexpr(
-        primitiveSexpr.slice(1) as PrimitiveSExpr[],
-      )
+      const paramArray = ClassDef.rawArgs
+        ? (primitiveSexpr.slice(1) as PrimitiveSExpr[])
+        : SxClass.parsePrimitiveSexpr(primitiveSexpr.slice(1) as PrimitiveSExpr[])
       const classInstance = new ClassDef(paramArray)
       return classInstance
     }
