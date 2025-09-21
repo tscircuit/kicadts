@@ -9,3 +9,10 @@ most extensive one is `references/SEXPR_MAIN.adoc` (use `bun run scripts/downloa
 - `references/FOOTPRINT_SEXPR.adoc`
 - `references/SCH_SYM_SEXPR.adoc`
 - `references/SEXPR_MAIN.adoc`
+
+### Tips
+
+- Every S-expression token must have a corresponding `SxClass` subclass and be registered via `SxClass.register`; missing registrations cause parse failures.
+- Tokens reused under different parents (for example `type` under `stroke`) require `static parentToken` overrides so the correct class resolves during parsing.
+- When a class accepts unordered child tokens, set `_propertyMap` using `loadProperties` to make getters convenient and keep `getString()` deterministic.
+- Snapshot tests with `bun test` provide quick verification that `getString()` matches the KiCad formatting expectations.
