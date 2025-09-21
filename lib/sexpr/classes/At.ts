@@ -20,5 +20,13 @@ export class At extends SxClass {
   x: number
   y: number
   angle?: number
+
+  override getString(): string {
+    const parts: Array<string | number> = [this.x, this.y]
+    if (this.angle !== undefined) {
+      parts.push(this.angle)
+    }
+    return `(at ${parts.join(" ")})`
+  }
 }
 SxClass.register(At)
