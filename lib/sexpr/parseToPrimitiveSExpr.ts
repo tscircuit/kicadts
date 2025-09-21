@@ -137,7 +137,7 @@ export function tokenize(input: string): Token[] {
   return tokens
 }
 
-export function parseSExpr(input: string): PrimitiveSExpr[] {
+export function parseToPrimitiveSExpr(input: string): PrimitiveSExpr[] {
   const toks = tokenize(input)
   let idx = 0
 
