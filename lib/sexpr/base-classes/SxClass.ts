@@ -39,6 +39,30 @@ export abstract class SxClass {
     )
   }
 
+  getString(): string {
+    if (this._propertyMap) {
+      const lines = [`(${this.token}`]
+      for (const p of Object.values(this._propertyMap)) {
+        const pLines = p.getString().split("\n")
+        for (const pLine of pLines) {
+          lines.push(`  ${pLine}`)
+        }
+      }
+      lines.push(")")
+      return lines.join("\n")
+    }
+
+    throw new Error(
+      `Cannot stringify ${this.constructor.name} without defining a propertyMap, consider manually defining the getString() method`,
+    )
+  }
+  get [Symbol.toStringTag](): string {
+    return this.getString()
+  }
+  [Symbol.for("nodejs.util.inspect.custom")]() {
+    return this.getString()
+  }
+
   // =========================== STATIC METHODS ===========================
 
   static classes: Record<string, SxClass> = {}
@@ -56,7 +80,7 @@ export abstract class SxClass {
   /**
    * Parse an S-expression string into registered SxClass instances
    */
-  static parse(sexpr: string): SxClass {
+  static parse(sexpr: string): SxClass[] {
     const primitiveSexpr = parseToPrimitiveSExpr(sexpr)
 
     return SxClass.parsePrimitiveSexpr(primitiveSexpr) as any

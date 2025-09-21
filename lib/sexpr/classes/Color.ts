@@ -12,5 +12,9 @@ export class Color extends SxClass {
     super()
     this.color = { r: args[0], g: args[1], b: args[2], a: args[3] }
   }
+
+  override getString() {
+    return `(color ${this.color.r} ${this.color.g} ${this.color.b} ${this.color.a})`
+  }
 }
 SxClass.register(Color)

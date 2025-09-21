@@ -19,5 +19,9 @@ export class StrokeType extends SxClass {
     super()
     this.type = args[0]
   }
+
+  override getString() {
+    return `(type ${this.type})`
+  }
 }
 SxClass.register(StrokeType)

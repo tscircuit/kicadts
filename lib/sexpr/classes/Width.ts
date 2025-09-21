@@ -10,5 +10,9 @@ export class Width extends SxClass {
     super()
     this.width = args[0]
   }
+
+  override getString() {
+    return `(width ${this.width})`
+  }
 }
 SxClass.register(Width)
