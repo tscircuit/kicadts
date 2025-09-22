@@ -12,6 +12,7 @@ import { FpRect } from "./FpRect"
 import { FpCircle } from "./FpCircle"
 import { FpArc } from "./FpArc"
 import { FpPoly } from "./FpPoly"
+import { FootprintPad } from "./FootprintPad"
 
 export class Footprint extends SxClass {
   static override token = "footprint"
@@ -47,6 +48,7 @@ export class Footprint extends SxClass {
   fpCircles: FpCircle[] = []
   fpArcs: FpArc[] = []
   fpPolys: FpPoly[] = []
+  fpPads: FootprintPad[] = []
   extraItems: PrimitiveSExpr[] = []
 
   constructor(args: PrimitiveSExpr[]) {
@@ -183,6 +185,9 @@ export class Footprint extends SxClass {
         case "fp_poly":
           this.fpPolys.push(new FpPoly(rest as PrimitiveSExpr[]))
           break
+        case "pad":
+          this.fpPads.push(new FootprintPad(rest as PrimitiveSExpr[]))
+          break
         default:
           this.extraItems.push(arg)
           break
@@ -260,6 +265,10 @@ export class Footprint extends SxClass {
 
     for (const fpPoly of this.fpPolys) {
       push(fpPoly)
+    }
+
+    for (const pad of this.fpPads) {
+      push(pad)
     }
 
     for (const item of this.extraItems) {

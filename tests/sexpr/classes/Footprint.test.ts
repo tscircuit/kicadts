@@ -72,6 +72,18 @@ test("Footprint", () => {
         (fill yes)
         (uuid 99999999-aaaa-bbbb-cccc-eeeeeeeeeeee)
       )
+      (pad "1" smd roundrect
+        (at 0 0 90)
+        (size 1.2 0.6)
+        (layers F.Cu F.Paste F.Mask)
+        (roundrect_rratio 0.25)
+        (solder_mask_margin 0.05)
+        (clearance 0.1)
+        (net 1 "GND")
+        (pinfunction "GND")
+        (pintype "passive")
+        (uuid 12121212-3434-5656-7878-909090909090)
+      )
     )
   `)
 
@@ -131,6 +143,12 @@ test("Footprint", () => {
   const poly = footprint.fpPolys[0] as FpPoly
   expect(poly.points?.points.length).toBe(4)
   expect(poly.fill?.filled).toBe(true)
+  expect(footprint.fpPads.length).toBe(1)
+  const pad = footprint.fpPads[0]
+  expect(pad.number).toBe("1")
+  expect(pad.padType).toBe("smd")
+  expect(pad.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
+  expect(pad.net?.name).toBe("GND")
   expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
@@ -235,6 +253,18 @@ test("Footprint", () => {
         )
         (fill yes)
         (uuid 99999999-aaaa-bbbb-cccc-eeeeeeeeeeee)
+      )
+      (pad \"1\" smd roundrect
+        (at 0 0 90)
+        (size 1.2 0.6)
+        (layers \"F.Cu\" \"F.Paste\" \"F.Mask\")
+        (roundrect_rratio 0.25)
+        (net 1 \"GND\")
+        (pinfunction \"GND\")
+        (pintype \"passive\")
+        (solder_mask_margin 0.05)
+        (clearance 0.1)
+        (uuid 12121212-3434-5656-7878-909090909090)
       )
     )"
   `)
