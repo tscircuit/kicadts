@@ -1,4 +1,11 @@
-import { At, SxClass, Symbol, SymbolProperty, SymbolPin, TextEffects } from "lib/sexpr"
+import {
+  At,
+  SxClass,
+  SchematicSymbol,
+  SymbolProperty,
+  SymbolPin,
+  TextEffects,
+} from "lib/sexpr"
 import { expect, test } from "bun:test"
 
 test("Symbol parse", () => {
@@ -19,8 +26,8 @@ test("Symbol parse", () => {
     )
   `)
 
-  expect(symbol).toBeInstanceOf(Symbol)
-  const sym = symbol as Symbol
+  expect(symbol).toBeInstanceOf(SchematicSymbol)
+  const sym = symbol as SchematicSymbol
   expect(sym.libraryIdentifier).toBe("Device:R")
   expect(sym.position).toBeInstanceOf(At)
   expect(sym.unit).toBe(2)

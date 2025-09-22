@@ -9,7 +9,7 @@ import { toNumberValue } from "../utils/toNumberValue"
 import { parseYesNo } from "../utils/parseYesNo"
 import { indentLines } from "../utils/indentLines"
 
-export class Symbol extends SxClass {
+export class SchematicSymbol extends SxClass {
   static override token = "symbol"
   static override rawArgs = true
   token = "symbol"
@@ -131,8 +131,10 @@ export class Symbol extends SxClass {
 
     if (this.position) pushLines(this.position.getString())
     if (this.unit !== undefined) pushLines(`(unit ${this.unit})`)
-    if (this.inBom !== undefined) pushLines(`(in_bom ${this.inBom ? "yes" : "no"})`)
-    if (this.onBoard !== undefined) pushLines(`(on_board ${this.onBoard ? "yes" : "no"})`)
+    if (this.inBom !== undefined)
+      pushLines(`(in_bom ${this.inBom ? "yes" : "no"})`)
+    if (this.onBoard !== undefined)
+      pushLines(`(on_board ${this.onBoard ? "yes" : "no"})`)
     if (this.uuid) pushLines(this.uuid.getString())
 
     for (const property of this.properties) {
@@ -153,7 +155,7 @@ export class Symbol extends SxClass {
     return lines.join("\n")
   }
 }
-SxClass.register(Symbol)
+SxClass.register(SchematicSymbol)
 
 export class SymbolProperty extends SxClass {
   static override token = "property"
@@ -286,9 +288,8 @@ export class SymbolPin extends SxClass {
   }
 
   override getString(): string {
-    const header = this.name !== undefined
-      ? `(pin ${quoteSExprString(this.name)}`
-      : "(pin"
+    const header =
+      this.name !== undefined ? `(pin ${quoteSExprString(this.name)}` : "(pin"
 
     const body: string[] = []
     if (this.uuid) {
