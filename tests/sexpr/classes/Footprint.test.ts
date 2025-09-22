@@ -4,6 +4,9 @@ import {
   FootprintPrivateLayers,
   FootprintSolderMaskMargin,
   FpText,
+  FpTextBox,
+  FpRect,
+  FpCircle,
   Layer,
   SxClass,
 } from "lib/sexpr"
@@ -37,6 +40,20 @@ test("Footprint", () => {
         (layer F.SilkS)
         (effects (font (size 1.2 1.2) (thickness 0.18)))
         (uuid 99999999-aaaa-bbbb-cccc-dddddddddddd)
+      )
+      (fp_rect
+        (start -2 -2)
+        (end 2 2)
+        (layer F.Cu)
+        (stroke (width 0.1) (type solid) (color 0 0 0 1))
+        (uuid 22222222-3333-4444-5555-666666666666)
+      )
+      (fp_circle locked
+        (center 0 0)
+        (end 1 0)
+        (layer F.SilkS)
+        (stroke (width 0.05) (type dash) (color 0.5 0.5 0.5 1))
+        (uuid 77777777-8888-9999-aaaa-bbbbbbbbbbbb)
       )
     )
   `)
@@ -73,11 +90,21 @@ test("Footprint", () => {
   expect(text.layer?.names).toEqual(["F.SilkS"])
   expect(text.effects).toBeDefined()
   expect(footprint.fpTextBoxes.length).toBe(1)
-  const textBox = footprint.fpTextBoxes[0]
+  const textBox = footprint.fpTextBoxes[0] as FpTextBox
   expect(textBox.locked).toBe(true)
   expect(textBox.text).toBe("Label")
   expect(textBox.start?.x).toBe(-1)
   expect(textBox.end?.y).toBe(1)
+  expect(footprint.fpRects.length).toBe(1)
+  const rect = footprint.fpRects[0] as FpRect
+  expect(rect.start?.x).toBe(-2)
+  expect(rect.end?.y).toBe(2)
+  expect(rect.layer?.names).toEqual(["F.Cu"])
+  expect(rect.stroke).toBeDefined()
+  expect(footprint.fpCircles.length).toBe(1)
+  const circle = footprint.fpCircles[0] as FpCircle
+  expect(circle.center?.x).toBe(0)
+  expect(circle.end?.x).toBe(1)
   expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
@@ -131,6 +158,29 @@ test("Footprint", () => {
           )
         )
         (uuid 99999999-aaaa-bbbb-cccc-dddddddddddd)
+      )
+      (fp_rect
+        (start -2 -2)
+        (end 2 2)
+        (layer F.Cu)
+        (stroke
+          (width 0.1)
+          (type solid)
+          (color 0 0 0 1)
+        )
+        (uuid 22222222-3333-4444-5555-666666666666)
+      )
+      (fp_circle
+        (center 0 0)
+        (end 1 0)
+        (layer F.SilkS)
+        (stroke
+          (width 0.05)
+          (type dash)
+          (color 0.5 0.5 0.5 1)
+        )
+        (uuid 77777777-8888-9999-aaaa-bbbbbbbbbbbb)
+        locked
       )
     )"
   `)
