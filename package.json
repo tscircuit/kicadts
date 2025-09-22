@@ -2,7 +2,10 @@
   "name": "kicadts",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "scripts": {
+    "download-references": "bun run scripts/download-references.ts",
+    "download-demos": "git clone --depth 1 --filter=blob:none --sparse git@gitlab.com:kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
     "@types/bun": "latest"

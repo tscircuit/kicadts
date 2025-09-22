@@ -3,10 +3,11 @@ import {
   FootprintAttr,
   FootprintPrivateLayers,
   FootprintSolderMaskMargin,
+  FpArc,
+  FpCircle,
+  FpRect,
   FpText,
   FpTextBox,
-  FpRect,
-  FpCircle,
   Layer,
   SxClass,
 } from "lib/sexpr"
@@ -54,6 +55,14 @@ test("Footprint", () => {
         (layer F.SilkS)
         (stroke (width 0.05) (type dash) (color 0.5 0.5 0.5 1))
         (uuid 77777777-8888-9999-aaaa-bbbbbbbbbbbb)
+      )
+      (fp_arc
+        (start -3 0)
+        (mid 0 1)
+        (end 3 0)
+        (layer F.SilkS)
+        (stroke (width 0.08) (type solid) (color 0 0 0 1))
+        (uuid 33333333-4444-5555-6666-777777777777)
       )
     )
   `)
@@ -105,6 +114,11 @@ test("Footprint", () => {
   const circle = footprint.fpCircles[0] as FpCircle
   expect(circle.center?.x).toBe(0)
   expect(circle.end?.x).toBe(1)
+  expect(footprint.fpArcs.length).toBe(1)
+  const arc = footprint.fpArcs[0] as FpArc
+  expect(arc.start?.x).toBe(-3)
+  expect(arc.mid?.y).toBe(1)
+  expect(arc.end?.x).toBe(3)
   expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
@@ -181,6 +195,18 @@ test("Footprint", () => {
         )
         (uuid 77777777-8888-9999-aaaa-bbbbbbbbbbbb)
         locked
+      )
+      (fp_arc
+        (start -3 0)
+        (mid 0 1)
+        (end 3 0)
+        (layer F.SilkS)
+        (stroke
+          (width 0.08)
+          (type solid)
+          (color 0 0 0 1)
+        )
+        (uuid 33333333-4444-5555-6666-777777777777)
       )
     )"
   `)

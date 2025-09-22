@@ -10,6 +10,7 @@ import { FpText } from "./FpText"
 import { FpTextBox } from "./FpTextBox"
 import { FpRect } from "./FpRect"
 import { FpCircle } from "./FpCircle"
+import { FpArc } from "./FpArc"
 
 export class Footprint extends SxClass {
   static override token = "footprint"
@@ -43,6 +44,7 @@ export class Footprint extends SxClass {
   fpTextBoxes: FpTextBox[] = []
   fpRects: FpRect[] = []
   fpCircles: FpCircle[] = []
+  fpArcs: FpArc[] = []
   extraItems: PrimitiveSExpr[] = []
 
   constructor(args: PrimitiveSExpr[]) {
@@ -173,6 +175,9 @@ export class Footprint extends SxClass {
         case "fp_circle":
           this.fpCircles.push(new FpCircle(rest as PrimitiveSExpr[]))
           break
+        case "fp_arc":
+          this.fpArcs.push(new FpArc(rest as PrimitiveSExpr[]))
+          break
         default:
           this.extraItems.push(arg)
           break
@@ -242,6 +247,10 @@ export class Footprint extends SxClass {
 
     for (const fpCircle of this.fpCircles) {
       push(fpCircle)
+    }
+
+    for (const fpArc of this.fpArcs) {
+      push(fpArc)
     }
 
     for (const item of this.extraItems) {
