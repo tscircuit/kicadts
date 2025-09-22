@@ -5,6 +5,7 @@ import {
   FootprintSolderMaskMargin,
   FpArc,
   FpCircle,
+  FpPoly,
   FpRect,
   FpText,
   FpTextBox,
@@ -62,7 +63,14 @@ test("Footprint", () => {
         (end 3 0)
         (layer F.SilkS)
         (stroke (width 0.08) (type solid) (color 0 0 0 1))
-        (uuid 33333333-4444-5555-6666-777777777777)
+        (uuid 44444444-5555-6666-7777-888888888888)
+      )
+      (fp_poly
+        (pts (xy 0 0) (xy 2 0) (xy 2 2) (xy 0 2))
+        (layer F.Mask)
+        (stroke (width 0.05) (type solid) (color 0 0 0 1))
+        (fill yes)
+        (uuid 99999999-aaaa-bbbb-cccc-eeeeeeeeeeee)
       )
     )
   `)
@@ -119,6 +127,10 @@ test("Footprint", () => {
   expect(arc.start?.x).toBe(-3)
   expect(arc.mid?.y).toBe(1)
   expect(arc.end?.x).toBe(3)
+  expect(footprint.fpPolys.length).toBe(1)
+  const poly = footprint.fpPolys[0] as FpPoly
+  expect(poly.points?.points.length).toBe(4)
+  expect(poly.fill?.filled).toBe(true)
   expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
@@ -206,7 +218,23 @@ test("Footprint", () => {
           (type solid)
           (color 0 0 0 1)
         )
-        (uuid 33333333-4444-5555-6666-777777777777)
+        (uuid 44444444-5555-6666-7777-888888888888)
+      )
+      (fp_poly
+        (pts
+          (xy 0 0)
+          (xy 2 0)
+          (xy 2 2)
+          (xy 0 2)
+        )
+        (layer F.Mask)
+        (stroke
+          (width 0.05)
+          (type solid)
+          (color 0 0 0 1)
+        )
+        (fill yes)
+        (uuid 99999999-aaaa-bbbb-cccc-eeeeeeeeeeee)
       )
     )"
   `)
