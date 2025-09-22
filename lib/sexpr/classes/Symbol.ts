@@ -4,36 +4,10 @@ import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { At } from "./At"
 import { Uuid } from "./Uuid"
 import { TextEffects } from "./TextEffects"
-
-const toStringValue = (value: PrimitiveSExpr | undefined): string | undefined => {
-  if (value === undefined) return undefined
-  if (typeof value === "string") return value
-  if (typeof value === "number" || typeof value === "boolean") return String(value)
-  return undefined
-}
-
-const toNumberValue = (value: PrimitiveSExpr | undefined): number | undefined => {
-  if (value === undefined) return undefined
-  if (typeof value === "number") return value
-  if (typeof value === "string") {
-    const parsed = Number(value)
-    return Number.isNaN(parsed) ? undefined : parsed
-  }
-  return undefined
-}
-
-const parseYesNo = (value: PrimitiveSExpr | undefined): boolean | undefined => {
-  const str = toStringValue(value)
-  if (!str) return undefined
-  if (str === "yes" || str === "true") return true
-  if (str === "no" || str === "false") return false
-  return undefined
-}
-
-const indentLines = (value: string): string[] => {
-  const segments = value.split("\n")
-  return segments.map((segment) => `  ${segment}`)
-}
+import { toStringValue } from "../utils/toStringValue"
+import { toNumberValue } from "../utils/toNumberValue"
+import { parseYesNo } from "../utils/parseYesNo"
+import { indentLines } from "../utils/indentLines"
 
 export class Symbol extends SxClass {
   static override token = "symbol"

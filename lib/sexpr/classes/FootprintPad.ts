@@ -1,28 +1,14 @@
 import { SxClass } from "../base-classes/SxClass"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { strokeFromArgs } from "../utils/strokeFromArgs"
+import { toStringValue } from "../utils/toStringValue"
+import { toNumberValue } from "../utils/toNumberValue"
 import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { At } from "./At"
 import { Uuid } from "./Uuid"
 import { Property } from "./Property"
 import { Width } from "./Width"
 import { Stroke } from "./Stroke"
-
-const toNumber = (value: PrimitiveSExpr): number | undefined => {
-  if (typeof value === "number") return value
-  if (typeof value === "string") {
-    const parsed = Number(value)
-    return Number.isNaN(parsed) ? undefined : parsed
-  }
-  return undefined
-}
-
-const toStringValue = (value: PrimitiveSExpr | undefined): string | undefined => {
-  if (value === undefined) return undefined
-  if (typeof value === "string") return value
-  if (typeof value === "number" || typeof value === "boolean") return String(value)
-  return undefined
-}
 
 type PadSize = { width: number; height: number }
 type PadLayers = string[]
@@ -150,9 +136,9 @@ export class FootprintPad extends SxClass {
 
       if (token in numberTokenMap) {
         const mappedKey = numberTokenMap[token]
-        const num = toNumber(restArgs[0])
+        const num = toNumberValue(restArgs[0])
         if (num !== undefined) {
-          this[mappedKey] = num
+          ;(this as any)[mappedKey] = num
         } else {
           this.extras.push(arg)
         }
@@ -161,7 +147,9 @@ export class FootprintPad extends SxClass {
 
       switch (token) {
         case "at": {
-          const coords = restArgs.map(toNumber).filter((n): n is number => n !== undefined)
+          const coords = restArgs
+            .map((value) => toNumberValue(value))
+            .filter((n): n is number => n !== undefined)
           if (coords.length >= 2) {
             this.at = new At(coords as [number, number, number?])
           } else {
@@ -170,8 +158,8 @@ export class FootprintPad extends SxClass {
           break
         }
         case "size": {
-          const width = toNumber(restArgs[0])
-          const height = toNumber(restArgs[1])
+          const width = toNumberValue(restArgs[0])
+          const height = toNumberValue(restArgs[1])
           if (width !== undefined && height !== undefined) {
             this.size = { width, height }
           } else {
@@ -204,7 +192,7 @@ export class FootprintPad extends SxClass {
           break
         }
         case "width": {
-          const num = toNumber(restArgs[0])
+          const num = toNumberValue(restArgs[0])
           if (num !== undefined) {
             this.width = new Width([num])
           } else {
@@ -222,7 +210,7 @@ export class FootprintPad extends SxClass {
           break
         }
         case "roundrect_rratio": {
-          const num = toNumber(restArgs[0])
+          const num = toNumberValue(restArgs[0])
           if (num !== undefined) {
             this.roundrectRatio = num
           } else {
@@ -231,7 +219,7 @@ export class FootprintPad extends SxClass {
           break
         }
         case "chamfer_ratio": {
-          const num = toNumber(restArgs[0])
+          const num = toNumberValue(restArgs[0])
           if (num !== undefined) {
             this.chamferRatio = num
           } else {
@@ -246,7 +234,7 @@ export class FootprintPad extends SxClass {
           break
         }
         case "net": {
-          const id = toNumber(restArgs[0])
+          const id = toNumberValue(restArgs[0])
           const name = toStringValue(restArgs[1])
           if (id !== undefined && name !== undefined) {
             this.net = { id, name }
@@ -372,11 +360,11 @@ const parsePadDrill = (args: PrimitiveSExpr[]): PadDrill | undefined => {
     remaining.shift()
   }
 
-  const diameter = toNumber(remaining.shift() as PrimitiveSExpr)
+  const diameter = toNumberValue(remaining.shift() as PrimitiveSExpr)
   if (diameter === undefined) return undefined
   drill.diameter = diameter
 
-  const width = toNumber(remaining[0] as PrimitiveSExpr)
+  const width = toNumberValue(remaining[0] as PrimitiveSExpr)
   if (width !== undefined) {
     drill.width = width
     remaining.shift()
@@ -385,8 +373,8 @@ const parsePadDrill = (args: PrimitiveSExpr[]): PadDrill | undefined => {
   while (remaining.length) {
     const next = remaining.shift()
     if (Array.isArray(next) && next[0] === "offset") {
-      const x = toNumber(next[1])
-      const y = toNumber(next[2])
+      const x = toNumberValue(next[1] as PrimitiveSExpr)
+      const y = toNumberValue(next[2] as PrimitiveSExpr)
       if (x !== undefined && y !== undefined) {
         drill.offset = { x, y }
       } else {
