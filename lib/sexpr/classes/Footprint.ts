@@ -5,6 +5,8 @@ import { At } from "./At"
 import { Xy } from "./Xy"
 import { Uuid } from "./Uuid"
 import { Property } from "./Property"
+import { Layer } from "./Layer"
+import { FpText } from "./FpText"
 
 export class Footprint extends SxClass {
   static override token = "footprint"
@@ -14,7 +16,7 @@ export class Footprint extends SxClass {
   libraryLink?: string
   locked = false
   placed = false
-  layer?: FootprintLayer
+  layer?: Layer
   tedit?: FootprintTedit
   uuid?: Uuid
   position?: At | Xy
@@ -34,6 +36,7 @@ export class Footprint extends SxClass {
   attr?: FootprintAttr
   privateLayers?: FootprintPrivateLayers
   netTiePadGroups?: FootprintNetTiePadGroups
+  fpTexts: FpText[] = []
   extraItems: PrimitiveSExpr[] = []
 
   constructor(args: PrimitiveSExpr[]) {
@@ -70,7 +73,7 @@ export class Footprint extends SxClass {
 
       switch (token) {
         case "layer":
-          this.layer = new FootprintLayer(rest as PrimitiveSExpr[])
+          this.layer = new Layer(rest as PrimitiveSExpr[])
           break
         case "tedit":
           this.tedit = new FootprintTedit(rest as [string])
@@ -88,10 +91,7 @@ export class Footprint extends SxClass {
           break
         }
         case "xy": {
-          const coords = rest.map((value) => Number(value)) as [
-            number,
-            number,
-          ]
+          const coords = rest.map((value) => Number(value)) as [number, number]
           this.position = new Xy(coords)
           break
         }
@@ -111,16 +111,24 @@ export class Footprint extends SxClass {
           this.autoplaceCost90 = new FootprintAutoplaceCost90(rest as [number])
           break
         case "autoplace_cost180":
-          this.autoplaceCost180 = new FootprintAutoplaceCost180(rest as [number])
+          this.autoplaceCost180 = new FootprintAutoplaceCost180(
+            rest as [number],
+          )
           break
         case "solder_mask_margin":
-          this.solderMaskMargin = new FootprintSolderMaskMargin(rest as [number])
+          this.solderMaskMargin = new FootprintSolderMaskMargin(
+            rest as [number],
+          )
           break
         case "solder_paste_margin":
-          this.solderPasteMargin = new FootprintSolderPasteMargin(rest as [number])
+          this.solderPasteMargin = new FootprintSolderPasteMargin(
+            rest as [number],
+          )
           break
         case "solder_paste_ratio":
-          this.solderPasteRatio = new FootprintSolderPasteRatio(rest as [number])
+          this.solderPasteRatio = new FootprintSolderPasteRatio(
+            rest as [number],
+          )
           break
         case "clearance":
           this.clearance = new FootprintClearance(rest as [number])
@@ -138,12 +146,17 @@ export class Footprint extends SxClass {
           this.attr = new FootprintAttr(rest as PrimitiveSExpr[])
           break
         case "private_layers":
-          this.privateLayers = new FootprintPrivateLayers(rest as PrimitiveSExpr[])
+          this.privateLayers = new FootprintPrivateLayers(
+            rest as PrimitiveSExpr[],
+          )
           break
         case "net_tie_pad_groups":
           this.netTiePadGroups = new FootprintNetTiePadGroups(
             rest as PrimitiveSExpr[],
           )
+          break
+        case "fp_text":
+          this.fpTexts.push(new FpText(rest as PrimitiveSExpr[]))
           break
         default:
           this.extraItems.push(arg)
@@ -200,6 +213,10 @@ export class Footprint extends SxClass {
     push(this.privateLayers)
     push(this.netTiePadGroups)
 
+    for (const fpText of this.fpTexts) {
+      push(fpText)
+    }
+
     for (const item of this.extraItems) {
       lines.push(`  ${printSExpr(item)}`)
     }
@@ -209,26 +226,6 @@ export class Footprint extends SxClass {
   }
 }
 SxClass.register(Footprint)
-
-export class FootprintLayer extends SxClass {
-  static override token = "layer"
-  static override parentToken = "footprint"
-  static override rawArgs = true
-  token = "layer"
-
-  layers: string[]
-
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    this.layers = args.map((item) => String(item))
-  }
-
-  override getString(): string {
-    return `(layer ${this.layers.join(" ")})`
-  }
-}
-SxClass.register(FootprintLayer)
-
 export class FootprintTedit extends SxClass {
   static override token = "tedit"
   static override parentToken = "footprint"
@@ -319,7 +316,7 @@ class FootprintNumberClass extends SxClass {
 export class FootprintAutoplaceCost90 extends FootprintNumberClass {
   static override token = "autoplace_cost90"
   static override parentToken = "footprint"
-  token = "autoplace_cost90"
+  override token = "autoplace_cost90"
 
   constructor(args: [number]) {
     super("autoplace_cost90", args)
@@ -330,7 +327,7 @@ SxClass.register(FootprintAutoplaceCost90)
 export class FootprintAutoplaceCost180 extends FootprintNumberClass {
   static override token = "autoplace_cost180"
   static override parentToken = "footprint"
-  token = "autoplace_cost180"
+  override token = "autoplace_cost180"
 
   constructor(args: [number]) {
     super("autoplace_cost180", args)
@@ -341,7 +338,7 @@ SxClass.register(FootprintAutoplaceCost180)
 export class FootprintSolderMaskMargin extends FootprintNumberClass {
   static override token = "solder_mask_margin"
   static override parentToken = "footprint"
-  token = "solder_mask_margin"
+  override token = "solder_mask_margin"
 
   constructor(args: [number]) {
     super("solder_mask_margin", args)
@@ -352,7 +349,7 @@ SxClass.register(FootprintSolderMaskMargin)
 export class FootprintSolderPasteMargin extends FootprintNumberClass {
   static override token = "solder_paste_margin"
   static override parentToken = "footprint"
-  token = "solder_paste_margin"
+  override token = "solder_paste_margin"
 
   constructor(args: [number]) {
     super("solder_paste_margin", args)
@@ -363,7 +360,7 @@ SxClass.register(FootprintSolderPasteMargin)
 export class FootprintSolderPasteRatio extends FootprintNumberClass {
   static override token = "solder_paste_ratio"
   static override parentToken = "footprint"
-  token = "solder_paste_ratio"
+  override token = "solder_paste_ratio"
 
   constructor(args: [number]) {
     super("solder_paste_ratio", args)
@@ -374,7 +371,7 @@ SxClass.register(FootprintSolderPasteRatio)
 export class FootprintClearance extends FootprintNumberClass {
   static override token = "clearance"
   static override parentToken = "footprint"
-  token = "clearance"
+  override token = "clearance"
 
   constructor(args: [number]) {
     super("clearance", args)
@@ -385,7 +382,7 @@ SxClass.register(FootprintClearance)
 export class FootprintZoneConnect extends FootprintNumberClass {
   static override token = "zone_connect"
   static override parentToken = "footprint"
-  token = "zone_connect"
+  override token = "zone_connect"
 
   constructor(args: [number]) {
     super("zone_connect", args)
@@ -396,7 +393,7 @@ SxClass.register(FootprintZoneConnect)
 export class FootprintThermalWidth extends FootprintNumberClass {
   static override token = "thermal_width"
   static override parentToken = "footprint"
-  token = "thermal_width"
+  override token = "thermal_width"
 
   constructor(args: [number]) {
     super("thermal_width", args)
@@ -407,7 +404,7 @@ SxClass.register(FootprintThermalWidth)
 export class FootprintThermalGap extends FootprintNumberClass {
   static override token = "thermal_gap"
   static override parentToken = "footprint"
-  token = "thermal_gap"
+  override token = "thermal_gap"
 
   constructor(args: [number]) {
     super("thermal_gap", args)

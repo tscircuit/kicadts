@@ -3,6 +3,7 @@ import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import type { At } from "./At"
 import type { Xy } from "./Xy"
 import { Uuid } from "./Uuid"
+import { Layer } from "./Layer"
 
 export type ImageClassProperty = SxClass | PrimitiveSExpr
 
@@ -67,19 +68,19 @@ export class Image extends SxClass {
     this.setProperty("scale", scaleClass)
   }
 
-  get layer(): ImageLayer | undefined {
-    return this.getProperty("layer") as ImageLayer | undefined
+  get layer(): Layer | undefined {
+    return this.getProperty("layer") as Layer | undefined
   }
 
-  set layer(value: ImageLayer | string[] | string | undefined) {
+  set layer(value: Layer | string[] | string | undefined) {
     if (value === undefined) {
       if (this._propertyMap) delete this._propertyMap["layer"]
       return
     }
     const layerClass =
-      value instanceof ImageLayer
+      value instanceof Layer
         ? value
-        : new ImageLayer(Array.isArray(value) ? value : [value])
+        : new Layer(Array.isArray(value) ? value : [value])
     this.setProperty("layer", layerClass)
   }
 
@@ -167,25 +168,6 @@ export class ImageScale extends SxClass {
   }
 }
 SxClass.register(ImageScale)
-
-export class ImageLayer extends SxClass {
-  static override token = "layer"
-  static override parentToken = "image"
-  static override rawArgs = true
-  token = "layer"
-
-  layers: string[]
-
-  constructor(args: string[]) {
-    super()
-    this.layers = args.map(String)
-  }
-
-  override getString(): string {
-    return `(layer ${this.layers.join(" ")})`
-  }
-}
-SxClass.register(ImageLayer)
 
 export class ImageData extends SxClass {
   static override token = "data"

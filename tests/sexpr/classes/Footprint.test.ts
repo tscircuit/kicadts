@@ -1,9 +1,10 @@
 import {
   Footprint,
   FootprintAttr,
-  FootprintLayer,
   FootprintPrivateLayers,
   FootprintSolderMaskMargin,
+  FpText,
+  Layer,
   SxClass,
 } from "lib/sexpr"
 import { expect, test } from "bun:test"
@@ -38,7 +39,7 @@ test("Footprint", () => {
   expect(footprint.libraryLink).toBe("Resistor_SMD:R_0603")
   expect(footprint.locked).toBe(true)
   expect(footprint.placed).toBe(true)
-  expect(footprint.layer).toBeInstanceOf(FootprintLayer)
+  expect(footprint.layer).toBeInstanceOf(Layer)
   expect(footprint.tedit?.value).toBe("5E4C0E65")
   expect(footprint.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
   expect(footprint.position?.x).toBe(10.16)
@@ -57,7 +58,13 @@ test("Footprint", () => {
   expect(footprint.privateLayers).toBeInstanceOf(FootprintPrivateLayers)
   expect(footprint.privateLayers?.layers).toEqual(["F.CrtYd", "B.CrtYd"])
   expect(footprint.netTiePadGroups?.groups).toEqual(["A,B", "C,D"])
-  expect(footprint.extraItems.length).toBeGreaterThan(0)
+  expect(footprint.fpTexts.length).toBe(1)
+  const text = footprint.fpTexts[0] as FpText
+  expect(text.type).toBe("reference")
+  expect(text.text).toBe("R1")
+  expect(text.layer?.names).toEqual(["F.SilkS"])
+  expect(text.effects).toBeDefined()
+  expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
   footprint.placed = false
@@ -79,7 +86,18 @@ test("Footprint", () => {
       (attr smd exclude_from_bom)
       (private_layers F.CrtYd B.CrtYd)
       (net_tie_pad_groups \"A,B\" \"C,D\")
-      (fp_text reference R1 (at 0 0) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
+      (fp_text
+        reference
+        \"R1\"
+        (at 0 0)
+        (layer F.SilkS)
+        (effects
+          (font
+            (size 1 1)
+            (thickness 0.15)
+          )
+        )
+      )
     )"
   `)
 })

@@ -1,4 +1,4 @@
-import { At, Image, ImageData, ImageLayer, ImageScale, SxClass, Uuid } from "lib/sexpr"
+import { At, Image, ImageData, ImageScale, Layer, SxClass, Uuid } from "lib/sexpr"
 import { expect, test } from "bun:test"
 
 test("Image", () => {
@@ -23,8 +23,8 @@ test("Image", () => {
   const scale = img.scale as ImageScale
   expect(scale.value).toBe(0.75)
 
-  const layer = img.layer as ImageLayer
-  expect(layer.layers).toEqual(["F.SilkS", "B.SilkS"])
+  const layer = img.layer as Layer
+  expect(layer.names).toEqual(["F.SilkS", "B.SilkS"])
 
   const uuid = img.uuid as Uuid
   expect(uuid.value).toBe("12345678-1234-1234-1234-123456789abc")
