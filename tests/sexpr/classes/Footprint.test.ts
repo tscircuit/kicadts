@@ -30,6 +30,14 @@ test("Footprint", () => {
       (fp_text reference R1 (at 0 0) (layer F.SilkS)
         (effects (font (size 1 1) (thickness 0.15)))
       )
+      (fp_text_box locked "Label"
+        (start -1 -1)
+        (end 1 1)
+        (pts (xy -1 -1) (xy 1 -1) (xy 1 1) (xy -1 1))
+        (layer F.SilkS)
+        (effects (font (size 1.2 1.2) (thickness 0.18)))
+        (uuid 99999999-aaaa-bbbb-cccc-dddddddddddd)
+      )
     )
   `)
 
@@ -64,6 +72,12 @@ test("Footprint", () => {
   expect(text.text).toBe("R1")
   expect(text.layer?.names).toEqual(["F.SilkS"])
   expect(text.effects).toBeDefined()
+  expect(footprint.fpTextBoxes.length).toBe(1)
+  const textBox = footprint.fpTextBoxes[0]
+  expect(textBox.locked).toBe(true)
+  expect(textBox.text).toBe("Label")
+  expect(textBox.start?.x).toBe(-1)
+  expect(textBox.end?.y).toBe(1)
   expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
@@ -97,6 +111,26 @@ test("Footprint", () => {
             (thickness 0.15)
           )
         )
+      )
+      (fp_text_box
+        locked
+        \"Label\"
+        (start -1 -1)
+        (end 1 1)
+        (pts
+          (xy -1 -1)
+          (xy 1 -1)
+          (xy 1 1)
+          (xy -1 1)
+        )
+        (layer F.SilkS)
+        (effects
+          (font
+            (size 1.2 1.2)
+            (thickness 0.18)
+          )
+        )
+        (uuid 99999999-aaaa-bbbb-cccc-dddddddddddd)
       )
     )"
   `)

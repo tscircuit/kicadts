@@ -7,6 +7,7 @@ import { Uuid } from "./Uuid"
 import { Property } from "./Property"
 import { Layer } from "./Layer"
 import { FpText } from "./FpText"
+import { FpTextBox } from "./FpTextBox"
 
 export class Footprint extends SxClass {
   static override token = "footprint"
@@ -37,6 +38,7 @@ export class Footprint extends SxClass {
   privateLayers?: FootprintPrivateLayers
   netTiePadGroups?: FootprintNetTiePadGroups
   fpTexts: FpText[] = []
+  fpTextBoxes: FpTextBox[] = []
   extraItems: PrimitiveSExpr[] = []
 
   constructor(args: PrimitiveSExpr[]) {
@@ -158,6 +160,9 @@ export class Footprint extends SxClass {
         case "fp_text":
           this.fpTexts.push(new FpText(rest as PrimitiveSExpr[]))
           break
+        case "fp_text_box":
+          this.fpTextBoxes.push(new FpTextBox(rest as PrimitiveSExpr[]))
+          break
         default:
           this.extraItems.push(arg)
           break
@@ -215,6 +220,10 @@ export class Footprint extends SxClass {
 
     for (const fpText of this.fpTexts) {
       push(fpText)
+    }
+
+    for (const fpTextBox of this.fpTextBoxes) {
+      push(fpTextBox)
     }
 
     for (const item of this.extraItems) {

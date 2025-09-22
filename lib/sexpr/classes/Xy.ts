@@ -12,5 +12,9 @@ export class Xy extends SxClass {
     this.x = args[0]
     this.y = args[1]
   }
+
+  override getString(): string {
+    return `(xy ${this.x} ${this.y})`
+  }
 }
 SxClass.register(Xy)
