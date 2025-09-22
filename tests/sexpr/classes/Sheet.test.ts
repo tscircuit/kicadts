@@ -14,7 +14,10 @@ test("Sheet", () => {
         (at 0 0 0)
         (effects (font (size 1.27 1.27) (thickness 0.1524)))
       )
-      (pin "IN" (uuid 11111111-2222-3333-4444-555555555555))
+      (pin "IN" input (at 50.8 0 180)
+        (effects (font (size 1 1) (thickness 0.15)))
+        (uuid 11111111-2222-3333-4444-555555555555)
+      )
       (instances (project Project (path /0001 (page "1"))))
     )
   `)
@@ -30,6 +33,11 @@ test("Sheet", () => {
   expect(s.properties[0]).toBeInstanceOf(SheetProperty)
   expect(s.pins).toHaveLength(1)
   expect(s.pins[0]).toBeInstanceOf(SheetPin)
+  const pin = s.pins[0]
+  expect(pin.name).toBe("IN")
+  expect(pin.electricalType).toBe("input")
+  expect(pin.position).toBeInstanceOf(At)
+  expect(pin.effects).toBeDefined()
   expect(s.instances).toBeDefined()
 
   expect(s.getString()).toMatchInlineSnapshot(`
@@ -53,7 +61,14 @@ test("Sheet", () => {
           )
         )
       )
-      (pin \"IN\"
+      (pin \"IN\" input
+        (at 50.8 0 180)
+        (effects
+          (font
+            (size 1 1)
+            (thickness 0.15)
+          )
+        )
         (uuid 11111111-2222-3333-4444-555555555555)
       )
       (instances
