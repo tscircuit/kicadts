@@ -77,121 +77,129 @@ export class Footprint extends SxClass {
         continue
       }
 
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
+      let parsed: unknown
+      try {
+        parsed = SxClass.parsePrimitiveSexpr(arg, { parentToken: this.token })
+      } catch (error) {
         this.extraItems.push(arg)
         continue
       }
 
-      switch (token) {
-        case "layer":
-          this.layer = new Layer(rest as PrimitiveSExpr[])
-          break
-        case "tedit":
-          this.tedit = new FootprintTedit(rest as [string])
-          break
-        case "uuid":
-          this.uuid = new Uuid(rest as [string])
-          break
-        case "at": {
-          const coords = rest.map((value) => Number(value)) as [
-            number,
-            number,
-            number?,
-          ]
-          this.position = new At(coords)
-          break
-        }
-        case "xy": {
-          const coords = rest.map((value) => Number(value)) as [number, number]
-          this.position = new Xy(coords)
-          break
-        }
-        case "descr":
-          this.descr = new FootprintDescr(rest as [string])
-          break
-        case "tags":
-          this.tags = new FootprintTags(rest as [string])
-          break
-        case "property":
-          this.properties.push(new Property(rest as [string, string]))
-          break
-        case "path":
-          this.path = new FootprintPath(rest as [string])
-          break
-        case "autoplace_cost90":
-          this.autoplaceCost90 = new FootprintAutoplaceCost90(rest as [number])
-          break
-        case "autoplace_cost180":
-          this.autoplaceCost180 = new FootprintAutoplaceCost180(
-            rest as [number],
-          )
-          break
-        case "solder_mask_margin":
-          this.solderMaskMargin = new FootprintSolderMaskMargin(
-            rest as [number],
-          )
-          break
-        case "solder_paste_margin":
-          this.solderPasteMargin = new FootprintSolderPasteMargin(
-            rest as [number],
-          )
-          break
-        case "solder_paste_ratio":
-          this.solderPasteRatio = new FootprintSolderPasteRatio(
-            rest as [number],
-          )
-          break
-        case "clearance":
-          this.clearance = new FootprintClearance(rest as [number])
-          break
-        case "zone_connect":
-          this.zoneConnect = new FootprintZoneConnect(rest as [number])
-          break
-        case "thermal_width":
-          this.thermalWidth = new FootprintThermalWidth(rest as [number])
-          break
-        case "thermal_gap":
-          this.thermalGap = new FootprintThermalGap(rest as [number])
-          break
-        case "attr":
-          this.attr = new FootprintAttr(rest as PrimitiveSExpr[])
-          break
-        case "private_layers":
-          this.privateLayers = new FootprintPrivateLayers(
-            rest as PrimitiveSExpr[],
-          )
-          break
-        case "net_tie_pad_groups":
-          this.netTiePadGroups = new FootprintNetTiePadGroups(
-            rest as PrimitiveSExpr[],
-          )
-          break
-        case "fp_text":
-          this.fpTexts.push(new FpText(rest as PrimitiveSExpr[]))
-          break
-        case "fp_text_box":
-          this.fpTextBoxes.push(new FpTextBox(rest as PrimitiveSExpr[]))
-          break
-        case "fp_rect":
-          this.fpRects.push(new FpRect(rest as PrimitiveSExpr[]))
-          break
-        case "fp_circle":
-          this.fpCircles.push(new FpCircle(rest as PrimitiveSExpr[]))
-          break
-        case "fp_arc":
-          this.fpArcs.push(new FpArc(rest as PrimitiveSExpr[]))
-          break
-        case "fp_poly":
-          this.fpPolys.push(new FpPoly(rest as PrimitiveSExpr[]))
-          break
-        case "pad":
-          this.fpPads.push(new FootprintPad(rest as PrimitiveSExpr[]))
-          break
-        default:
-          this.extraItems.push(arg)
-          break
+      if (!(parsed instanceof SxClass)) {
+        this.extraItems.push(arg)
+        continue
       }
+
+      if (parsed instanceof Layer) {
+        this.layer = parsed
+        continue
+      }
+      if (parsed instanceof FootprintTedit) {
+        this.tedit = parsed
+        continue
+      }
+      if (parsed instanceof Uuid) {
+        this.uuid = parsed
+        continue
+      }
+      if (parsed instanceof At || parsed instanceof Xy) {
+        this.position = parsed
+        continue
+      }
+      if (parsed instanceof FootprintDescr) {
+        this.descr = parsed
+        continue
+      }
+      if (parsed instanceof FootprintTags) {
+        this.tags = parsed
+        continue
+      }
+      if (parsed instanceof Property) {
+        this.properties.push(parsed)
+        continue
+      }
+      if (parsed instanceof FootprintPath) {
+        this.path = parsed
+        continue
+      }
+      if (parsed instanceof FootprintAutoplaceCost90) {
+        this.autoplaceCost90 = parsed
+        continue
+      }
+      if (parsed instanceof FootprintAutoplaceCost180) {
+        this.autoplaceCost180 = parsed
+        continue
+      }
+      if (parsed instanceof FootprintSolderMaskMargin) {
+        this.solderMaskMargin = parsed
+        continue
+      }
+      if (parsed instanceof FootprintSolderPasteMargin) {
+        this.solderPasteMargin = parsed
+        continue
+      }
+      if (parsed instanceof FootprintSolderPasteRatio) {
+        this.solderPasteRatio = parsed
+        continue
+      }
+      if (parsed instanceof FootprintClearance) {
+        this.clearance = parsed
+        continue
+      }
+      if (parsed instanceof FootprintZoneConnect) {
+        this.zoneConnect = parsed
+        continue
+      }
+      if (parsed instanceof FootprintThermalWidth) {
+        this.thermalWidth = parsed
+        continue
+      }
+      if (parsed instanceof FootprintThermalGap) {
+        this.thermalGap = parsed
+        continue
+      }
+      if (parsed instanceof FootprintAttr) {
+        this.attr = parsed
+        continue
+      }
+      if (parsed instanceof FootprintPrivateLayers) {
+        this.privateLayers = parsed
+        continue
+      }
+      if (parsed instanceof FootprintNetTiePadGroups) {
+        this.netTiePadGroups = parsed
+        continue
+      }
+      if (parsed instanceof FpText) {
+        this.fpTexts.push(parsed)
+        continue
+      }
+      if (parsed instanceof FpTextBox) {
+        this.fpTextBoxes.push(parsed)
+        continue
+      }
+      if (parsed instanceof FpRect) {
+        this.fpRects.push(parsed)
+        continue
+      }
+      if (parsed instanceof FpCircle) {
+        this.fpCircles.push(parsed)
+        continue
+      }
+      if (parsed instanceof FpArc) {
+        this.fpArcs.push(parsed)
+        continue
+      }
+      if (parsed instanceof FpPoly) {
+        this.fpPolys.push(parsed)
+        continue
+      }
+      if (parsed instanceof FootprintPad) {
+        this.fpPads.push(parsed)
+        continue
+      }
+
+      this.extraItems.push(arg)
     }
   }
 

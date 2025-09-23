@@ -3,6 +3,7 @@ import { quoteSExprString } from "../utils/quoteSExprString"
 
 export class Property extends SxClass {
   static override token = "property"
+  static override rawArgs = true
   token = "property"
 
   key: string

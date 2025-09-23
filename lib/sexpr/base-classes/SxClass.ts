@@ -3,6 +3,8 @@ import {
   type PrimitiveSExpr,
 } from "../parseToPrimitiveSExpr"
 
+const DEFAULT_PARENT_TOKEN = "__default__"
+
 export abstract class SxClass {
   abstract token: string
   static token: string
@@ -70,7 +72,7 @@ export abstract class SxClass {
 
   // =========================== STATIC METHODS ===========================
 
-  static classes: Record<string, SxClass> = {}
+  static classes: Record<string, Record<string, any>> = {}
 
   /**
    * Should be called after class definition to register the class for parsing
@@ -79,7 +81,10 @@ export abstract class SxClass {
     if (!newClass.token) {
       throw new Error("Class must have a static override token")
     }
-    SxClass.classes[newClass.token] = newClass
+    const parentKey = newClass.parentToken ?? DEFAULT_PARENT_TOKEN
+    const existing = SxClass.classes[newClass.token] ?? {}
+    existing[parentKey] = newClass
+    SxClass.classes[newClass.token] = existing
   }
 
   /**
@@ -93,28 +98,42 @@ export abstract class SxClass {
 
   static parsePrimitiveSexpr(
     primitiveSexpr: PrimitiveSExpr,
+    options: { parentToken?: string } = {},
   ): SxClass | SxClass[] | number | string | boolean | null {
+    const parentToken = options.parentToken
+
     if (
       Array.isArray(primitiveSexpr) &&
       primitiveSexpr.length > 1 &&
       typeof primitiveSexpr[0] === "string"
     ) {
       const classToken = primitiveSexpr[0] as string
-      const ClassDef: any = SxClass.classes[classToken]
-      if (!ClassDef) {
+      const classGroup = SxClass.classes[classToken]
+      if (!classGroup) {
         throw new Error(
           `Class "${classToken}" not registered via SxClass.register`,
         )
       }
+      const parentKey = parentToken ?? DEFAULT_PARENT_TOKEN
+      const ClassDef: any =
+        classGroup[parentKey] ?? classGroup[DEFAULT_PARENT_TOKEN]
+      if (!ClassDef) {
+        throw new Error(
+          `Class "${classToken}" not registered for parent "${parentToken ?? "<root>"}"`,
+        )
+      }
+      const args = primitiveSexpr.slice(1) as PrimitiveSExpr[]
       const paramArray = ClassDef.rawArgs
-        ? (primitiveSexpr.slice(1) as PrimitiveSExpr[])
-        : SxClass.parsePrimitiveSexpr(primitiveSexpr.slice(1) as PrimitiveSExpr[])
+        ? args
+        : SxClass.parsePrimitiveSexpr(args, { parentToken: classToken })
       const classInstance = new ClassDef(paramArray)
       return classInstance
     }
 
     if (Array.isArray(primitiveSexpr)) {
-      return primitiveSexpr.map(SxClass.parsePrimitiveSexpr) as any[]
+      return primitiveSexpr.map((item) =>
+        SxClass.parsePrimitiveSexpr(item, options),
+      ) as any[]
     }
 
     if (
