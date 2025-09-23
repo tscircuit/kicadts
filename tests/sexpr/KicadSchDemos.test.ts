@@ -3,6 +3,8 @@ import { KicadSch, SxClass } from "lib/sexpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 import type { PrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 
+import { expectEqualPrimitiveSExpr } from "../fixtures/expectEqualPrimitiveSExpr"
+
 const numericLike = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/
 
 const normalizePrimitive = (value: PrimitiveSExpr): PrimitiveSExpr => {
@@ -42,9 +44,6 @@ test("kicad_sch round-trips kicad demo schematics", async () => {
       normalizePrimitive(form),
     )
 
-    expect({ path, roundTrip: roundTripPrimitive }).toEqual({
-      path,
-      roundTrip: originalPrimitive,
-    })
+    expectEqualPrimitiveSExpr(roundTripPrimitive, originalPrimitive, { path })
   }
 })
