@@ -1,8 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
-import {
-  printSExpr,
-  type PrimitiveSExpr,
-} from "../parseToPrimitiveSExpr"
+import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Paper } from "./Paper"
 import { TitleBlock } from "./TitleBlock"
 import { Property } from "./Property"
@@ -36,33 +33,18 @@ export class KicadPcb extends SxClass {
   footprints: Footprint[] = []
   images: Image[] = []
   otherClasses: SxClass[] = []
-  extras: PrimitiveSExpr[] = []
 
   constructor(args: PrimitiveSExpr[]) {
     super()
 
     for (const arg of args) {
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
+      const parsed = SxClass.parsePrimitiveSexpr(arg, {
+        parentToken: this.token,
+      }) as SxClass
 
-      let parsed: unknown
-      try {
-        parsed = SxClass.parsePrimitiveSexpr(arg, { parentToken: this.token })
-      } catch (error) {
-        this.extras.push(arg)
-        continue
+      if (!this.assignClass(parsed)) {
+        this.otherClasses.push(parsed)
       }
-
-      if (parsed instanceof SxClass) {
-        if (!this.assignClass(parsed)) {
-          this.otherClasses.push(parsed)
-        }
-        continue
-      }
-
-      this.extras.push(arg)
     }
   }
 
@@ -135,7 +117,6 @@ export class KicadPcb extends SxClass {
     children.push(...this.footprints)
     children.push(...this.images)
     children.push(...this.otherClasses)
-    children.push(...this.extras)
 
     return children
   }
