@@ -23,7 +23,6 @@ export class Stroke extends SxClass {
       primitiveSexprs,
       this.token,
     )
-    console.log(propertyMap)
     stroke._sxWidth = propertyMap.width as Width
     stroke._sxType = propertyMap.type as StrokeType
     stroke._sxColor = propertyMap.color as Color
@@ -31,29 +30,29 @@ export class Stroke extends SxClass {
     return stroke
   }
 
-  get width(): number {
-    return this._propertyMap.width!.width
+  get width(): number | undefined {
+    return this._sxWidth?.value
   }
 
-  get type(): StrokeTypeString {
-    return this._propertyMap.type!.type
+  get type(): StrokeTypeString | undefined {
+    return this._sxType?.type
   }
 
-  get color(): RGBAColor {
-    return this._propertyMap.color!.color
+  get color(): RGBAColor | undefined {
+    return this._sxColor?.color
   }
 
   set width(width: number) {
-    this._propertyMap.width = new Width([width])
+    this._sxWidth = new Width(width)
   }
 
   set type(type: StrokeTypeString) {
-    this._propertyMap.type = new StrokeType([type])
+    this._sxType = new StrokeType(type)
   }
 
   set color(color: RGBAColor) {
     // TODO accept color as string
-    this._propertyMap.color = new Color([color.r, color.g, color.b, color.a])
+    this._sxColor = new Color([color.r, color.g, color.b, color.a])
   }
 
   override getChildren() {
