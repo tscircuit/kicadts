@@ -21,9 +21,9 @@ export class SchematicSymbol extends SxClass {
   _sxInBom?: InBom
   _sxOnBoard?: OnBoard
   _sxAt?: At
+  _sxUuid?: Uuid
 
   libraryId?: string
-  uuid?: Uuid
   properties: SymbolProperty[] = []
   pins: SymbolPin[] = []
   instances?: SymbolInstances
@@ -41,6 +41,10 @@ export class SchematicSymbol extends SxClass {
     return this._sxOnBoard?.value
   }
 
+  get uuid(): string | undefined {
+    return this._sxUuid?.value
+  }
+
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SchematicSymbol {
@@ -54,9 +58,8 @@ export class SchematicSymbol extends SxClass {
     symbol._sxAt = propertyMap.at as At
     symbol._sxInBom = propertyMap.in_bom as InBom
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
+    symbol._sxUuid = propertyMap.uuid as Uuid
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
-
-    // TODO
 
     return symbol
   }
@@ -67,6 +70,9 @@ export class SchematicSymbol extends SxClass {
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())
     }
+    lines.push(
+      ...this.properties.map((property) => property.getStringIndented()),
+    )
 
     lines.push(")")
     return lines.join("\n")
@@ -93,21 +99,21 @@ export class SymbolProperty extends SxClass {
   static override parentToken = "symbol"
   token = "property"
 
-  name: string
+  key: string
   value: string
   _sxId: SymbolPropertyId
   _sxAt: At
   _sxEffects: TextEffects
 
   constructor(params: {
-    name: string
+    key: string
     value: string
     id: number | SymbolPropertyId
     at: At
     effects: TextEffects
   }) {
     super()
-    this.name = params.name
+    this.key = params.key
     this.value = params.value
     this._sxId = SymbolPropertyId.from(params.id)
     this._sxAt = params.at
@@ -117,9 +123,10 @@ export class SymbolProperty extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolProperty {
-    const [key, inputValue, idSexpr, atSexpr, effectsSexpr] = primitiveSexprs
+    const [inputKey, inputValue, idSexpr, atSexpr, effectsSexpr] =
+      primitiveSexprs
 
-    const name = toStringValue(key)!
+    const key = toStringValue(inputKey)!
     const value = toStringValue(inputValue)!
     const id = SxClass.parsePrimitiveSexpr(idSexpr!, {
       parentToken: "property",
@@ -132,7 +139,7 @@ export class SymbolProperty extends SxClass {
     }) as TextEffects
 
     return new SymbolProperty({
-      name,
+      key,
       value,
       id,
       at,
@@ -146,6 +153,17 @@ export class SymbolProperty extends SxClass {
 
   set id(value: number) {
     this._sxId.value = value
+  }
+
+  override getString() {
+    const lines = [
+      `(property ${quoteSExprString(this.key)} ${quoteSExprString(this.value)}`,
+      `  (id ${this.id})`,
+      this._sxAt.getStringIndented(),
+      this._sxEffects.getStringIndented(),
+      ")",
+    ]
+    return lines.join("\n")
   }
 }
 SxClass.register(SymbolProperty)

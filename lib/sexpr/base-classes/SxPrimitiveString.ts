@@ -21,6 +21,6 @@ export abstract class SxPrimitiveString extends SxClass {
   }
 
   override getString() {
-    return `(${this.token} ${this.value ? "yes" : "no"})`
+    return `(${this.token} ${this.value})`
   }
 }

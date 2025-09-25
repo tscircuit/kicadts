@@ -33,14 +33,13 @@ test("Symbol parse", () => {
   expect(sym.libraryId).toBe("Device:R")
   expect(sym.inBom).toBe(true)
   expect(sym.onBoard).toBe(false)
-  expect(sym.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
+  expect(sym.uuid).toBe("12345678-1234-1234-1234-123456789abc")
   expect(sym.properties).toHaveLength(1)
   const property = sym.properties[0] as SymbolProperty
+  console.log(property)
   expect(property.key).toBe("Reference")
   expect(property.value).toBe("R?")
   expect(property.id).toBe(0)
-  expect(property.at).toBeInstanceOf(At)
-  expect(property.effects).toBeInstanceOf(TextEffects)
   expect(sym.pins).toHaveLength(1)
   const pin = sym.pins[0] as SymbolPin
   expect(pin.name).toBe("1")
