@@ -2,20 +2,20 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { SxClass } from "./SxClass"
 
 export abstract class SxPrimitiveBoolean extends SxClass {
-  value: number
+  value: boolean
 
-  constructor(v: number) {
+  constructor(v: boolean) {
     super()
     this.value = v
   }
 
-  set(value: number) {
+  set(value: boolean) {
     this.value = value
   }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
-  ): SxPrimitiveNumber {
+  ): SxPrimitiveBoolean {
     const [rawVal] = primitiveSexprs
     let booleanVal: boolean
     if (typeof rawVal === "boolean") {
