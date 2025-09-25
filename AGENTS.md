@@ -24,3 +24,4 @@ most extensive one is `references/SEXPR_MAIN.adoc` (use `bun run scripts/downloa
 - NEW PATTERN: All classes have a `fromSexprPrimitives` static method that takes a `PrimitiveSExpr` array and returns an instance of the class
 - NEW PATTERN: Classes have ergonomic getters and setters for properties
 - NEW PATTERN: Never has "extras" property, everything becomes an `SxClass`
+- NEW PATTERN: Never have "switch cases" that switch on the token. Always use the `SxClass.parsePrimitiveSexpr` method to parse arrays of `PrimitiveSExpr` into instances of the correct class.
