@@ -65,11 +65,31 @@ test("Symbol parse", () => {
           )
         )
       )
-      (pin \"1\"
-        (uuid 87654321-4321-4321-4321-cba987654321)
+      (pin input line
+        (at 0 -5.08 90)
+        (length 2.54)
+        (name \"A\"
+          (effects
+            (font
+              (size 1.27 1.27)
+            )
+          )
+        )
+        (number \"1\"
+          (effects
+            (font
+              (size 1.27 1.27)
+            )
+          )
+        )
       )
       (instances
-        (project Project (path /0001 (reference R1) (unit 1)))
+        (project \"Project\"
+          (path \"/0001\"
+            (reference \"R1\")
+            (unit 1)
+          )
+        )
       )
     )"
   `)
