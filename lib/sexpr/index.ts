@@ -1,4 +1,5 @@
 export * from "./base-classes/SxClass"
+export * from "./base-classes/SxClassWithOrderedChildren"
 export * from "./classes/Stroke"
 export * from "./classes/Width"
 export * from "./classes/StrokeType"
