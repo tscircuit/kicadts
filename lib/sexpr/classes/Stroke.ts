@@ -54,11 +54,5 @@ export class Stroke extends SxClass {
     // TODO accept color as string
     this._sxColor = new Color([color.r, color.g, color.b, color.a])
   }
-
-  override getChildren() {
-    return [this._sxWidth, this._sxType, this._sxColor].filter(
-      Boolean,
-    ) as SxClass[]
-  }
 }
 SxClass.register(Stroke)
