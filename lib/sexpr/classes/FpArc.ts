@@ -7,7 +7,6 @@ import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export class FpArc extends SxClass {
   static override token = "fp_arc"
-  static override rawArgs = true
   token = "fp_arc"
 
   start?: FpArcStart
@@ -60,7 +59,7 @@ export class FpArc extends SxClass {
           break
         }
         case "layer": {
-          this.layer = new Layer(rest as PrimitiveSExpr[])
+          this.layer = Layer.fromSexprPrimitives(rest as PrimitiveSExpr[])
           break
         }
         case "stroke": {

@@ -157,7 +157,7 @@ export class Via extends SxClass {
           break
         }
         case "layers": {
-          this.layers = new Layers(rest as PrimitiveSExpr[])
+          this.layers = Layers.fromSexprPrimitives(rest as PrimitiveSExpr[])
           break
         }
         case "net": {

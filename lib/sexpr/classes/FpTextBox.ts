@@ -91,7 +91,7 @@ export class FpTextBox extends SxClass {
           break
         }
         case "layer": {
-          this.layer = new Layer(rest as PrimitiveSExpr[])
+          this.layer = Layer.fromSexprPrimitives(rest as PrimitiveSExpr[])
           break
         }
         case "effects": {
