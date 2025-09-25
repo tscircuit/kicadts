@@ -20,14 +20,26 @@ export class SchematicSymbol extends SxClass {
   _sxUnit?: Unit
   _sxInBom?: InBom
   _sxOnBoard?: OnBoard
+  _sxAt?: At
 
-  libraryIdentifier?: string
-  position?: At
+  libraryId?: string
   uuid?: Uuid
   properties: SymbolProperty[] = []
   pins: SymbolPin[] = []
   instances?: SymbolInstances
   extras: PrimitiveSExpr[] = []
+
+  get unit(): UnitString | undefined {
+    return this._sxUnit?.value
+  }
+
+  get inBom(): boolean | undefined {
+    return this._sxInBom?.value
+  }
+
+  get onBoard(): boolean | undefined {
+    return this._sxOnBoard?.value
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -37,7 +49,9 @@ export class SchematicSymbol extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
+    symbol.libraryId = toStringValue(primitiveSexprs[0])
     symbol._sxUnit = propertyMap.unit as Unit
+    symbol._sxAt = propertyMap.at as At
     symbol._sxInBom = propertyMap.in_bom as InBom
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
@@ -47,12 +61,15 @@ export class SchematicSymbol extends SxClass {
     return symbol
   }
 
-  get unit(): UnitString | undefined {
-    return this._sxUnit?.value
-  }
+  override getString() {
+    const lines = [`(symbol ${this.libraryId}`]
 
-  get inBom(): boolean | undefined {
-    return this._sxInBom?.value
+    for (const child of this.getChildren()) {
+      lines.push(child.getStringIndented())
+    }
+
+    lines.push(")")
+    return lines.join("\n")
   }
 }
 SxClass.register(SchematicSymbol)

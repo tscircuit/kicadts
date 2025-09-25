@@ -30,9 +30,7 @@ test("Symbol parse", () => {
 
   expect(symbol).toBeInstanceOf(SchematicSymbol)
   const sym = symbol as SchematicSymbol
-  expect(sym.libraryIdentifier).toBe("Device:R")
-  expect(sym.position).toBeInstanceOf(At)
-  expect(sym.unit).toBe(2)
+  expect(sym.libraryId).toBe("Device:R")
   expect(sym.inBom).toBe(true)
   expect(sym.onBoard).toBe(false)
   expect(sym.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")

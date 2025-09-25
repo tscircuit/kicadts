@@ -25,6 +25,13 @@ export abstract class SxClass {
       .filter((v) => v && typeof v === "object" && v.isSxClass)
   }
 
+  getStringIndented(): string {
+    return this.getString()
+      .split("\n")
+      .map((line) => `  ${line}`)
+      .join("\n")
+  }
+
   getString(): string {
     const children = this.getChildren()
     if (children.length === 0) {
@@ -33,10 +40,7 @@ export abstract class SxClass {
 
     const lines = [`(${this.token}`]
     for (const p of children) {
-      const pLines = p.getString().split("\n")
-      for (const pLine of pLines) {
-        lines.push(`  ${pLine}`)
-      }
+      lines.push(p.getStringIndented())
     }
     lines.push(")")
     return lines.join("\n")

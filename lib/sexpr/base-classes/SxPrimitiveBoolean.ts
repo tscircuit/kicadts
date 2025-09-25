@@ -26,7 +26,7 @@ export abstract class SxPrimitiveBoolean extends SxClass {
       booleanVal = false
     }
     // @ts-ignore
-    return new this(rawVal as boolean)
+    return new this(booleanVal)
   }
 
   override getString() {
