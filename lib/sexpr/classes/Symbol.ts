@@ -42,8 +42,6 @@ export class SchematicSymbol extends SxClass {
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
 
-    console.log(symbol.properties)
-
     // TODO
 
     return symbol
@@ -102,7 +100,6 @@ export class SymbolProperty extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolProperty {
-    console.log(primitiveSexprs)
     const [key, inputValue, idSexpr, atSexpr, effectsSexpr] = primitiveSexprs
 
     const name = toStringValue(key)!

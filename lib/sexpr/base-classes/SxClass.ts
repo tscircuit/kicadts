@@ -26,8 +26,13 @@ export abstract class SxClass {
   }
 
   getString(): string {
+    const children = this.getChildren()
+    if (children.length === 0) {
+      return `(${this.token})`
+    }
+
     const lines = [`(${this.token}`]
-    for (const p of this.getChildren()) {
+    for (const p of children) {
       const pLines = p.getString().split("\n")
       for (const pLine of pLines) {
         lines.push(`  ${pLine}`)

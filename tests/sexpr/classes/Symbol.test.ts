@@ -26,6 +26,8 @@ test("Symbol parse", () => {
     )
   `)
 
+  console.log(symbol)
+
   expect(symbol).toBeInstanceOf(SchematicSymbol)
   const sym = symbol as SchematicSymbol
   expect(sym.libraryIdentifier).toBe("Device:R")
