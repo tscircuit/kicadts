@@ -60,6 +60,7 @@ export class SchematicSymbol extends SxClass {
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
     symbol._sxUuid = propertyMap.uuid as Uuid
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
+    symbol.pins = (arrayPropertyMap.pin as SymbolPin[]) ?? []
 
     return symbol
   }
@@ -72,6 +73,7 @@ export class SchematicSymbol extends SxClass {
     }
     lines.push(
       ...this.properties.map((property) => property.getStringIndented()),
+      ...this.pins.map((pin) => pin.getStringIndented()),
     )
 
     lines.push(")")
@@ -168,17 +170,35 @@ export class SymbolProperty extends SxClass {
 }
 SxClass.register(SymbolProperty)
 
+type PinElectricalType =
+  | "input"
+  | "output"
+  | "bidirectional"
+  | "tri_state"
+  | "passive"
+  | "free"
+  | "unspecified"
+  | "power_in"
+  | "power_out"
+  | "open_collector"
+  | "open_emitter"
+  | "no_connect"
+
 export class SymbolPin extends SxClass {
   static override token = "pin"
   static override parentToken = "symbol"
   token = "pin"
 
-  name?: string
-  uuid?: Uuid
-  extras: PrimitiveSExpr[] = []
+  pinElectricalType?: PinElectricalType
 
   static override fromSexprPrimitives(args: PrimitiveSExpr[]): SymbolPin {
     const symbolPin = new SymbolPin()
+
+    const [pinElectricalType, pinGraphiStyle, positionId] = args
+
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(args, this.token)
+
     return symbolPin
   }
 }
