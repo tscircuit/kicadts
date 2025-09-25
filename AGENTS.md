@@ -23,3 +23,4 @@ most extensive one is `references/SEXPR_MAIN.adoc` (use `bun run scripts/downloa
 - NEW PATTERN: Constructors never take `PrimitiveSExpr` arguments
 - NEW PATTERN: All classes have a `fromSexprPrimitives` static method that takes a `PrimitiveSExpr` array and returns an instance of the class
 - NEW PATTERN: Classes have ergonomic getters and setters for properties
+- NEW PATTERN: Never has "extras" property, everything becomes an `SxClass`
