@@ -11,24 +11,10 @@ export class Image extends SxClass {
   static override token = "image"
   token = "image"
 
-  override _propertyMap?: Record<string, SxClass>
   extraArgs: PrimitiveSExpr[] = []
 
   constructor(args: Array<SxClass | PrimitiveSExpr>) {
-    super()
-
-    const classArgs: SxClass[] = []
-    for (const arg of args) {
-      if (arg instanceof SxClass) {
-        classArgs.push(arg)
-        continue
-      }
-      this.extraArgs.push(arg)
-    }
-
-    if (classArgs.length > 0) {
-      this.loadProperties(classArgs)
-    }
+    super(args)
   }
 
   get position(): At | Xy | undefined {

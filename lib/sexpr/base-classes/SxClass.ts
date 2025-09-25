@@ -10,58 +10,27 @@ export abstract class SxClass {
   static token: string
 
   /**
-   * Set to true for classes that need access to the raw (unparsed) argument list
-   */
-  static rawArgs = false
-
-  /**
    * Token strings are sometimes re-used (e.g. a "type" token) but the class
    * varies based on the parent token
    */
   static parentToken?: string
 
-  /**
-   * Some classes accept properties in any order, in these cases we generally
-   * store the properties in a map by token. You can load a properties array
-   * using `loadProperties`
-   */
-  _propertyMap?: Record<string, SxClass>
+  isSxClass = true
 
-  getProperty<T extends SxClass>(token: string): T | undefined {
-    return this._propertyMap?.[token] as T
-  }
-
-  setProperty(token: string, property: SxClass) {
-    this._propertyMap ??= {}
-    this._propertyMap[token] = property
-  }
-
-  loadProperties(properties: Array<SxClass>) {
-    this._propertyMap = properties.reduce(
-      (acc, p) => {
-        acc[p.token] = p
-        return acc
-      },
-      {} as Record<string, SxClass>,
-    )
+  getChildren(): SxClass[] {
+    return []
   }
 
   getString(): string {
-    if (this._propertyMap) {
-      const lines = [`(${this.token}`]
-      for (const p of Object.values(this._propertyMap)) {
-        const pLines = p.getString().split("\n")
-        for (const pLine of pLines) {
-          lines.push(`  ${pLine}`)
-        }
+    const lines = [`(${this.token}`]
+    for (const p of this.getChildren()) {
+      const pLines = p.getString().split("\n")
+      for (const pLine of pLines) {
+        lines.push(`  ${pLine}`)
       }
-      lines.push(")")
-      return lines.join("\n")
     }
-
-    throw new Error(
-      `Cannot stringify ${this.constructor.name} without defining a propertyMap, consider manually defining the getString() method`,
-    )
+    lines.push(")")
+    return lines.join("\n")
   }
   get [Symbol.toStringTag](): string {
     return this.getString()
@@ -96,6 +65,12 @@ export abstract class SxClass {
     return SxClass.parsePrimitiveSexpr(primitiveSexpr) as any
   }
 
+  static fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): SxClass {
+    throw new Error(
+      `"${this.name}" class has not implemented fromSexprPrimitives`,
+    )
+  }
+
   static parsePrimitiveSexpr(
     primitiveSexpr: PrimitiveSExpr,
     options: { parentToken?: string } = {},
@@ -123,10 +98,12 @@ export abstract class SxClass {
         )
       }
       const args = primitiveSexpr.slice(1) as PrimitiveSExpr[]
-      const paramArray = ClassDef.rawArgs
-        ? args
-        : SxClass.parsePrimitiveSexpr(args, { parentToken: classToken })
-      const classInstance = new ClassDef(paramArray)
+      if (!("fromSexprPrimitives" in ClassDef)) {
+        throw new Error(
+          `Class "${classToken}" does not have a fromSexprPrimitives method`,
+        )
+      }
+      const classInstance = ClassDef.fromSexprPrimitives(args)
       return classInstance
     }
 
@@ -148,5 +125,27 @@ export abstract class SxClass {
     throw new Error(
       `Couldn't parse primitive S-expression: ${JSON.stringify(primitiveSexpr)}`,
     )
+  }
+
+  // =========================== STATIC UTILITIES  ===========================
+  static parsePrimitivesToClassProperties(
+    primitiveSexprs: PrimitiveSExpr[],
+    parentToken?: string,
+  ): {
+    propertyMap: Record<string, SxClass>
+    arrayPropertyMap: Record<string, SxClass[]>
+  } {
+    const propertyMap = {} as Record<string, SxClass>
+    const arrayPropertyMap = {} as Record<string, SxClass[]>
+    for (const primitiveSexpr of primitiveSexprs) {
+      const sxClass = SxClass.parsePrimitiveSexpr(primitiveSexpr, {
+        parentToken,
+      }) as SxClass
+      if (!sxClass.isSxClass) continue
+      propertyMap[sxClass.token] = sxClass
+      arrayPropertyMap[sxClass.token] ??= []
+      arrayPropertyMap[sxClass.token]!.push(sxClass)
+    }
+    return { propertyMap, arrayPropertyMap }
   }
 }

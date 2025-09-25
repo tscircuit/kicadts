@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export type StrokeTypeString =
   | "dash"
@@ -15,9 +16,15 @@ export class StrokeType extends SxClass {
 
   type: StrokeTypeString
 
-  constructor(args: [type: StrokeTypeString]) {
+  constructor(type: StrokeTypeString) {
     super()
-    this.type = args[0]
+    this.type = type
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): StrokeType {
+    return new StrokeType(primitiveSexprs[0] as StrokeTypeString)
   }
 
   override getString() {

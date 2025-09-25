@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export type RGBAColor = { r: number; g: number; b: number; a: number }
 
@@ -11,6 +12,14 @@ export class Color extends SxClass {
   constructor(args: [r: number, g: number, b: number, a: number]) {
     super()
     this.color = { r: args[0], g: args[1], b: args[2], a: args[3] }
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Color {
+    return new Color(
+      primitiveSexprs as [r: number, g: number, b: number, a: number],
+    )
   }
 
   override getString() {
