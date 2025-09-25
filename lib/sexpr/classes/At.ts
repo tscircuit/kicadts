@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export class At extends SxClass {
   static override token = "at"
@@ -20,6 +21,11 @@ export class At extends SxClass {
   x: number
   y: number
   angle?: number
+
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): At {
+    const [x, y, angle] = primitiveSexprs
+    return new At([x as number, y as number, angle as number])
+  }
 
   override getString(): string {
     const parts: Array<string | number> = [this.x, this.y]

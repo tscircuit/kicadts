@@ -11,10 +11,9 @@ import { indentLines } from "../utils/indentLines"
 
 export class SchematicSymbol extends SxClass {
   static override token = "symbol"
-  static override rawArgs = true
   token = "symbol"
 
-  libraryIdentifier: string
+  libraryIdentifier?: string
   position?: At
   unit?: number
   inBom?: boolean
@@ -25,134 +24,19 @@ export class SchematicSymbol extends SxClass {
   instances?: SymbolInstances
   extras: PrimitiveSExpr[] = []
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    if (args.length === 0 || typeof args[0] !== "string") {
-      throw new Error("symbol must start with a library identifier string")
-    }
-    this.libraryIdentifier = args[0]
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SchematicSymbol {
+    const symbol = new SchematicSymbol()
 
-    for (const arg of args.slice(1)) {
-      if (typeof arg === "string") {
-        this.extras.push(arg)
-        continue
-      }
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
+    // TODO
 
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
-      }
-
-      switch (token) {
-        case "at": {
-          const coords = rest
-            .map((value) => toNumberValue(value))
-            .filter((value): value is number => value !== undefined)
-          if (coords.length >= 2) {
-            this.position = new At(coords as [number, number, number?])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "unit": {
-          const num = toNumberValue(rest[0])
-          if (num !== undefined) {
-            this.unit = num
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "in_bom": {
-          const bool = parseYesNo(rest[0])
-          if (bool !== undefined) {
-            this.inBom = bool
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "on_board": {
-          const bool = parseYesNo(rest[0])
-          if (bool !== undefined) {
-            this.onBoard = bool
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "uuid": {
-          this.uuid = new Uuid(rest as [string])
-          break
-        }
-        case "property": {
-          this.properties.push(new SymbolProperty(rest as PrimitiveSExpr[]))
-          break
-        }
-        case "pin": {
-          this.pins.push(new SymbolPin(rest as PrimitiveSExpr[]))
-          break
-        }
-        case "instances": {
-          this.instances = new SymbolInstances(rest as PrimitiveSExpr[])
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
-      }
-    }
-  }
-
-  override getString(): string {
-    const lines = [`(symbol ${quoteSExprString(this.libraryIdentifier)}`]
-
-    const pushLines = (value?: string | string[]) => {
-      if (!value) return
-      const push = (line: string) => {
-        const parts = line.split("\n")
-        for (const part of parts) {
-          lines.push(`  ${part}`)
-        }
-      }
-      if (Array.isArray(value)) {
-        for (const line of value) push(line)
-      } else {
-        push(value)
-      }
-    }
-
-    if (this.position) pushLines(this.position.getString())
-    if (this.unit !== undefined) pushLines(`(unit ${this.unit})`)
-    if (this.inBom !== undefined)
-      pushLines(`(in_bom ${this.inBom ? "yes" : "no"})`)
-    if (this.onBoard !== undefined)
-      pushLines(`(on_board ${this.onBoard ? "yes" : "no"})`)
-    if (this.uuid) pushLines(this.uuid.getString())
-
-    for (const property of this.properties) {
-      pushLines(property.getStringLines())
-    }
-
-    for (const pin of this.pins) {
-      pushLines(pin.getString())
-    }
-
-    if (this.instances) pushLines(this.instances.getStringLines())
-
-    for (const extra of this.extras) {
-      pushLines(printSExpr(extra))
-    }
-
-    lines.push(")")
-    return lines.join("\n")
+    return symbol
   }
 }
 SxClass.register(SchematicSymbol)
@@ -160,7 +44,6 @@ SxClass.register(SchematicSymbol)
 export class SymbolProperty extends SxClass {
   static override token = "property"
   static override parentToken = "symbol"
-  static override rawArgs = true
   token = "property"
 
   key: string
