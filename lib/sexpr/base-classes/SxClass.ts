@@ -18,7 +18,11 @@ export abstract class SxClass {
   isSxClass = true
 
   getChildren(): SxClass[] {
-    return []
+    // By default, return any properties found in this instance that have the _sx* prefix
+    return Object.keys(this)
+      .filter((k) => k.startsWith("_sx"))
+      .map((k) => (this as any)[k])
+      .filter((v) => v && typeof v === "object" && v.isSxClass)
   }
 
   getString(): string {
