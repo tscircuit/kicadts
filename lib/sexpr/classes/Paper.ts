@@ -1,8 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
-import {
-  printSExpr,
-  type PrimitiveSExpr,
-} from "../parseToPrimitiveSExpr"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export type StandardPaperSize =
   | "A0"
@@ -19,51 +16,46 @@ export type StandardPaperSize =
 
 export class Paper extends SxClass {
   static override token = "paper"
-  static override rawArgs = true
   token = "paper"
 
   private _size?: StandardPaperSize | string
   private _width?: number
   private _height?: number
-  portrait = false
-  additionalArgs: PrimitiveSExpr[] = []
+  private _portrait = false
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Paper {
+    const paper = new Paper()
 
     const numericArgs: number[] = []
 
-    for (const arg of args) {
-      if (typeof arg === "number") {
-        numericArgs.push(arg)
+    for (const primitive of primitiveSexprs) {
+      if (typeof primitive === "number") {
+        numericArgs.push(primitive)
         continue
       }
 
-      if (typeof arg === "string") {
-        if (arg === "portrait") {
-          this.portrait = true
+      if (typeof primitive === "string") {
+        if (primitive === "portrait") {
+          paper._portrait = true
           continue
         }
-        if (!this._size && numericArgs.length === 0) {
-          this._size = arg
-          continue
-        }
-        this.additionalArgs.push(arg)
-        continue
-      }
 
-      this.additionalArgs.push(arg)
+        if (paper._size === undefined && numericArgs.length === 0) {
+          paper._size = primitive as StandardPaperSize | string
+        }
+      }
     }
 
     if (numericArgs.length >= 2) {
-      this._width = numericArgs[0]
-      this._height = numericArgs[1]
-      if (numericArgs.length > 2) {
-        this.additionalArgs.push(...numericArgs.slice(2))
-      }
+      paper._width = numericArgs[0]
+      paper._height = numericArgs[1]
     } else if (numericArgs.length === 1) {
-      this._width = numericArgs[0]
+      paper._width = numericArgs[0]
     }
+
+    return paper
   }
 
   get size(): string | undefined {
@@ -97,11 +89,11 @@ export class Paper extends SxClass {
   }
 
   get isPortrait(): boolean {
-    return this.portrait
+    return this._portrait
   }
 
   set isPortrait(value: boolean) {
-    this.portrait = value
+    this._portrait = value
   }
 
   override getString(): string {
@@ -116,12 +108,8 @@ export class Paper extends SxClass {
       lines.push(`  ${this._width} ${this._height}`)
     }
 
-    if (this.portrait) {
+    if (this._portrait) {
       lines.push("  portrait")
-    }
-
-    for (const arg of this.additionalArgs) {
-      lines.push(`  ${printSExpr(arg)}`)
     }
 
     lines.push(")")

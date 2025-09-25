@@ -256,10 +256,6 @@ export class TextEffectsFontFace extends SxPrimitiveString {
   static override token = "face"
   static override parentToken = "font"
   token = "face"
-
-  override getString(): string {
-    return `(face ${quoteSExprString(this.value)})`
-  }
 }
 SxClass.register(TextEffectsFontFace)
 
