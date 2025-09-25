@@ -16,3 +16,10 @@ most extensive one is `references/SEXPR_MAIN.adoc` (use `bun run scripts/downloa
 - Tokens reused under different parents (for example `type` under `stroke`) require `static parentToken` overrides so the correct class resolves during parsing.
 - When a class accepts unordered child tokens, set `_propertyMap` using `loadProperties` to make getters convenient and keep `getString()` deterministic.
 - Snapshot tests with `bun test` provide quick verification that `getString()` matches the KiCad formatting expectations.
+
+### Major Refactor Notice
+
+- The code in this repo is only partially migrated to the new pattern
+- NEW PATTERN: Constructors never take `PrimitiveSExpr` arguments
+- NEW PATTERN: All classes have a `fromSexprPrimitives` static method that takes a `PrimitiveSExpr` array and returns an instance of the class
+- NEW PATTERN: Classes have ergonomic getters and setters for properties
