@@ -46,97 +46,11 @@ export class SymbolProperty extends SxClass {
   static override parentToken = "symbol"
   token = "property"
 
-  key: string
-  value: string
-  id?: number
-  at?: At
-  effects?: TextEffects
-  extras: PrimitiveSExpr[] = []
-
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    if (args.length < 2) {
-      throw new Error("symbol property requires a key and value")
-    }
-
-    const key = toStringValue(args[0])
-    const value = toStringValue(args[1])
-    if (!key || value === undefined) {
-      throw new Error("symbol property key/value must be strings")
-    }
-    this.key = key
-    this.value = value
-
-    for (const arg of args.slice(2)) {
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
-      }
-
-      switch (token) {
-        case "id": {
-          const num = toNumberValue(rest[0])
-          if (num !== undefined) {
-            this.id = num
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "at": {
-          const coords = rest
-            .map((value) => toNumberValue(value))
-            .filter((value): value is number => value !== undefined)
-          if (coords.length >= 2) {
-            this.at = new At(coords as [number, number, number?])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "effects": {
-          const parsed = SxClass.parsePrimitiveSexpr([
-            "effects",
-            ...rest,
-          ] as PrimitiveSExpr)
-          if (parsed instanceof TextEffects) {
-            this.effects = parsed
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
-      }
-    }
-  }
-
-  getStringLines(): string[] {
-    const lines: string[] = [
-      `(property ${quoteSExprString(this.key)} ${quoteSExprString(this.value)}`,
-    ]
-
-    if (this.id !== undefined) {
-      lines.push(`  (id ${this.id})`)
-    }
-    if (this.at) {
-      lines.push(`  ${this.at.getString()}`)
-    }
-    if (this.effects) {
-      lines.push(...indentLines(this.effects.getString()))
-    }
-    for (const extra of this.extras) {
-      lines.push(`  ${printSExpr(extra)}`)
-    }
-    lines.push(")")
-    return lines
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolProperty {
+    // TODO
+    return new SymbolProperty()
   }
 }
 SxClass.register(SymbolProperty)
@@ -144,54 +58,15 @@ SxClass.register(SymbolProperty)
 export class SymbolPin extends SxClass {
   static override token = "pin"
   static override parentToken = "symbol"
-  static override rawArgs = true
   token = "pin"
 
   name?: string
   uuid?: Uuid
   extras: PrimitiveSExpr[] = []
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    this.name = toStringValue(args[0])
-
-    for (const arg of args.slice(this.name ? 1 : 0)) {
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
-
-      const [token, ...rest] = arg
-      if (token === "uuid") {
-        this.uuid = new Uuid(rest as [string])
-      } else {
-        this.extras.push(arg)
-      }
-    }
-  }
-
-  override getString(): string {
-    const header =
-      this.name !== undefined ? `(pin ${quoteSExprString(this.name)}` : "(pin"
-
-    const body: string[] = []
-    if (this.uuid) {
-      body.push(this.uuid.getString())
-    }
-    for (const extra of this.extras) {
-      body.push(printSExpr(extra))
-    }
-
-    if (body.length === 0) {
-      return `${header})`
-    }
-
-    const lines = [header]
-    for (const segment of body) {
-      lines.push(`  ${segment}`)
-    }
-    lines.push(")")
-    return lines.join("\n")
+  static override fromSexprPrimitives(args: PrimitiveSExpr[]): SymbolPin {
+    const symbolPin = new SymbolPin()
+    return symbolPin
   }
 }
 SxClass.register(SymbolPin)
@@ -199,25 +74,11 @@ SxClass.register(SymbolPin)
 export class SymbolInstances extends SxClass {
   static override token = "instances"
   static override parentToken = "symbol"
-  static override rawArgs = true
   token = "instances"
 
-  raw: PrimitiveSExpr[]
-
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    this.raw = args
-  }
-
-  getStringLines(): string[] {
-    const lines = ["(instances"]
-    for (const entry of this.raw) {
-      for (const line of indentLines(printSExpr(entry))) {
-        lines.push(line)
-      }
-    }
-    lines.push(")")
-    return lines
+  static override fromSexprPrimitives(args: PrimitiveSExpr[]): SymbolInstances {
+    const symbolInstances = new SymbolInstances()
+    return symbolInstances
   }
 }
 SxClass.register(SymbolInstances)
