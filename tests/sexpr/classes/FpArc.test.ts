@@ -20,8 +20,10 @@ test("FpArc", () => {
   expect(fpArc.end?.x).toBe(2)
   expect(fpArc.layer).toBeInstanceOf(Layer)
   expect(fpArc.stroke).toBeInstanceOf(Stroke)
-  expect(fpArc.uuid?.value).toBe("12340000-0000-0000-0000-000000000000")
+  expect(fpArc.uuid).toBe("12340000-0000-0000-0000-000000000000")
 
+  fpArc.width = 0.25
+  expect(fpArc.width).toBe(0.25)
   fpArc.locked = true
 
   expect(fpArc.getString()).toMatchInlineSnapshot(`
@@ -30,6 +32,7 @@ test("FpArc", () => {
       (mid 1 1)
       (end 2 0)
       (layer F.SilkS)
+      (width 0.25)
       (stroke
         (width 0.12)
         (type solid)

@@ -18,7 +18,7 @@ test("FpCircle", () => {
   expect(fpCircle.end?.x).toBe(2)
   expect(fpCircle.layer).toBeInstanceOf(Layer)
   expect(fpCircle.stroke).toBeInstanceOf(Stroke)
-  expect(fpCircle.uuid?.value).toBe("55555555-6666-7777-8888-999999999999")
+  expect(fpCircle.uuid).toBe("55555555-6666-7777-8888-999999999999")
 
   fpCircle.locked = true
 
