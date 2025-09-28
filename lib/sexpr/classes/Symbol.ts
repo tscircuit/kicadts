@@ -3,9 +3,13 @@ import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { indentLines } from "../utils/indentLines"
+import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { At } from "./At"
+import { Dnp } from "./Dnp"
+import { EmbeddedFonts } from "./EmbeddedFonts"
+import { ExcludeFromSim } from "./ExcludeFromSim"
 import { InBom } from "./InBom"
 import { OnBoard } from "./OnBoard"
 import { TextEffects } from "./TextEffects"
@@ -25,6 +29,39 @@ export class SymbolUnit extends SxPrimitiveNumber {
 }
 SxClass.register(SymbolUnit)
 
+export class SymbolLibId extends SxClass {
+  static override token = "lib_id"
+  static override parentToken = "symbol"
+  token = "lib_id"
+
+  value: string
+
+  constructor(value: string) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolLibId {
+    const [valuePrimitive] = primitiveSexprs
+    const value = toStringValue(valuePrimitive)
+    if (value === undefined) {
+      throw new Error("lib_id expects a string value")
+    }
+    return new SymbolLibId(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(lib_id ${quoteSExprString(this.value)})`
+  }
+}
+SxClass.register(SymbolLibId)
+
 export class SymbolDuplicatePinNumbersAreJumpers extends SxPrimitiveBoolean {
   static override token = "duplicate_pin_numbers_are_jumpers"
   static override parentToken = "symbol"
@@ -32,20 +69,625 @@ export class SymbolDuplicatePinNumbersAreJumpers extends SxPrimitiveBoolean {
 }
 SxClass.register(SymbolDuplicatePinNumbersAreJumpers)
 
+export class SymbolPinNumbers extends SxClass {
+  static override token = "pin_numbers"
+  static override parentToken = "symbol"
+  token = "pin_numbers"
+
+  private _sxHide?: SymbolPinNumbersHide
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPinNumbers {
+    const pinNumbers = new SymbolPinNumbers()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    pinNumbers._sxHide = propertyMap.hide as SymbolPinNumbersHide
+
+    return pinNumbers
+  }
+
+  get hide(): boolean {
+    return this._sxHide?.value ?? false
+  }
+
+  set hide(value: boolean) {
+    this._sxHide = new SymbolPinNumbersHide(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return this._sxHide ? [this._sxHide] : []
+  }
+}
+SxClass.register(SymbolPinNumbers)
+
+export class SymbolPinNumbersHide extends SxPrimitiveBoolean {
+  static override token = "hide"
+  static override parentToken = "pin_numbers"
+  token = "hide"
+}
+SxClass.register(SymbolPinNumbersHide)
+
+export class SymbolPinNames extends SxClass {
+  static override token = "pin_names"
+  static override parentToken = "symbol"
+  token = "pin_names"
+
+  private _sxOffset?: SymbolPinNamesOffset
+  private _sxHide?: SymbolPinNamesHide
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPinNames {
+    const pinNames = new SymbolPinNames()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    pinNames._sxOffset = propertyMap.offset as SymbolPinNamesOffset
+    pinNames._sxHide = propertyMap.hide as SymbolPinNamesHide
+
+    return pinNames
+  }
+
+  get offset(): number | undefined {
+    return this._sxOffset?.value
+  }
+
+  set offset(value: number | undefined) {
+    if (value === undefined) {
+      this._sxOffset = undefined
+      return
+    }
+    this._sxOffset = new SymbolPinNamesOffset(value)
+  }
+
+  get hide(): boolean {
+    return this._sxHide?.value ?? false
+  }
+
+  set hide(value: boolean) {
+    this._sxHide = new SymbolPinNamesHide(value)
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxOffset) children.push(this._sxOffset)
+    if (this._sxHide) children.push(this._sxHide)
+    return children
+  }
+}
+SxClass.register(SymbolPinNames)
+
+export class SymbolPinNamesOffset extends SxClass {
+  static override token = "offset"
+  static override parentToken = "pin_names"
+  token = "offset"
+
+  value: number
+
+  constructor(value: number) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPinNamesOffset {
+    const [valuePrimitive] = primitiveSexprs
+    const value = toNumberValue(valuePrimitive)
+    if (value === undefined) {
+      throw new Error("pin_names offset expects a numeric value")
+    }
+    return new SymbolPinNamesOffset(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(offset ${this.value})`
+  }
+}
+SxClass.register(SymbolPinNamesOffset)
+
+export class SymbolPinNamesHide extends SxPrimitiveBoolean {
+  static override token = "hide"
+  static override parentToken = "pin_names"
+  token = "hide"
+}
+SxClass.register(SymbolPinNamesHide)
+
+abstract class SymbolPointBase extends SxClass {
+  protected _x: number
+  protected _y: number
+
+  constructor(x: number, y: number) {
+    super()
+    this._x = x
+    this._y = y
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPointBase {
+    const [rawX, rawY] = primitiveSexprs
+    const x = toNumberValue(rawX)
+    const y = toNumberValue(rawY)
+    if (x === undefined || y === undefined) {
+      throw new Error(`${this.name} expects two numeric arguments`)
+    }
+    const Ctor = this as unknown as new (x: number, y: number) => SymbolPointBase
+    return new Ctor(x, y)
+  }
+
+  get x(): number {
+    return this._x
+  }
+
+  set x(value: number) {
+    this._x = value
+  }
+
+  get y(): number {
+    return this._y
+  }
+
+  set y(value: number) {
+    this._y = value
+  }
+
+  toObject(): { x: number; y: number } {
+    return { x: this._x, y: this._y }
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(${this.token} ${this._x} ${this._y})`
+  }
+}
+
+export class SymbolRectangleStart extends SymbolPointBase {
+  static override token = "start"
+  static override parentToken = "rectangle"
+  token = "start"
+}
+SxClass.register(SymbolRectangleStart)
+
+export class SymbolRectangleEnd extends SymbolPointBase {
+  static override token = "end"
+  static override parentToken = "rectangle"
+  token = "end"
+}
+SxClass.register(SymbolRectangleEnd)
+
+export class SymbolArcStart extends SymbolPointBase {
+  static override token = "start"
+  static override parentToken = "arc"
+  token = "start"
+}
+SxClass.register(SymbolArcStart)
+
+export class SymbolArcMid extends SymbolPointBase {
+  static override token = "mid"
+  static override parentToken = "arc"
+  token = "mid"
+}
+SxClass.register(SymbolArcMid)
+
+export class SymbolArcEnd extends SymbolPointBase {
+  static override token = "end"
+  static override parentToken = "arc"
+  token = "end"
+}
+SxClass.register(SymbolArcEnd)
+
+export class SymbolCircleCenter extends SymbolPointBase {
+  static override token = "center"
+  static override parentToken = "circle"
+  token = "center"
+}
+SxClass.register(SymbolCircleCenter)
+
+export class SymbolCircleRadius extends SxPrimitiveNumber {
+  static override token = "radius"
+  static override parentToken = "circle"
+  token = "radius"
+}
+SxClass.register(SymbolCircleRadius)
+
+abstract class SymbolFillBase extends SxClass {
+  protected _sxType?: SymbolFillType
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolFillBase {
+    const fill = new (this as unknown as new () => SymbolFillBase)()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, "fill")
+    fill._sxType = propertyMap.type as SymbolFillType
+    return fill
+  }
+
+  get type(): string | undefined {
+    return this._sxType?.value
+  }
+
+  set type(value: string | undefined) {
+    if (value === undefined) {
+      this._sxType = undefined
+      return
+    }
+    this._sxType = new SymbolFillType(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return this._sxType ? [this._sxType] : []
+  }
+}
+
+export class SymbolPolylineFill extends SymbolFillBase {
+  static override token = "fill"
+  static override parentToken = "polyline"
+  token = "fill"
+}
+SxClass.register(SymbolPolylineFill)
+
+export class SymbolRectangleFill extends SymbolFillBase {
+  static override token = "fill"
+  static override parentToken = "rectangle"
+  token = "fill"
+}
+SxClass.register(SymbolRectangleFill)
+
+export class SymbolCircleFill extends SymbolFillBase {
+  static override token = "fill"
+  static override parentToken = "circle"
+  token = "fill"
+}
+SxClass.register(SymbolCircleFill)
+
+export class SymbolArcFill extends SymbolFillBase {
+  static override token = "fill"
+  static override parentToken = "arc"
+  token = "fill"
+}
+SxClass.register(SymbolArcFill)
+
+export class SymbolFillType extends SxClass {
+  static override token = "type"
+  static override parentToken = "fill"
+  token = "type"
+
+  value: string
+
+  constructor(value: string) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolFillType {
+    const [valuePrimitive] = primitiveSexprs
+    const value = toStringValue(valuePrimitive)
+    if (value === undefined) {
+      throw new Error("fill type expects a string value")
+    }
+    return new SymbolFillType(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(type ${this.value})`
+  }
+}
+SxClass.register(SymbolFillType)
+
+export class SymbolPolyline extends SxClass {
+  static override token = "polyline"
+  static override parentToken = "symbol"
+  token = "polyline"
+
+  private _sxPts?: Pts
+  private _sxStroke?: Stroke
+  private _sxFill?: SymbolPolylineFill
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPolyline {
+    const polyline = new SymbolPolyline()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    polyline._sxPts = propertyMap.pts as Pts
+    polyline._sxStroke = propertyMap.stroke as Stroke
+    polyline._sxFill = propertyMap.fill as SymbolPolylineFill
+
+    return polyline
+  }
+
+  get points(): Pts | undefined {
+    return this._sxPts
+  }
+
+  set points(value: Pts | undefined) {
+    this._sxPts = value
+  }
+
+  get stroke(): Stroke | undefined {
+    return this._sxStroke
+  }
+
+  set stroke(value: Stroke | undefined) {
+    this._sxStroke = value
+  }
+
+  get fill(): SymbolPolylineFill | undefined {
+    return this._sxFill
+  }
+
+  set fill(value: SymbolPolylineFill | undefined) {
+    this._sxFill = value
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxPts) children.push(this._sxPts)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    return children
+  }
+}
+SxClass.register(SymbolPolyline)
+
+export class SymbolRectangle extends SxClass {
+  static override token = "rectangle"
+  static override parentToken = "symbol"
+  token = "rectangle"
+
+  private _sxStart?: SymbolRectangleStart
+  private _sxEnd?: SymbolRectangleEnd
+  private _sxStroke?: Stroke
+  private _sxFill?: SymbolRectangleFill
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolRectangle {
+    const rectangle = new SymbolRectangle()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    rectangle._sxStart = propertyMap.start as SymbolRectangleStart
+    rectangle._sxEnd = propertyMap.end as SymbolRectangleEnd
+    rectangle._sxStroke = propertyMap.stroke as Stroke
+    rectangle._sxFill = propertyMap.fill as SymbolRectangleFill
+
+    return rectangle
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxStart) children.push(this._sxStart)
+    if (this._sxEnd) children.push(this._sxEnd)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    return children
+  }
+}
+SxClass.register(SymbolRectangle)
+
+export class SymbolCircle extends SxClass {
+  static override token = "circle"
+  static override parentToken = "symbol"
+  token = "circle"
+
+  private _sxCenter?: SymbolCircleCenter
+  private _sxRadius?: SymbolCircleRadius
+  private _sxStroke?: Stroke
+  private _sxFill?: SymbolCircleFill
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolCircle {
+    const circle = new SymbolCircle()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    circle._sxCenter = propertyMap.center as SymbolCircleCenter
+    circle._sxRadius = propertyMap.radius as SymbolCircleRadius
+    circle._sxStroke = propertyMap.stroke as Stroke
+    circle._sxFill = propertyMap.fill as SymbolCircleFill
+
+    return circle
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxCenter) children.push(this._sxCenter)
+    if (this._sxRadius) children.push(this._sxRadius)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    return children
+  }
+}
+SxClass.register(SymbolCircle)
+
+export class SymbolArc extends SxClass {
+  static override token = "arc"
+  static override parentToken = "symbol"
+  token = "arc"
+
+  private _sxStart?: SymbolArcStart
+  private _sxMid?: SymbolArcMid
+  private _sxEnd?: SymbolArcEnd
+  private _sxStroke?: Stroke
+  private _sxFill?: SymbolArcFill
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolArc {
+    const arc = new SymbolArc()
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    arc._sxStart = propertyMap.start as SymbolArcStart
+    arc._sxMid = propertyMap.mid as SymbolArcMid
+    arc._sxEnd = propertyMap.end as SymbolArcEnd
+    arc._sxStroke = propertyMap.stroke as Stroke
+    arc._sxFill = propertyMap.fill as SymbolArcFill
+
+    return arc
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxStart) children.push(this._sxStart)
+    if (this._sxMid) children.push(this._sxMid)
+    if (this._sxEnd) children.push(this._sxEnd)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    return children
+  }
+}
+SxClass.register(SymbolArc)
+
+export class SymbolText extends SxClass {
+  static override token = "text"
+  static override parentToken = "symbol"
+  token = "text"
+
+  private _value = ""
+  private _sxAt?: At
+  private _sxEffects?: TextEffects
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolText {
+    const [valuePrimitive, ...rest] = primitiveSexprs
+    const value = toStringValue(valuePrimitive)
+    if (value === undefined) {
+      throw new Error("text expects a string value")
+    }
+
+    const text = new SymbolText()
+    text._value = value
+
+    const { propertyMap } =
+      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+
+    text._sxAt = propertyMap.at as At
+    text._sxEffects = propertyMap.effects as TextEffects
+
+    return text
+  }
+
+  get value(): string {
+    return this._value
+  }
+
+  set value(newValue: string) {
+    this._value = newValue
+  }
+
+  get at(): At | undefined {
+    return this._sxAt
+  }
+
+  set at(value: At | undefined) {
+    this._sxAt = value
+  }
+
+  get effects(): TextEffects | undefined {
+    return this._sxEffects
+  }
+
+  set effects(value: TextEffects | undefined) {
+    this._sxEffects = value
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxAt) children.push(this._sxAt)
+    if (this._sxEffects) children.push(this._sxEffects)
+    return children
+  }
+
+  override getString(): string {
+    const lines = [`(text ${quoteSExprString(this._value)}`]
+    for (const child of this.getChildren()) {
+      lines.push(child.getStringIndented())
+    }
+    lines.push(")")
+    return lines.join("\n")
+  }
+}
+SxClass.register(SymbolText)
+
+export class SymbolPower extends SxClass {
+  static override token = "power"
+  static override parentToken = "symbol"
+  token = "power"
+
+  static override fromSexprPrimitives(): SymbolPower {
+    return new SymbolPower()
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return "(power)"
+  }
+}
+SxClass.register(SymbolPower)
+
 export class SchematicSymbol extends SxClass {
   static override token = "symbol"
   token = "symbol"
 
-  libraryId = ""
+  private _sxLibId?: SymbolLibId
   _sxAt?: At
   _sxUnit?: SymbolUnit
+  _sxPinNumbers?: SymbolPinNumbers
+  _sxPinNames?: SymbolPinNames
+  _sxExcludeFromSim?: ExcludeFromSim
   _sxInBom?: InBom
   _sxOnBoard?: OnBoard
+  _sxDnp?: Dnp
   _sxUuid?: Uuid
   _sxDuplicatePinNumbersAreJumpers?: SymbolDuplicatePinNumbersAreJumpers
   properties: SymbolProperty[] = []
   pins: SymbolPin[] = []
+  subSymbols: SchematicSymbol[] = []
+  polylines: SymbolPolyline[] = []
+  rectangles: SymbolRectangle[] = []
+  circles: SymbolCircle[] = []
+  arcs: SymbolArc[] = []
+  texts: SymbolText[] = []
+  _sxPower?: SymbolPower
+  _sxEmbeddedFonts?: EmbeddedFonts
   _sxInstances?: SymbolInstances
+
+  get libraryId(): string | undefined {
+    return this._sxLibId?.value
+  }
+
+  set libraryId(value: string | undefined) {
+    if (value === undefined || value === "") {
+      this._sxLibId = undefined
+      return
+    }
+    this._sxLibId = new SymbolLibId(value)
+  }
 
   get at(): At | undefined {
     return this._sxAt
@@ -63,6 +705,22 @@ export class SchematicSymbol extends SxClass {
     this._sxUnit = value === undefined ? undefined : SymbolUnit.from(value)
   }
 
+  get pinNumbers(): SymbolPinNumbers | undefined {
+    return this._sxPinNumbers
+  }
+
+  set pinNumbers(value: SymbolPinNumbers | undefined) {
+    this._sxPinNumbers = value
+  }
+
+  get pinNames(): SymbolPinNames | undefined {
+    return this._sxPinNames
+  }
+
+  set pinNames(value: SymbolPinNames | undefined) {
+    this._sxPinNames = value
+  }
+
   get inBom(): boolean | undefined {
     return this._sxInBom?.value
   }
@@ -71,12 +729,28 @@ export class SchematicSymbol extends SxClass {
     this._sxInBom = value === undefined ? undefined : new InBom(value)
   }
 
+  get excludeFromSim(): boolean {
+    return this._sxExcludeFromSim?.value ?? false
+  }
+
+  set excludeFromSim(value: boolean) {
+    this._sxExcludeFromSim = new ExcludeFromSim(value)
+  }
+
   get onBoard(): boolean | undefined {
     return this._sxOnBoard?.value
   }
 
   set onBoard(value: boolean | undefined) {
     this._sxOnBoard = value === undefined ? undefined : new OnBoard(value)
+  }
+
+  get dnp(): boolean {
+    return this._sxDnp?.value ?? false
+  }
+
+  set dnp(value: boolean) {
+    this._sxDnp = new Dnp(value)
   }
 
   get uuid(): string | undefined {
@@ -110,23 +784,49 @@ export class SchematicSymbol extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SchematicSymbol {
-    const [libraryIdentifier, ...rest] = primitiveSexprs
-
     const symbol = new SchematicSymbol()
-    symbol.libraryId = toStringValue(libraryIdentifier) ?? ""
+
+    let remaining = primitiveSexprs
+    let inlineId: string | undefined
+    if (remaining.length > 0) {
+      const first = remaining[0]
+      inlineId = toStringValue(first)
+      if (inlineId !== undefined) {
+        symbol.libraryId = inlineId
+        remaining = remaining.slice(1)
+      }
+    }
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+      SxClass.parsePrimitivesToClassProperties(remaining, this.token)
 
+    const libIdClass = propertyMap.lib_id as SymbolLibId | undefined
+    if (libIdClass) {
+      symbol._sxLibId = libIdClass
+    } else if (!symbol._sxLibId && inlineId !== undefined) {
+      symbol._sxLibId = new SymbolLibId(inlineId)
+    }
     symbol._sxAt = propertyMap.at as At
     symbol._sxUnit = propertyMap.unit as SymbolUnit
+    symbol._sxPinNumbers = propertyMap.pin_numbers as SymbolPinNumbers
+    symbol._sxPinNames = propertyMap.pin_names as SymbolPinNames
+    symbol._sxExcludeFromSim = propertyMap.exclude_from_sim as ExcludeFromSim
     symbol._sxInBom = propertyMap.in_bom as InBom
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
+    symbol._sxDnp = propertyMap.dnp as Dnp
     symbol._sxUuid = propertyMap.uuid as Uuid
     symbol._sxDuplicatePinNumbersAreJumpers =
       propertyMap.duplicate_pin_numbers_are_jumpers as SymbolDuplicatePinNumbersAreJumpers
+    symbol._sxPower = propertyMap.power as SymbolPower
+    symbol._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
     symbol.pins = (arrayPropertyMap.pin as SymbolPin[]) ?? []
+    symbol.subSymbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
+    symbol.polylines = (arrayPropertyMap.polyline as SymbolPolyline[]) ?? []
+    symbol.rectangles = (arrayPropertyMap.rectangle as SymbolRectangle[]) ?? []
+    symbol.circles = (arrayPropertyMap.circle as SymbolCircle[]) ?? []
+    symbol.arcs = (arrayPropertyMap.arc as SymbolArc[]) ?? []
+    symbol.texts = (arrayPropertyMap.text as SymbolText[]) ?? []
     symbol._sxInstances = propertyMap.instances as SymbolInstances
 
     return symbol
@@ -134,22 +834,39 @@ export class SchematicSymbol extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxLibId) children.push(this._sxLibId)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxUnit) children.push(this._sxUnit)
+    if (this._sxPinNumbers) children.push(this._sxPinNumbers)
+    if (this._sxPinNames) children.push(this._sxPinNames)
+    if (this._sxExcludeFromSim) children.push(this._sxExcludeFromSim)
     if (this._sxInBom) children.push(this._sxInBom)
     if (this._sxOnBoard) children.push(this._sxOnBoard)
+    if (this._sxDnp) children.push(this._sxDnp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxDuplicatePinNumbersAreJumpers) {
       children.push(this._sxDuplicatePinNumbersAreJumpers)
     }
     children.push(...this.properties)
     children.push(...this.pins)
+    children.push(...this.subSymbols)
+    children.push(...this.polylines)
+    children.push(...this.rectangles)
+    children.push(...this.circles)
+    children.push(...this.arcs)
+    children.push(...this.texts)
+    if (this._sxPower) children.push(this._sxPower)
+    if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     if (this._sxInstances) children.push(this._sxInstances)
     return children
   }
 
   override getString() {
-    const lines = [`(symbol ${quoteSExprString(this.libraryId)}`]
+    const inlineLibId = this._sxLibId ? undefined : this.libraryId
+    const lines =
+      inlineLibId !== undefined && inlineLibId !== ""
+        ? [`(symbol ${quoteSExprString(inlineLibId)}`]
+        : ["(symbol"]
 
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())

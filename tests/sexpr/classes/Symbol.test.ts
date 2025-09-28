@@ -49,7 +49,8 @@ test("Symbol parse", () => {
   expect(sym.instances).toBeDefined()
 
   expect(sym.getString()).toMatchInlineSnapshot(`
-    "(symbol \"Device:R\"
+    "(symbol
+      (lib_id \"Device:R\")
       (at 10 20 90)
       (unit 2)
       (in_bom yes)
