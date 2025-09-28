@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { indentLines } from "../utils/indentLines"
@@ -24,6 +25,13 @@ export class SymbolUnit extends SxPrimitiveNumber {
 }
 SxClass.register(SymbolUnit)
 
+export class SymbolDuplicatePinNumbersAreJumpers extends SxPrimitiveBoolean {
+  static override token = "duplicate_pin_numbers_are_jumpers"
+  static override parentToken = "symbol"
+  token = "duplicate_pin_numbers_are_jumpers"
+}
+SxClass.register(SymbolDuplicatePinNumbersAreJumpers)
+
 export class SchematicSymbol extends SxClass {
   static override token = "symbol"
   token = "symbol"
@@ -34,6 +42,7 @@ export class SchematicSymbol extends SxClass {
   _sxInBom?: InBom
   _sxOnBoard?: OnBoard
   _sxUuid?: Uuid
+  _sxDuplicatePinNumbersAreJumpers?: SymbolDuplicatePinNumbersAreJumpers
   properties: SymbolProperty[] = []
   pins: SymbolPin[] = []
   _sxInstances?: SymbolInstances
@@ -78,6 +87,18 @@ export class SchematicSymbol extends SxClass {
     this._sxUuid = value === undefined ? undefined : new Uuid(value)
   }
 
+  get duplicatePinNumbersAreJumpers(): boolean {
+    return this._sxDuplicatePinNumbersAreJumpers?.value ?? false
+  }
+
+  set duplicatePinNumbersAreJumpers(value: boolean | undefined) {
+    if (value === undefined) {
+      this._sxDuplicatePinNumbersAreJumpers = undefined
+      return
+    }
+    this._sxDuplicatePinNumbersAreJumpers = new SymbolDuplicatePinNumbersAreJumpers(value)
+  }
+
   get instances(): SymbolInstances | undefined {
     return this._sxInstances
   }
@@ -102,6 +123,8 @@ export class SchematicSymbol extends SxClass {
     symbol._sxInBom = propertyMap.in_bom as InBom
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
     symbol._sxUuid = propertyMap.uuid as Uuid
+    symbol._sxDuplicatePinNumbersAreJumpers =
+      propertyMap.duplicate_pin_numbers_are_jumpers as SymbolDuplicatePinNumbersAreJumpers
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
     symbol.pins = (arrayPropertyMap.pin as SymbolPin[]) ?? []
     symbol._sxInstances = propertyMap.instances as SymbolInstances
@@ -116,6 +139,9 @@ export class SchematicSymbol extends SxClass {
     if (this._sxInBom) children.push(this._sxInBom)
     if (this._sxOnBoard) children.push(this._sxOnBoard)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxDuplicatePinNumbersAreJumpers) {
+      children.push(this._sxDuplicatePinNumbersAreJumpers)
+    }
     children.push(...this.properties)
     children.push(...this.pins)
     if (this._sxInstances) children.push(this._sxInstances)
