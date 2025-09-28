@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "download-references": "bun run scripts/download-references.ts",
-    "download-demos": "git clone --depth 1 --filter=blob:none --sparse git@gitlab.com:kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos"
+    "download-demos": "git clone --depth 1 --filter=blob:none --sparse git@gitlab.com:kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos",
+    "typecheck": "bunx tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",

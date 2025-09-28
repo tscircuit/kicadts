@@ -25,3 +25,9 @@ most extensive one is `references/SEXPR_MAIN.adoc` (use `bun run scripts/downloa
 - NEW PATTERN: Classes have ergonomic getters and setters for properties
 - NEW PATTERN: Never has "extras" property, everything becomes an `SxClass`
 - NEW PATTERN: Never have "switch cases" that switch on the token. Always use the `SxClass.parsePrimitiveSexpr` method to parse arrays of `PrimitiveSExpr` into instances of the correct class.
+- NEW PATTERN: Never track the order of children unless absolutely necessary,
+  use the `_sx*` properties and `getChildren` to return the children in a
+  predefined order
+- NEW PATTERN: Never track unknown children, throw an error/allow an error to
+  be thrown if you encounter a child PrimitiveSExpr that can't be parsed. You
+  can introduce new `_sx*` properties and a new class to prevent the error

@@ -64,7 +64,8 @@ export class GrText extends SxClass {
         }
         case "xy": {
           const coords = rest.map((value) => Number(value)) as [number, number]
-          this.position = new Xy(coords)
+          const [x, y] = coords
+          this.position = new Xy(x, y)
           break
         }
         case "layer": {
