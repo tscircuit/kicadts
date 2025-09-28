@@ -1,248 +1,375 @@
 import { SxClass } from "../base-classes/SxClass"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { toStringValue } from "../utils/toStringValue"
-import { toNumberValue } from "../utils/toNumberValue"
-import { parseYesNo } from "../utils/parseYesNo"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { indentLines } from "../utils/indentLines"
-import { strokeFromArgs } from "../utils/strokeFromArgs"
+import { quoteSExprString } from "../utils/quoteSExprString"
+import { toNumberValue } from "../utils/toNumberValue"
+import { toStringValue } from "../utils/toStringValue"
 import { At } from "./At"
-import { Uuid } from "./Uuid"
+import { Color } from "./Color"
+import { Dnp } from "./Dnp"
+import { ExcludeFromSim } from "./ExcludeFromSim"
+import { FieldsAutoplaced } from "./FieldsAutoplaced"
+import { InBom } from "./InBom"
+import { OnBoard } from "./OnBoard"
+import { SheetInstances } from "./SheetInstances"
+import { SheetPin } from "./SheetPin"
 import { Stroke } from "./Stroke"
 import { TextEffects } from "./TextEffects"
+import { Uuid } from "./Uuid"
+import { SymbolPropertyId as PropertyId } from "./Symbol"
 
 export class Sheet extends SxClass {
   static override token = "sheet"
-  static override rawArgs = true
   token = "sheet"
 
-  position?: At
-  size?: { width: number; height: number }
-  fieldsAutoplaced = false
-  stroke?: Stroke
-  uuid?: Uuid
-  properties: SheetProperty[] = []
-  pins: SheetPin[] = []
-  instances?: SheetInstances
-  extras: PrimitiveSExpr[] = []
+  private _sxAt?: At
+  private _sxSize?: SheetSize
+  private _sxExcludeFromSim?: ExcludeFromSim
+  private _sxInBom?: InBom
+  private _sxOnBoard?: OnBoard
+  private _sxDnp?: Dnp
+  private _sxFieldsAutoplaced?: FieldsAutoplaced
+  private _sxStroke?: Stroke
+  private _sxFill?: SheetFill
+  private _sxUuid?: Uuid
+  private _properties: SheetProperty[] = []
+  private _pins: SheetPin[] = []
+  private _sxInstances?: SheetInstances
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Sheet {
+    const sheet = new Sheet()
 
-    for (const arg of args) {
-      if (typeof arg === "string") {
-        if (arg === "fields_autoplaced") {
-          this.fieldsAutoplaced = true
-          continue
-        }
-        this.extras.push(arg)
-        continue
-      }
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
+    sheet._sxAt = propertyMap.at as At | undefined
+    sheet._sxSize = propertyMap.size as SheetSize | undefined
+    sheet._sxExcludeFromSim = propertyMap.exclude_from_sim as ExcludeFromSim | undefined
+    sheet._sxInBom = propertyMap.in_bom as InBom | undefined
+    sheet._sxOnBoard = propertyMap.on_board as OnBoard | undefined
+    sheet._sxDnp = propertyMap.dnp as Dnp | undefined
+    sheet._sxFieldsAutoplaced = propertyMap.fields_autoplaced as FieldsAutoplaced | undefined
+    sheet._sxStroke = propertyMap.stroke as Stroke | undefined
+    sheet._sxFill = propertyMap.fill as SheetFill | undefined
+    sheet._sxUuid = propertyMap.uuid as Uuid | undefined
+    sheet._properties = (arrayPropertyMap.property as SheetProperty[]) ?? []
+    sheet._pins = (arrayPropertyMap.pin as SheetPin[]) ?? []
+    sheet._sxInstances = propertyMap.instances as SheetInstances | undefined
 
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
-      }
-
-      switch (token) {
-        case "at": {
-          const coords = rest
-            .map((value) => toNumberValue(value))
-            .filter((value): value is number => value !== undefined)
-          if (coords.length >= 2) {
-            this.position = new At(coords as [number, number, number?])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "size": {
-          const width = toNumberValue(rest[0])
-          const height = toNumberValue(rest[1])
-          if (width !== undefined && height !== undefined) {
-            this.size = { width, height }
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "stroke": {
-          const stroke = strokeFromArgs(rest as PrimitiveSExpr[])
-          if (stroke) {
-            this.stroke = stroke
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "uuid": {
-          this.uuid = new Uuid(rest as [string])
-          break
-        }
-        case "property": {
-          this.properties.push(new SheetProperty(rest as PrimitiveSExpr[]))
-          break
-        }
-        case "pin": {
-          this.pins.push(new SheetPin(rest as PrimitiveSExpr[]))
-          break
-        }
-        case "instances": {
-          this.instances = new SheetInstances(rest as PrimitiveSExpr[])
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
-      }
-    }
+    return sheet
   }
 
-  override getString(): string {
-    const lines = ["(sheet"]
+  get position(): At | undefined {
+    return this._sxAt
+  }
 
-    const push = (value?: string | string[]) => {
-      if (!value) return
-      const pushLine = (line: string) => {
-        for (const segment of line.split("\n")) {
-          lines.push(`  ${segment}`)
-        }
-      }
-      if (Array.isArray(value)) {
-        for (const line of value) pushLine(line)
-      } else {
-        pushLine(value)
-      }
+  set position(value: At | undefined) {
+    this._sxAt = value
+  }
+
+  get size(): { width: number; height: number } | undefined {
+    return this._sxSize?.toObject()
+  }
+
+  set size(value: SheetSize | { width: number; height: number } | undefined) {
+    if (value === undefined) {
+      this._sxSize = undefined
+      return
     }
-
-    if (this.position) push(this.position.getString())
-    if (this.size) push(`(size ${this.size.width} ${this.size.height})`)
-    if (this.fieldsAutoplaced) push("fields_autoplaced")
-    if (this.stroke) push(this.stroke.getString())
-    if (this.uuid) push(this.uuid.getString())
-
-    for (const property of this.properties) {
-      push(property.getStringLines())
+    if (value instanceof SheetSize) {
+      this._sxSize = value
+      return
     }
+    this._sxSize = new SheetSize(value.width, value.height)
+  }
 
-    for (const pin of this.pins) {
-      push(pin.getString())
+  get excludeFromSim(): boolean {
+    return this._sxExcludeFromSim?.value ?? false
+  }
+
+  set excludeFromSim(value: boolean) {
+    this._sxExcludeFromSim = new ExcludeFromSim(value)
+  }
+
+  get inBom(): boolean {
+    return this._sxInBom?.value ?? false
+  }
+
+  set inBom(value: boolean) {
+    this._sxInBom = new InBom(value)
+  }
+
+  get onBoard(): boolean {
+    return this._sxOnBoard?.value ?? false
+  }
+
+  set onBoard(value: boolean) {
+    this._sxOnBoard = new OnBoard(value)
+  }
+
+  get dnp(): boolean {
+    return this._sxDnp?.value ?? false
+  }
+
+  set dnp(value: boolean) {
+    this._sxDnp = new Dnp(value)
+  }
+
+  get fieldsAutoplaced(): boolean {
+    return this._sxFieldsAutoplaced?.value ?? false
+  }
+
+  set fieldsAutoplaced(value: boolean) {
+    this._sxFieldsAutoplaced = new FieldsAutoplaced(value)
+  }
+
+  get stroke(): Stroke | undefined {
+    return this._sxStroke
+  }
+
+  set stroke(value: Stroke | undefined) {
+    this._sxStroke = value
+  }
+
+  get fill(): SheetFill | undefined {
+    return this._sxFill
+  }
+
+  set fill(value: SheetFill | undefined) {
+    this._sxFill = value
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
+  }
+
+  set uuid(value: Uuid | string | undefined) {
+    if (value === undefined) {
+      this._sxUuid = undefined
+      return
     }
+    this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
+  }
 
-    if (this.instances) push(this.instances.getStringLines())
+  get properties(): SheetProperty[] {
+    return this._properties
+  }
 
-    for (const extra of this.extras) {
-      push(printSExpr(extra))
-    }
+  set properties(value: SheetProperty[]) {
+    this._properties = value
+  }
 
-    lines.push(")")
-    return lines.join("\n")
+  get pins(): SheetPin[] {
+    return this._pins
+  }
+
+  set pins(value: SheetPin[]) {
+    this._pins = value
+  }
+
+  get instances(): SheetInstances | undefined {
+    return this._sxInstances
+  }
+
+  set instances(value: SheetInstances | undefined) {
+    this._sxInstances = value
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxAt) children.push(this._sxAt)
+    if (this._sxSize) children.push(this._sxSize)
+    if (this._sxExcludeFromSim) children.push(this._sxExcludeFromSim)
+    if (this._sxInBom) children.push(this._sxInBom)
+    if (this._sxOnBoard) children.push(this._sxOnBoard)
+    if (this._sxDnp) children.push(this._sxDnp)
+    if (this._sxFieldsAutoplaced) children.push(this._sxFieldsAutoplaced)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    if (this._sxUuid) children.push(this._sxUuid)
+    children.push(...this._properties)
+    children.push(...this._pins)
+    if (this._sxInstances) children.push(this._sxInstances)
+    return children
   }
 }
 SxClass.register(Sheet)
 
+export class SheetSize extends SxClass {
+  static override token = "size"
+  static override parentToken = "sheet"
+  token = "size"
+
+  width: number
+  height: number
+
+  constructor(width: number, height: number) {
+    super()
+    this.width = width
+    this.height = height
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SheetSize {
+    const width = toNumberValue(primitiveSexprs[0])
+    const height = toNumberValue(primitiveSexprs[1])
+    if (width === undefined || height === undefined) {
+      throw new Error("sheet size requires numeric width and height")
+    }
+    return new SheetSize(width, height)
+  }
+
+  toObject(): { width: number; height: number } {
+    return { width: this.width, height: this.height }
+  }
+
+  override getString(): string {
+    return `(size ${this.width} ${this.height})`
+  }
+}
+SxClass.register(SheetSize)
+
+export class SheetFill extends SxClass {
+  static override token = "fill"
+  static override parentToken = "sheet"
+  token = "fill"
+
+  private _sxColor?: Color
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SheetFill {
+    const fill = new SheetFill()
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
+
+    fill._sxColor = propertyMap.color as Color | undefined
+
+    return fill
+  }
+
+  get color(): Color | undefined {
+    return this._sxColor
+  }
+
+  set color(value: Color | undefined) {
+    this._sxColor = value
+  }
+
+  override getChildren(): SxClass[] {
+    return this._sxColor ? [this._sxColor] : []
+  }
+}
+SxClass.register(SheetFill)
+
 export class SheetProperty extends SxClass {
   static override token = "property"
   static override parentToken = "sheet"
-  static override rawArgs = true
   token = "property"
 
   key: string
   value: string
-  id?: number
-  at?: At
-  effects?: TextEffects
-  extras: PrimitiveSExpr[] = []
+  private _sxId?: PropertyId
+  private _sxAt?: At
+  private _sxEffects?: TextEffects
 
-  constructor(args: PrimitiveSExpr[]) {
+  constructor(params: {
+    key: string
+    value: string
+    id?: number | PropertyId
+    at?: At
+    effects?: TextEffects
+  }) {
     super()
-    if (args.length < 2) {
-      throw new Error("sheet property requires key and value")
-    }
-
-    const key = toStringValue(args[0])
-    const value = toStringValue(args[1])
-    if (!key || value === undefined) {
-      throw new Error("sheet property key/value must be strings")
-    }
-    this.key = key
-    this.value = value
-
-    for (const arg of args.slice(2)) {
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
-      }
-
-      switch (token) {
-        case "id": {
-          const num = toNumberValue(rest[0])
-          if (num !== undefined) {
-            this.id = num
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "at": {
-          const coords = rest
-            .map((value) => toNumberValue(value))
-            .filter((value): value is number => value !== undefined)
-          if (coords.length >= 2) {
-            this.at = new At(coords as [number, number, number?])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "effects": {
-          const parsed = SxClass.parsePrimitiveSexpr([
-            "effects",
-            ...rest,
-          ] as PrimitiveSExpr)
-          if (parsed instanceof TextEffects) {
-            this.effects = parsed
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
-      }
-    }
+    this.key = params.key
+    this.value = params.value
+    this.id = params.id
+    this.at = params.at
+    this.effects = params.effects
   }
 
-  getStringLines(): string[] {
-    const lines = [
-      `(property ${quoteSExprString(this.key)} ${quoteSExprString(this.value)}`,
-    ]
-    if (this.id !== undefined) {
-      lines.push(`  (id ${this.id})`)
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SheetProperty {
+    const [rawKey, rawValue, ...rest] = primitiveSexprs
+
+    const key = toStringValue(rawKey)
+    const value = toStringValue(rawValue)
+
+    if (key === undefined || value === undefined) {
+      throw new Error("sheet property requires string key and value")
     }
-    if (this.at) {
-      lines.push(`  ${this.at.getString()}`)
+
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
+
+    return new SheetProperty({
+      key,
+      value,
+      id: propertyMap.id as PropertyId | undefined,
+      at: propertyMap.at as At | undefined,
+      effects: propertyMap.effects as TextEffects | undefined,
+    })
+  }
+
+  get id(): number | undefined {
+    return this._sxId?.value
+  }
+
+  set id(value: number | PropertyId | undefined) {
+    if (value === undefined) {
+      this._sxId = undefined
+      return
     }
-    if (this.effects) {
-      lines.push(...indentLines(this.effects.getString()))
+    this._sxId = value instanceof PropertyId ? value : new PropertyId(value)
+  }
+
+  get idClass(): PropertyId | undefined {
+    return this._sxId
+  }
+
+  get at(): At | undefined {
+    return this._sxAt
+  }
+
+  set at(value: At | undefined) {
+    this._sxAt = value
+  }
+
+  get effects(): TextEffects | undefined {
+    return this._sxEffects
+  }
+
+  set effects(value: TextEffects | undefined) {
+    this._sxEffects = value
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxId) children.push(this._sxId)
+    if (this._sxAt) children.push(this._sxAt)
+    if (this._sxEffects) children.push(this._sxEffects)
+    return children
+  }
+
+  override getString(): string {
+    const header = `(property ${quoteSExprString(this.key)} ${quoteSExprString(this.value)}`
+    const bodyLines = this.getChildren().flatMap((child) =>
+      indentLines(child.getString()),
+    )
+
+    if (bodyLines.length === 0) {
+      return `${header})`
     }
-    for (const extra of this.extras) {
-      lines.push(`  ${printSExpr(extra)}`)
-    }
-    lines.push(")")
-    return lines
+
+    return [header, ...bodyLines, ")"].join("\n")
   }
 }
 SxClass.register(SheetProperty)
