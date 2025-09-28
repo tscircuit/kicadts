@@ -1,179 +1,245 @@
 import { SxClass } from "../base-classes/SxClass"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
-import { strokeFromArgs } from "../utils/strokeFromArgs"
-import { toNumberValue } from "../utils/toNumberValue"
-import { toStringValue } from "../utils/toStringValue"
-import { parseYesNo } from "../utils/parseYesNo"
+import { GrLineStart } from "./GrLineStart"
+import { GrLineEnd } from "./GrLineEnd"
+import { GrLineAngle } from "./GrLineAngle"
+import { GrLineLocked } from "./GrLineLocked"
 
-interface GrLinePoint {
+export interface GrLinePoint {
   x: number
   y: number
 }
 
+const SUPPORTED_SINGLE_TOKENS = new Set([
+  "start",
+  "end",
+  "angle",
+  "layer",
+  "width",
+  "stroke",
+  "uuid",
+  "locked",
+])
+
 export class GrLine extends SxClass {
   static override token = "gr_line"
-  static override rawArgs = true
-  token = "gr_line"
+  override token = "gr_line"
 
-  start?: GrLinePoint
-  end?: GrLinePoint
-  angle?: number
-  layer?: Layer
-  width?: Width
-  stroke?: Stroke
-  uuid?: Uuid
-  locked = false
-  extras: PrimitiveSExpr[] = []
+  private _sxStart?: GrLineStart
+  private _sxEnd?: GrLineEnd
+  private _sxAngle?: GrLineAngle
+  private _sxLayer?: Layer
+  private _sxWidth?: Width
+  private _sxStroke?: Stroke
+  private _sxUuid?: Uuid
+  private _sxLocked?: GrLineLocked
 
-  constructor(args: PrimitiveSExpr[]) {
+  constructor() {
     super()
-
-    for (const arg of args) {
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
-      }
-
-      const [token, ...rest] = arg
-      if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
-      }
-
-      switch (token) {
-        case "start": {
-          const x = toNumberValue(rest[0])
-          const y = toNumberValue(rest[1])
-          if (x !== undefined && y !== undefined) {
-            this.start = { x, y }
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "end": {
-          const x = toNumberValue(rest[0])
-          const y = toNumberValue(rest[1])
-          if (x !== undefined && y !== undefined) {
-            this.end = { x, y }
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "angle": {
-          const value = toNumberValue(rest[0])
-          if (value !== undefined) {
-            this.angle = value
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "layer": {
-          this.layer = Layer.fromSexprPrimitives(rest as PrimitiveSExpr[])
-          break
-        }
-        case "width": {
-          const width = toNumberValue(rest[0])
-          if (width !== undefined) {
-            this.width = new Width([width])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "stroke": {
-          const stroke = strokeFromArgs(rest as PrimitiveSExpr[])
-          if (stroke) {
-            this.stroke = stroke
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "uuid": {
-          const value = toStringValue(rest[0])
-          if (value !== undefined) {
-            this.uuid = new Uuid([value])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "locked": {
-          const value = parseYesNo(rest[0])
-          if (value !== undefined) {
-            this.locked = value
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
-      }
-    }
   }
 
-  override getString(): string {
-    const lines = ["(gr_line"]
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): GrLine {
+    const grLine = new GrLine()
 
-    const pushLine = (value: string | SxClass | undefined) => {
-      if (!value) return
-      if (typeof value === "string") {
-        lines.push(`  ${value}`)
-        return
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+
+    const unexpectedTokens = new Set<string>()
+    for (const token of Object.keys(propertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        unexpectedTokens.add(token)
       }
-      const parts = value.getString().split("\n")
-      for (const part of parts) {
-        lines.push(`  ${part}`)
+    }
+    for (const token of Object.keys(arrayPropertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        unexpectedTokens.add(token)
+        continue
+      }
+      if (arrayPropertyMap[token]!.length > 1) {
+        throw new Error(
+          `gr_line does not support repeated child tokens: ${token}`,
+        )
       }
     }
 
-    if (this.start) {
-      pushLine(`(start ${this.start.x} ${this.start.y})`)
+    if (unexpectedTokens.size > 0) {
+      throw new Error(
+        `Unsupported child tokens inside gr_line expression: ${[...unexpectedTokens].join(", ")}`,
+      )
     }
 
-    if (this.end) {
-      pushLine(`(end ${this.end.x} ${this.end.y})`)
+    for (const primitive of primitiveSexprs) {
+      if (Array.isArray(primitive)) continue
+      throw new Error(
+        `gr_line encountered unexpected primitive child: ${JSON.stringify(primitive)}`,
+      )
     }
 
-    if (this.angle !== undefined) {
-      pushLine(`(angle ${this.angle})`)
+    grLine._sxStart = propertyMap.start as GrLineStart | undefined
+    grLine._sxEnd = propertyMap.end as GrLineEnd | undefined
+    grLine._sxAngle = propertyMap.angle as GrLineAngle | undefined
+    grLine._sxLayer = propertyMap.layer as Layer | undefined
+    grLine._sxWidth = propertyMap.width as Width | undefined
+    grLine._sxStroke = propertyMap.stroke as Stroke | undefined
+    const locked = propertyMap.locked as GrLineLocked | undefined
+    grLine._sxLocked = locked && locked.value ? locked : undefined
+    grLine._sxUuid = propertyMap.uuid as Uuid | undefined
+
+    if (!grLine._sxStart) {
+      throw new Error("gr_line requires a start child token")
+    }
+    if (!grLine._sxEnd) {
+      throw new Error("gr_line requires an end child token")
+    }
+    if (!grLine._sxLayer) {
+      throw new Error("gr_line requires a layer child token")
     }
 
-    if (this.stroke) {
-      pushLine(this.stroke)
-    }
+    return grLine
+  }
 
-    if (this.width) {
-      pushLine(this.width)
-    }
+  get start(): GrLineStart | undefined {
+    return this._sxStart
+  }
 
-    if (this.locked) {
-      pushLine("(locked yes)")
-    }
+  set start(value: GrLineStart | GrLinePoint | undefined) {
+    this._sxStart = this.normalizeStart(value)
+  }
 
-    if (this.layer) {
-      pushLine(this.layer)
-    }
+  get end(): GrLineEnd | undefined {
+    return this._sxEnd
+  }
 
-    if (this.uuid) {
-      pushLine(this.uuid)
-    }
+  set end(value: GrLineEnd | GrLinePoint | undefined) {
+    this._sxEnd = this.normalizeEnd(value)
+  }
 
-    for (const extra of this.extras) {
-      pushLine(printSExpr(extra))
-    }
+  get startPoint(): GrLinePoint | undefined {
+    return this._sxStart?.toObject()
+  }
 
-    lines.push(")")
-    return lines.join("\n")
+  get endPoint(): GrLinePoint | undefined {
+    return this._sxEnd?.toObject()
+  }
+
+  get angle(): number | undefined {
+    return this._sxAngle?.value
+  }
+
+  set angle(value: number | undefined) {
+    if (value === undefined) {
+      this._sxAngle = undefined
+      return
+    }
+    this._sxAngle = new GrLineAngle(value)
+  }
+
+  get layer(): Layer | undefined {
+    return this._sxLayer
+  }
+
+  set layer(value: Layer | string | Array<string | number> | undefined) {
+    if (value === undefined) {
+      this._sxLayer = undefined
+      return
+    }
+    if (value instanceof Layer) {
+      this._sxLayer = value
+      return
+    }
+    const names = Array.isArray(value) ? value : [value]
+    this._sxLayer = new Layer(names)
+  }
+
+  get width(): number | undefined {
+    return this._sxWidth?.value
+  }
+
+  set width(value: Width | number | undefined) {
+    if (value === undefined) {
+      this._sxWidth = undefined
+      return
+    }
+    this._sxWidth = value instanceof Width ? value : new Width(value)
+  }
+
+  get widthClass(): Width | undefined {
+    return this._sxWidth
+  }
+
+  set widthClass(value: Width | undefined) {
+    this._sxWidth = value
+  }
+
+  get stroke(): Stroke | undefined {
+    return this._sxStroke
+  }
+
+  set stroke(value: Stroke | undefined) {
+    this._sxStroke = value
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
+  }
+
+  set uuid(value: Uuid | string | undefined) {
+    if (value === undefined) {
+      this._sxUuid = undefined
+      return
+    }
+    this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
+  }
+
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: boolean) {
+    this._sxLocked = value ? new GrLineLocked(true) : undefined
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxStart) children.push(this._sxStart)
+    if (this._sxEnd) children.push(this._sxEnd)
+    if (this._sxAngle) children.push(this._sxAngle)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxWidth) children.push(this._sxWidth)
+    if (this._sxLocked) children.push(this._sxLocked)
+    if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxUuid) children.push(this._sxUuid)
+    return children
+  }
+
+  private normalizeStart(
+    value: GrLineStart | GrLinePoint | undefined,
+  ): GrLineStart | undefined {
+    if (value === undefined) {
+      return undefined
+    }
+    if (value instanceof GrLineStart) {
+      return value
+    }
+    return new GrLineStart(value.x, value.y)
+  }
+
+  private normalizeEnd(
+    value: GrLineEnd | GrLinePoint | undefined,
+  ): GrLineEnd | undefined {
+    if (value === undefined) {
+      return undefined
+    }
+    if (value instanceof GrLineEnd) {
+      return value
+    }
+    return new GrLineEnd(value.x, value.y)
   }
 }
 SxClass.register(GrLine)
