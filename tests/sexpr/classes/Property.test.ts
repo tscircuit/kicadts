@@ -35,7 +35,7 @@ test("Property preserves extended attributes", () => {
   expect(property.hiddenProperty).toBe(true)
   expect(property.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
   expect(property.effects).toBeDefined()
-  expect(property.extraArgs.length).toBe(1)
+  expect(property.unknownChildren.length).toBe(1)
 
   const roundTrip = property.getString()
 

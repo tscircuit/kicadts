@@ -44,7 +44,7 @@ test("FpTextBox", () => {
   expect(fpTextBox.effects).toBeInstanceOf(TextEffects)
   expect(fpTextBox.stroke).toBeInstanceOf(Stroke)
   expect(fpTextBox.uuid).toBeInstanceOf(Uuid)
-  expect(fpTextBox.extras.length).toBe(1)
+  expect(fpTextBox.unknownChildren.length).toBe(1)
 
   fpTextBox.locked = false
 

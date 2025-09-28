@@ -1,138 +1,172 @@
 import { SxClass } from "../base-classes/SxClass"
 import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import type { At } from "./At"
-import type { Xy } from "./Xy"
-import { Uuid } from "./Uuid"
 import { Layer } from "./Layer"
+import { Uuid } from "./Uuid"
+import { At } from "./At"
+import { Xy } from "./Xy"
 
-export type ImageClassProperty = SxClass | PrimitiveSExpr
+type ImageUnknownKind = ImageUnknown
 
 export class Image extends SxClass {
   static override token = "image"
   token = "image"
 
-  extraArgs: PrimitiveSExpr[] = []
+  private _sxPosition?: At | Xy
+  private _sxScale?: ImageScale
+  private _sxLayer?: Layer
+  private _sxUuid?: Uuid
+  private _sxData?: ImageData
+  private _additionalChildren: SxClass[] = []
+  private _unknownChildren: ImageUnknownKind[] = []
 
-  constructor(args: Array<SxClass | PrimitiveSExpr>) {
-    super(args)
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Image {
+    const image = new Image()
+
+    for (const primitive of primitiveSexprs) {
+      if (Array.isArray(primitive) && primitive.length > 0) {
+        try {
+          const parsed = SxClass.parsePrimitiveSexpr(primitive, {
+            parentToken: this.token,
+          })
+          if (parsed instanceof SxClass) {
+            image.attachChild(parsed)
+            continue
+          }
+        } catch (error) {
+          // handled below as unknown
+        }
+      }
+
+      image.addUnknown(primitive)
+    }
+
+    return image
+  }
+
+  private attachChild(child: SxClass) {
+    if (child instanceof At || child instanceof Xy) {
+      this._sxPosition = child
+      return
+    }
+    if (child instanceof ImageScale) {
+      this._sxScale = child
+      return
+    }
+    if (child instanceof Layer) {
+      this._sxLayer = child
+      return
+    }
+    if (child instanceof Uuid) {
+      this._sxUuid = child
+      return
+    }
+    if (child instanceof ImageData) {
+      this._sxData = child
+      return
+    }
+
+    this._additionalChildren.push(child)
+  }
+
+  private addUnknown(primitive: PrimitiveSExpr) {
+    this._unknownChildren.push(new ImageUnknown(primitive))
   }
 
   get position(): At | Xy | undefined {
-    return (
-      (this.getProperty("at") as At | undefined) ??
-      (this.getProperty("xy") as Xy | undefined)
-    )
+    return this._sxPosition
   }
 
   set position(value: At | Xy | undefined) {
-    if (!value) {
-      if (this._propertyMap) {
-        delete this._propertyMap["at"]
-        delete this._propertyMap["xy"]
-      }
-      return
-    }
-    if (!this._propertyMap) {
-      this._propertyMap = {}
-    }
-    delete this._propertyMap["at"]
-    delete this._propertyMap["xy"]
-    this.setProperty(value.token, value)
+    this._sxPosition = value
   }
 
   get scale(): ImageScale | undefined {
-    return this.getProperty("scale") as ImageScale | undefined
+    return this._sxScale
   }
 
   set scale(value: ImageScale | number | undefined) {
     if (value === undefined) {
-      if (this._propertyMap) delete this._propertyMap["scale"]
+      this._sxScale = undefined
       return
     }
-    const scaleClass =
-      value instanceof ImageScale ? value : new ImageScale([value])
-    this.setProperty("scale", scaleClass)
+    this._sxScale = value instanceof ImageScale ? value : new ImageScale(value)
   }
 
   get layer(): Layer | undefined {
-    return this.getProperty("layer") as Layer | undefined
+    return this._sxLayer
   }
 
-  set layer(value: Layer | string[] | string | undefined) {
+  set layer(value: Layer | string | string[] | undefined) {
     if (value === undefined) {
-      if (this._propertyMap) delete this._propertyMap["layer"]
+      this._sxLayer = undefined
       return
     }
-    const layerClass =
-      value instanceof Layer
-        ? value
-        : new Layer(Array.isArray(value) ? value : [value])
-    this.setProperty("layer", layerClass)
+    if (value instanceof Layer) {
+      this._sxLayer = value
+    } else {
+      const names = Array.isArray(value) ? value : [value]
+      this._sxLayer = new Layer(names)
+    }
   }
 
   get uuid(): Uuid | undefined {
-    return this.getProperty("uuid") as Uuid | undefined
+    return this._sxUuid
   }
 
   set uuid(value: Uuid | string | undefined) {
     if (value === undefined) {
-      if (this._propertyMap) delete this._propertyMap["uuid"]
+      this._sxUuid = undefined
       return
     }
-    const uuidClass = value instanceof Uuid ? value : new Uuid([value])
-    this.setProperty("uuid", uuidClass)
+    this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
   get data(): ImageData | undefined {
-    return this.getProperty("data") as ImageData | undefined
+    return this._sxData
   }
 
   set data(value: ImageData | string | string[] | undefined) {
     if (value === undefined) {
-      if (this._propertyMap) delete this._propertyMap["data"]
+      this._sxData = undefined
       return
     }
-    const dataClass =
-      value instanceof ImageData
-        ? value
-        : new ImageData(Array.isArray(value) ? value : [value])
-    this.setProperty("data", dataClass)
+    if (value instanceof ImageData) {
+      this._sxData = value
+    } else if (Array.isArray(value)) {
+      this._sxData = ImageData.fromStrings(value)
+    } else {
+      this._sxData = ImageData.fromStrings([value])
+    }
   }
 
-  override getString(): string {
-    const lines = ["(image"]
+  get additionalChildren(): SxClass[] {
+    return [...this._additionalChildren]
+  }
 
-    const pushProp = (prop?: SxClass) => {
-      if (!prop) return
-      const propLines = prop.getString().split("\n")
-      for (const propLine of propLines) {
-        lines.push(`  ${propLine}`)
-      }
-    }
+  set additionalChildren(children: SxClass[]) {
+    this._additionalChildren = [...children]
+  }
 
-    const seen = new Set<string>()
-    const preferOrder = ["at", "xy", "scale", "layer", "uuid", "data"]
-    for (const token of preferOrder) {
-      const prop = this._propertyMap?.[token]
-      if (prop) {
-        pushProp(prop)
-        seen.add(token)
-      }
-    }
+  get unknownChildren(): ImageUnknownKind[] {
+    return [...this._unknownChildren]
+  }
 
-    if (this._propertyMap) {
-      for (const [token, prop] of Object.entries(this._propertyMap)) {
-        if (seen.has(token)) continue
-        pushProp(prop)
-      }
-    }
+  set unknownChildren(children: ImageUnknownKind[]) {
+    this._unknownChildren = [...children]
+  }
 
-    for (const arg of this.extraArgs) {
-      lines.push(`  ${printSExpr(arg)}`)
-    }
-
-    lines.push(")")
-    return lines.join("\n")
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxPosition) children.push(this._sxPosition)
+    if (this._sxScale) children.push(this._sxScale)
+    if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxData) children.push(this._sxData)
+    children.push(...this._additionalChildren)
+    children.push(...this._unknownChildren)
+    return children
   }
 }
 SxClass.register(Image)
@@ -144,9 +178,22 @@ export class ImageScale extends SxClass {
 
   value: number
 
-  constructor(args: [value: number]) {
+  constructor(value: number) {
     super()
-    this.value = args[0]
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): ImageScale {
+    const [raw] = primitiveSexprs
+    const numeric =
+      typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : 1
+    return new ImageScale(Number.isFinite(numeric) ? numeric : 1)
+  }
+
+  override getChildren(): SxClass[] {
+    return []
   }
 
   override getString(): string {
@@ -158,36 +205,84 @@ SxClass.register(ImageScale)
 export class ImageData extends SxClass {
   static override token = "data"
   static override parentToken = "image"
-  static override rawArgs = true
   token = "data"
 
-  chunks: PrimitiveSExpr[]
+  private _chunks: PrimitiveSExpr[]
 
-  constructor(args: PrimitiveSExpr[]) {
+  constructor(chunks: PrimitiveSExpr[] = []) {
     super()
-    this.chunks = args
+    this._chunks = chunks
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): ImageData {
+    return new ImageData(primitiveSexprs)
+  }
+
+  static fromStrings(values: string[]): ImageData {
+    return new ImageData(values)
+  }
+
+  get chunks(): PrimitiveSExpr[] {
+    return [...this._chunks]
+  }
+
+  set chunks(values: PrimitiveSExpr[]) {
+    this._chunks = [...values]
   }
 
   get value(): string {
-    return this.chunks
-      .map((chunk) =>
-        typeof chunk === "string" || typeof chunk === "number"
-          ? String(chunk)
-          : printSExpr(chunk),
-      )
-      .join("")
+    return this._chunks.map((chunk) => printSExpr(chunk)).join("")
   }
 
   set value(data: string) {
-    this.chunks = [data]
+    this._chunks = [data]
+  }
+
+  override getChildren(): SxClass[] {
+    return []
   }
 
   override getString(): string {
-    if (this.chunks.length === 0) {
+    if (this._chunks.length === 0) {
       return "(data)"
     }
-    const chunkStrings = this.chunks.map((chunk) => printSExpr(chunk))
-    return `(data ${chunkStrings.join(" ")})`
+    const rendered = this._chunks.map((chunk) => printSExpr(chunk)).join(" ")
+    return `(data ${rendered})`
   }
 }
 SxClass.register(ImageData)
+
+class ImageUnknown extends SxClass {
+  static override token = "__image_unknown__"
+  token: string
+  private readonly primitive: PrimitiveSExpr
+
+  constructor(primitive: PrimitiveSExpr) {
+    super()
+    this.primitive = primitive
+    this.token = this.resolveToken(primitive)
+  }
+
+  private resolveToken(primitive: PrimitiveSExpr): string {
+    if (typeof primitive === "string") return primitive
+    if (Array.isArray(primitive) && primitive.length > 0) {
+      const [token] = primitive
+      if (typeof token === "string") return token
+    }
+    return "__image_unknown__"
+  }
+
+  get primitiveValue(): PrimitiveSExpr {
+    return this.primitive
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return printSExpr(this.primitive)
+  }
+}
