@@ -1,17 +1,17 @@
-import { SxClass } from "../base-classes/SxClass"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
-import { Xy } from "./Xy"
-import { Uuid } from "./Uuid"
+import { SxClass } from "../../base-classes/SxClass"
+import { quoteSExprString } from "../../utils/quoteSExprString"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { At } from "../At"
+import { Xy } from "../Xy"
+import { Uuid } from "../Uuid"
 import { Property } from "./Property"
-import { Layer } from "./Layer"
-import { FpText } from "./FpText"
-import { FpTextBox } from "./FpTextBox"
-import { FpRect } from "./FpRect"
-import { FpCircle } from "./FpCircle"
-import { FpArc } from "./FpArc"
-import { FpPoly } from "./FpPoly"
+import { Layer } from "../Layer"
+import { FpText } from "../FpText"
+import { FpTextBox } from "../FpTextBox"
+import { FpRect } from "../FpRect"
+import { FpCircle } from "../FpCircle"
+import { FpArc } from "../FpArc"
+import { FpPoly } from "../FpPoly"
 import { FootprintPad } from "./FootprintPad"
 
 type FootprintSingleKey =
@@ -50,12 +50,16 @@ type FootprintEntry =
   | { kind: "locked" }
   | { kind: "placed" }
   | { kind: "single"; key: FootprintSingleKey }
-  | { kind: "array"; collection: FootprintArrayKey; index: number; value: SxClass }
+  | {
+      kind: "array"
+      collection: FootprintArrayKey
+      index: number
+      value: SxClass
+    }
   | { kind: "raw"; value: PrimitiveSExpr }
 
 export class Footprint extends SxClass {
   static override token = "footprint"
-  static override rawArgs = true
   token = "footprint"
 
   libraryLink?: string

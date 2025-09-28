@@ -1,15 +1,15 @@
-import { SxClass } from "../base-classes/SxClass"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { toNumberValue } from "../utils/toNumberValue"
-import { toStringValue } from "../utils/toStringValue"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { Paper } from "./Paper"
-import { TitleBlock } from "./TitleBlock"
+import { SxClass } from "../../base-classes/SxClass"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { toNumberValue } from "../../utils/toNumberValue"
+import { toStringValue } from "../../utils/toStringValue"
+import { quoteSExprString } from "../../utils/quoteSExprString"
+import { Paper } from "../Paper"
+import { TitleBlock } from "../TitleBlock"
 import { Property } from "./Property"
-import { Image } from "./Image"
-import { Sheet } from "./Sheet"
-import { SchematicSymbol } from "./Symbol"
-import { Uuid } from "./Uuid"
+import { Image } from "../Image"
+import { Sheet } from "../Sheet"
+import { SchematicSymbol } from "../Symbol"
+import { Uuid } from "../Uuid"
 
 export class KicadSch extends SxClass {
   static override token = "kicad_sch"
@@ -90,11 +90,7 @@ export class KicadSch extends SxClass {
         case "property": {
           const key = toStringValue(rest[0])
           const value = toStringValue(rest[1])
-          if (
-            key !== undefined &&
-            value !== undefined &&
-            rest.length === 2
-          ) {
+          if (key !== undefined && value !== undefined && rest.length === 2) {
             this.properties.push(new Property([key, value]))
           } else {
             this.extras.push(arg)
@@ -185,9 +181,7 @@ export class KicadSch extends SxClass {
   }
 
   private formatGenerator(value: string): string {
-    return /^[A-Za-z0-9._-]+$/.test(value)
-      ? value
-      : quoteSExprString(value)
+    return /^[A-Za-z0-9._-]+$/.test(value) ? value : quoteSExprString(value)
   }
 }
 SxClass.register(KicadSch)

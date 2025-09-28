@@ -1,9 +1,6 @@
-import { SxClass } from "../base-classes/SxClass"
-import {
-  printSExpr,
-  type PrimitiveSExpr,
-} from "../parseToPrimitiveSExpr"
-import { toNumberValue } from "../utils/toNumberValue"
+import { SxClass } from "../../base-classes/SxClass"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { toNumberValue } from "../../utils/toNumberValue"
 
 export class PcbGeneral extends SxClass {
   static override token = "general"
@@ -19,7 +16,11 @@ export class PcbGeneral extends SxClass {
 
   get thickness(): number | undefined {
     for (const entry of this.entries) {
-      if (Array.isArray(entry) && entry.length > 1 && entry[0] === "thickness") {
+      if (
+        Array.isArray(entry) &&
+        entry.length > 1 &&
+        entry[0] === "thickness"
+      ) {
         return toNumberValue(entry[1] as PrimitiveSExpr)
       }
     }

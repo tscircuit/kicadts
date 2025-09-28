@@ -1,10 +1,7 @@
-import { SxClass } from "../base-classes/SxClass"
-import {
-  printSExpr,
-  type PrimitiveSExpr,
-} from "../parseToPrimitiveSExpr"
-import { toNumberValue } from "../utils/toNumberValue"
-import { toStringValue } from "../utils/toStringValue"
+import { SxClass } from "../../base-classes/SxClass"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { toNumberValue } from "../../utils/toNumberValue"
+import { toStringValue } from "../../utils/toStringValue"
 
 export interface PcbLayerDefinition {
   index: number | undefined

@@ -1,14 +1,14 @@
-import { SxClass } from "../base-classes/SxClass"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { strokeFromArgs } from "../utils/strokeFromArgs"
-import { toStringValue } from "../utils/toStringValue"
-import { toNumberValue } from "../utils/toNumberValue"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
-import { Uuid } from "./Uuid"
+import { SxClass } from "../../base-classes/SxClass"
+import { quoteSExprString } from "../../utils/quoteSExprString"
+import { strokeFromArgs } from "../../utils/strokeFromArgs"
+import { toStringValue } from "../../utils/toStringValue"
+import { toNumberValue } from "../../utils/toNumberValue"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { At } from "../At"
+import { Uuid } from "../Uuid"
 import { Property } from "./Property"
-import { Width } from "./Width"
-import { Stroke } from "./Stroke"
+import { Width } from "../Width"
+import { Stroke } from "../Stroke"
 
 type PadSize = { width: number; height: number }
 type PadLayers = string[]
@@ -277,7 +277,9 @@ export class FootprintPad extends SxClass {
   }
 
   override getString(): string {
-    const lines = [`(pad ${quoteSExprString(this.number)} ${this.padType} ${this.shape}`]
+    const lines = [
+      `(pad ${quoteSExprString(this.number)} ${this.padType} ${this.shape}`,
+    ]
 
     const pushLines = (value: string | string[]) => {
       if (!value) return
@@ -291,8 +293,7 @@ export class FootprintPad extends SxClass {
     }
 
     if (this.at) pushLines(this.at.getString())
-    if (this.size)
-      pushLines(`(size ${this.size.width} ${this.size.height})`)
+    if (this.size) pushLines(`(size ${this.size.width} ${this.size.height})`)
     if (this.drill) pushLines(formatPadDrill(this.drill))
     if (this.layers)
       pushLines(
@@ -320,8 +321,7 @@ export class FootprintPad extends SxClass {
 
     if (this.pinfunction)
       pushLines(`(pinfunction ${quoteSExprString(this.pinfunction)})`)
-    if (this.pintype)
-      pushLines(`(pintype ${quoteSExprString(this.pintype)})`)
+    if (this.pintype) pushLines(`(pintype ${quoteSExprString(this.pintype)})`)
     if (this.dieLength !== undefined)
       pushLines(`(die_length ${this.dieLength})`)
     if (this.solderMaskMargin !== undefined)
@@ -330,8 +330,7 @@ export class FootprintPad extends SxClass {
       pushLines(`(solder_paste_margin ${this.solderPasteMargin})`)
     if (this.solderPasteMarginRatio !== undefined)
       pushLines(`(solder_paste_margin_ratio ${this.solderPasteMarginRatio})`)
-    if (this.clearance !== undefined)
-      pushLines(`(clearance ${this.clearance})`)
+    if (this.clearance !== undefined) pushLines(`(clearance ${this.clearance})`)
     if (this.zoneConnect !== undefined)
       pushLines(`(zone_connect ${this.zoneConnect})`)
     if (this.thermalWidth !== undefined)

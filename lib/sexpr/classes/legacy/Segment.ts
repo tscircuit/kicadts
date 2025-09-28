@@ -1,12 +1,12 @@
-import { SxClass } from "../base-classes/SxClass"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { Layer } from "./Layer"
-import { Width } from "./Width"
-import { Uuid } from "./Uuid"
-import { toNumberValue } from "../utils/toNumberValue"
-import { toStringValue } from "../utils/toStringValue"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { parseYesNo } from "../utils/parseYesNo"
+import { SxClass } from "../../base-classes/SxClass"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { Layer } from "../Layer"
+import { Width } from "../Width"
+import { Uuid } from "../Uuid"
+import { toNumberValue } from "../../utils/toNumberValue"
+import { toStringValue } from "../../utils/toStringValue"
+import { quoteSExprString } from "../../utils/quoteSExprString"
+import { parseYesNo } from "../../utils/parseYesNo"
 
 interface SegmentPoint {
   x: number

@@ -1,11 +1,8 @@
-import { SxClass } from "../base-classes/SxClass"
-import {
-  printSExpr,
-  type PrimitiveSExpr,
-} from "../parseToPrimitiveSExpr"
-import { quoteSExprString } from "../utils/quoteSExprString"
-import { toNumberValue } from "../utils/toNumberValue"
-import { toStringValue } from "../utils/toStringValue"
+import { SxClass } from "../../base-classes/SxClass"
+import { printSExpr, type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { quoteSExprString } from "../../utils/quoteSExprString"
+import { toNumberValue } from "../../utils/toNumberValue"
+import { toStringValue } from "../../utils/toStringValue"
 
 export class PcbNet extends SxClass {
   static override token = "net"
