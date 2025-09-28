@@ -17,9 +17,9 @@ import { Stroke } from "./Stroke"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { SymbolPropertyId as PropertyId } from "./Symbol"
-import type { SheetFill } from "./SheetFill"
-import type { SheetSize } from "./SheetSize"
-import type { SheetProperty } from "./SheetProperty"
+import { SheetFill } from "./SheetFill"
+import { SheetSize } from "./SheetSize"
+import { SheetProperty } from "./SheetProperty"
 
 export class Sheet extends SxClass {
   static override token = "sheet"
