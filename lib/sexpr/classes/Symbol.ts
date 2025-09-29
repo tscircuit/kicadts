@@ -1143,6 +1143,7 @@ export class SymbolPin extends SxClass {
   _sxNumber?: SymbolPinNumber
   _sxUuid?: Uuid
   private inlineNumber?: string
+  private _sxHide?: SymbolPinHide
 
   static override fromSexprPrimitives(args: PrimitiveSExpr[]): SymbolPin {
     const symbolPin = new SymbolPin()
@@ -1175,6 +1176,7 @@ export class SymbolPin extends SxClass {
     symbolPin._sxName = propertyMap.name as SymbolPinName
     symbolPin._sxNumber = propertyMap.number as SymbolPinNumber
     symbolPin._sxUuid = propertyMap.uuid as Uuid
+    symbolPin._sxHide = propertyMap.hide as SymbolPinHide | undefined
 
     return symbolPin
   }
@@ -1229,6 +1231,14 @@ export class SymbolPin extends SxClass {
     this._sxUuid = value === undefined ? undefined : new Uuid(value)
   }
 
+  get hidden(): boolean {
+    return this._sxHide?.value ?? false
+  }
+
+  set hidden(value: boolean) {
+    this._sxHide = value ? new SymbolPinHide(value) : undefined
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -1236,6 +1246,7 @@ export class SymbolPin extends SxClass {
     if (this._sxName) children.push(this._sxName)
     if (this._sxNumber) children.push(this._sxNumber)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxHide) children.push(this._sxHide)
     return children
   }
 
@@ -1298,6 +1309,21 @@ export class SymbolInstances extends SxClass {
   }
 }
 SxClass.register(SymbolInstances)
+
+class SymbolPinHide extends SxPrimitiveBoolean {
+  static override token = "hide"
+  static override parentToken = "pin"
+  token = "hide"
+
+  constructor(value?: boolean) {
+    super(value ?? true)
+  }
+
+  override getString(): string {
+    return this.value ? "(hide yes)" : "(hide no)"
+  }
+}
+SxClass.register(SymbolPinHide)
 
 export class SymbolInstancesProject extends SxClass {
   static override token = "project"
