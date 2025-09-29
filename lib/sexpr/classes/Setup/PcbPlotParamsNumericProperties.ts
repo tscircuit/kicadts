@@ -1,7 +1,8 @@
+import { SxClass } from "lib/sexpr/base-classes/SxClass"
 import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
 import { toNumberValue } from "../../utils/toNumberValue"
 
-import { registerPlotParam, PlotParamProperty } from "./PcbPlotParamsBase"
+import { PlotParamProperty } from "./PcbPlotParamsBase"
 
 abstract class PlotParamNumberProperty extends PlotParamProperty<number> {
   protected static override parsePrimitiveValue(
@@ -15,86 +16,90 @@ abstract class PlotParamNumberProperty extends PlotParamProperty<number> {
   }
 }
 
-export class PlotParamLayerSelection extends PlotParamProperty<string | number> {
+export class PlotParamLayerSelection extends PlotParamProperty<
+  string | number
+> {
   static override token = "layerselection"
   token = "layerselection"
 }
-registerPlotParam(PlotParamLayerSelection)
+SxClass.register(PlotParamLayerSelection)
 
-export class PlotParamPlotOnAllLayersSelection extends PlotParamProperty<string | number> {
+export class PlotParamPlotOnAllLayersSelection extends PlotParamProperty<
+  string | number
+> {
   static override token = "plot_on_all_layers_selection"
   token = "plot_on_all_layers_selection"
 }
-registerPlotParam(PlotParamPlotOnAllLayersSelection)
+SxClass.register(PlotParamPlotOnAllLayersSelection)
 
 export class PlotParamDashedLineDashRatio extends PlotParamNumberProperty {
   static override token = "dashed_line_dash_ratio"
   token = "dashed_line_dash_ratio"
 }
-registerPlotParam(PlotParamDashedLineDashRatio)
+SxClass.register(PlotParamDashedLineDashRatio)
 
 export class PlotParamDashedLineGapRatio extends PlotParamNumberProperty {
   static override token = "dashed_line_gap_ratio"
   token = "dashed_line_gap_ratio"
 }
-registerPlotParam(PlotParamDashedLineGapRatio)
+SxClass.register(PlotParamDashedLineGapRatio)
 
 export class PlotParamSvgPrecision extends PlotParamNumberProperty {
   static override token = "svgprecision"
   token = "svgprecision"
 }
-registerPlotParam(PlotParamSvgPrecision)
+SxClass.register(PlotParamSvgPrecision)
 
 export class PlotParamLineWidth extends PlotParamNumberProperty {
   static override token = "linewidth"
   token = "linewidth"
 }
-registerPlotParam(PlotParamLineWidth)
+SxClass.register(PlotParamLineWidth)
 
 export class PlotParamMode extends PlotParamNumberProperty {
   static override token = "mode"
   token = "mode"
 }
-registerPlotParam(PlotParamMode)
+SxClass.register(PlotParamMode)
 
 export class PlotParamHpglPenNumber extends PlotParamNumberProperty {
   static override token = "hpglpennumber"
   token = "hpglpennumber"
 }
-registerPlotParam(PlotParamHpglPenNumber)
+SxClass.register(PlotParamHpglPenNumber)
 
 export class PlotParamHpglPenSpeed extends PlotParamNumberProperty {
   static override token = "hpglpenspeed"
   token = "hpglpenspeed"
 }
-registerPlotParam(PlotParamHpglPenSpeed)
+SxClass.register(PlotParamHpglPenSpeed)
 
 export class PlotParamHpglPenDiameter extends PlotParamNumberProperty {
   static override token = "hpglpendiameter"
   token = "hpglpendiameter"
 }
-registerPlotParam(PlotParamHpglPenDiameter)
+SxClass.register(PlotParamHpglPenDiameter)
 
 export class PlotParamHpglPenOverlay extends PlotParamNumberProperty {
   static override token = "hpglpenoverlay"
   token = "hpglpenoverlay"
 }
-registerPlotParam(PlotParamHpglPenOverlay)
+SxClass.register(PlotParamHpglPenOverlay)
 
 export class PlotParamOutputFormat extends PlotParamNumberProperty {
   static override token = "outputformat"
   token = "outputformat"
 }
-registerPlotParam(PlotParamOutputFormat)
+SxClass.register(PlotParamOutputFormat)
 
 export class PlotParamDrillShape extends PlotParamNumberProperty {
   static override token = "drillshape"
   token = "drillshape"
 }
-registerPlotParam(PlotParamDrillShape)
+SxClass.register(PlotParamDrillShape)
 
 export class PlotParamScaleSelection extends PlotParamNumberProperty {
   static override token = "scaleselection"
   token = "scaleselection"
 }
-registerPlotParam(PlotParamScaleSelection)
+SxClass.register(PlotParamScaleSelection)

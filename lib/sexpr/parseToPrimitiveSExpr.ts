@@ -21,11 +21,19 @@ export function tokenize(input: string): Token[] {
 
   const isWhitespace = (ch: string) => /\s/.test(ch)
   const isSymbolInitial = (ch: string) => /[^\s()"]/u.test(ch) // anything except ws, parens, quote
-  const peek = () => input[i]
-  const advance = () => input[i++]
+  const peek = () => (i < input.length ? input[i]! : undefined)
+  const advance = () => {
+    if (i >= input.length) {
+      throw new SyntaxError("Unexpected end of input")
+    }
+    return input[i++]!
+  }
 
   while (i < input.length) {
     const ch = peek()
+    if (ch === undefined) {
+      break
+    }
 
     // Skip whitespace
     if (isWhitespace(ch)) {
@@ -141,21 +149,29 @@ export function parseToPrimitiveSExpr(input: string): PrimitiveSExpr[] {
   const toks = tokenize(input)
   let idx = 0
 
-  const peek = () => toks[idx]
-  const advance = () => toks[idx++]
+  const peekToken = () => (idx < toks.length ? toks[idx]! : undefined)
+  const advanceToken = () => {
+    if (idx >= toks.length) {
+      throw new SyntaxError("Unexpected end of input")
+    }
+    return toks[idx++]!
+  }
 
   function readForm(): PrimitiveSExpr {
-    const t = advance()
-    if (!t) throw new SyntaxError("Unexpected end of input")
+    const t = advanceToken()
 
     switch (t.type) {
       case "lparen": {
         const list: PrimitiveSExpr[] = []
-        while (peek() && peek()!.type !== "rparen") {
+        while (true) {
+          const next = peekToken()
+          if (!next) {
+            throw new SyntaxError("Unmatched '('")
+          }
+          if (next.type === "rparen") break
           list.push(readForm())
         }
-        if (!peek()) throw new SyntaxError("Unmatched '('")
-        advance() // consume rparen
+        advanceToken() // consume rparen
         return list
       }
       case "rparen":
@@ -174,7 +190,7 @@ export function parseToPrimitiveSExpr(input: string): PrimitiveSExpr[] {
   }
 
   const forms: PrimitiveSExpr[] = []
-  while (peek()) forms.push(readForm())
+  while (peekToken()) forms.push(readForm())
   return forms
 }
 
@@ -202,8 +218,11 @@ export function printSExpr(x: PrimitiveSExpr): string {
               : "\\t",
     )}"`
   }
-  // list
-  return `(${x.map(printSExpr).join(" ")})`
+  if (Array.isArray(x)) {
+    return `(${x.map(printSExpr).join(" ")})`
+  }
+
+  throw new Error(`Unsupported S-expression value: ${JSON.stringify(x)}`)
 }
 
 // Quick example:

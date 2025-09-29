@@ -55,6 +55,10 @@ const canonicalizeNode = (
 ): CanonicalPrimitiveSExpr => {
   const [head, ...tail] = list
 
+  if (head === undefined) {
+    return []
+  }
+
   const positional: CanonicalPrimitiveSExpr[] = []
   const grouped = new Map<string, CanonicalPrimitiveSExpr[]>()
 
@@ -108,4 +112,3 @@ export const expectEqualPrimitiveSExpr = (
 
   expect(normalizedActual).toEqual(normalizedExpected)
 }
-

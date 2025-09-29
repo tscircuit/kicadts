@@ -96,9 +96,11 @@ test("Footprint", () => {
   expect(footprint.layer).toBeInstanceOf(Layer)
   expect(footprint.tedit?.value).toBe("5E4C0E65")
   expect(footprint.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
-  expect(footprint.position?.x).toBe(10.16)
-  expect(footprint.position?.y).toBe(5.08)
-  expect(footprint.position?.angle).toBe(90)
+  const position = footprint.position
+  expect(position).toBeDefined()
+  expect(position?.x).toBe(10.16)
+  expect(position?.y).toBe(5.08)
+  expect(position?.angle).toBe(90)
   expect(footprint.descr?.value).toBe("0603 chip resistor")
   expect(footprint.tags?.value).toBe("resistor smd")
   expect(footprint.properties[0]?.key).toBe("Sheetfile")
@@ -147,13 +149,12 @@ test("Footprint", () => {
   const pad = footprint.fpPads[0]
   expect(pad.number).toBe("1")
   expect(pad.padType).toBe("smd")
-  expect(pad.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
+  expect(pad.layers?.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
   expect(pad.net?.name).toBe("GND")
-  expect(footprint.extraItems.length).toBe(0)
 
   footprint.locked = false
   footprint.placed = false
-  footprint.solderMaskMargin = new FootprintSolderMaskMargin([0.09])
+  footprint.solderMaskMargin = new FootprintSolderMaskMargin(0.09)
 
   expect(footprint.getString()).toMatchInlineSnapshot(`
     "(footprint

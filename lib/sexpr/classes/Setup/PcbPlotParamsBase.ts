@@ -7,9 +7,3 @@ export abstract class PlotParamProperty<
 > extends SingleValueProperty<T> {
   static override parentToken = "pcbplotparams"
 }
-
-export const registerPlotParam = <T extends string | number>(
-  ClassRef: new (value: T) => PlotParamProperty<T>,
-) => {
-  SxClass.register(ClassRef)
-}

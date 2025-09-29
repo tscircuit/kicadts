@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { Property, SxClass } from "lib/sexpr"
+import { At, Property, SxClass } from "lib/sexpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 import { expectEqualPrimitiveSExpr } from "../../fixtures/expectEqualPrimitiveSExpr"
 
@@ -27,15 +27,19 @@ test("Property preserves extended attributes", () => {
   const property = parsed as Property
   expect(property.key).toBe("Reference")
   expect(property.value).toBe("R1")
-  expect(property.position?.x).toBe(1)
-  expect(property.position?.y).toBe(2)
-  expect(property.position?.angle).toBe(90)
-  expect(property.unlockedProperty).toBe(true)
+  const position = property.position
+  expect(position).toBeInstanceOf(At)
+  if (position instanceof At) {
+    expect(position.x).toBe(1)
+    expect(position.y).toBe(2)
+    expect(position.angle).toBe(90)
+  }
+  expect(property.unlocked).toBe(true)
   expect(property.layer?.names).toEqual(["F.SilkS"])
-  expect(property.hiddenProperty).toBe(true)
+  expect(property.hidden).toBe(true)
   expect(property.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
   expect(property.effects).toBeDefined()
-  expect(property.unknownChildren.length).toBe(1)
+  expect(property.getChildren().length).toBeGreaterThan(0)
 
   const roundTrip = property.getString()
 

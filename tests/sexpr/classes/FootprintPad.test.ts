@@ -1,4 +1,4 @@
-import { FootprintPad, SxClass } from "lib/sexpr"
+import { FootprintPad, PadLayers, PadNet, PadSize, PadDrill, SxClass } from "lib/sexpr"
 import { expect, test } from "bun:test"
 
 test("FootprintPad", () => {
@@ -30,12 +30,19 @@ test("FootprintPad", () => {
   expect(fpPad.padType).toBe("smd")
   expect(fpPad.shape).toBe("roundrect")
   expect(fpPad.at).toBeDefined()
-  expect(fpPad.size).toEqual({ width: 1.2, height: 0.6 })
-  expect(fpPad.drill).toEqual({ oval: false, diameter: 0.3, extras: [] })
-  expect(fpPad.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
+  expect(fpPad.size).toBeInstanceOf(PadSize)
+  expect(fpPad.size?.width).toBe(1.2)
+  expect(fpPad.size?.height).toBe(0.6)
+  expect(fpPad.drill).toBeInstanceOf(PadDrill)
+  expect(fpPad.drill?.oval).toBe(false)
+  expect(fpPad.drill?.diameter).toBe(0.3)
+  expect(fpPad.layers).toBeInstanceOf(PadLayers)
+  expect(fpPad.layers?.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
   expect(fpPad.roundrectRatio).toBe(0.25)
   expect(fpPad.chamferCorners).toEqual(["top_left", "bottom_right"])
-  expect(fpPad.net).toEqual({ id: 3, name: "SIG" })
+  expect(fpPad.net).toBeInstanceOf(PadNet)
+  expect(fpPad.net?.id).toBe(3)
+  expect(fpPad.net?.name).toBe("SIG")
   expect(fpPad.pinfunction).toBe("SIG")
   expect(fpPad.pintype).toBe("input")
   expect(fpPad.locked).toBe(true)

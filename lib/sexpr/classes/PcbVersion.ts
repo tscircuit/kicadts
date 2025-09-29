@@ -1,24 +1,9 @@
+import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { SxClass } from "../base-classes/SxClass"
-import { toNumberValue } from "../utils/toNumberValue"
 
-export class PcbVersion extends SxClass {
+export class PcbVersion extends SxPrimitiveNumber {
   static override token = "version"
   static override parentToken = "kicad_pcb"
-  override token = "version"
-
-  value: number
-
-  constructor(args: [number | string]) {
-    super()
-    const parsed = toNumberValue(args[0])
-    if (parsed === undefined) {
-      throw new Error("version expects a numeric argument")
-    }
-    this.value = parsed
-  }
-
-  override getString(): string {
-    return `(version ${this.value})`
-  }
+  token = "version"
 }
 SxClass.register(PcbVersion)

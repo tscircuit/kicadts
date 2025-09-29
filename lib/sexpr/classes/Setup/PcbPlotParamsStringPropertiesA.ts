@@ -1,104 +1,104 @@
-import { registerPlotParam, PlotParamProperty } from "./PcbPlotParamsBase"
+import { SxClass } from "lib/sexpr/base-classes/SxClass"
+import { PlotParamProperty } from "./PcbPlotParamsBase"
 
 export class PlotParamDisableApertMacros extends PlotParamProperty<string> {
   static override token = "disableapertmacros"
   token = "disableapertmacros"
 }
-registerPlotParam(PlotParamDisableApertMacros)
+SxClass.register(PlotParamDisableApertMacros)
 
 export class PlotParamUseGerberExtensions extends PlotParamProperty<string> {
   static override token = "usegerberextensions"
   token = "usegerberextensions"
 }
-registerPlotParam(PlotParamUseGerberExtensions)
+SxClass.register(PlotParamUseGerberExtensions)
 
 export class PlotParamUseGerberAttributes extends PlotParamProperty<string> {
   static override token = "usegerberattributes"
   token = "usegerberattributes"
 }
-registerPlotParam(PlotParamUseGerberAttributes)
+SxClass.register(PlotParamUseGerberAttributes)
 
 export class PlotParamUseGerberAdvancedAttributes extends PlotParamProperty<string> {
   static override token = "usegerberadvancedattributes"
   token = "usegerberadvancedattributes"
 }
-registerPlotParam(PlotParamUseGerberAdvancedAttributes)
+SxClass.register(PlotParamUseGerberAdvancedAttributes)
 
 export class PlotParamCreateGerberJobFile extends PlotParamProperty<string> {
   static override token = "creategerberjobfile"
   token = "creategerberjobfile"
 }
-registerPlotParam(PlotParamCreateGerberJobFile)
+SxClass.register(PlotParamCreateGerberJobFile)
 
 export class PlotParamExcludeEdgeLayer extends PlotParamProperty<string> {
   static override token = "excludeedgelayer"
   token = "excludeedgelayer"
 }
-registerPlotParam(PlotParamExcludeEdgeLayer)
+SxClass.register(PlotParamExcludeEdgeLayer)
 
 export class PlotParamPlotFrameRef extends PlotParamProperty<string> {
   static override token = "plotframeref"
   token = "plotframeref"
 }
-registerPlotParam(PlotParamPlotFrameRef)
+SxClass.register(PlotParamPlotFrameRef)
 
 export class PlotParamViaOnMask extends PlotParamProperty<string> {
   static override token = "viasonmask"
   token = "viasonmask"
 }
-registerPlotParam(PlotParamViaOnMask)
+SxClass.register(PlotParamViaOnMask)
 
 export class PlotParamUseAuxOrigin extends PlotParamProperty<string> {
   static override token = "useauxorigin"
   token = "useauxorigin"
 }
-registerPlotParam(PlotParamUseAuxOrigin)
+SxClass.register(PlotParamUseAuxOrigin)
 
 export class PlotParamPdfFrontFpPropertyPopups extends PlotParamProperty<string> {
   static override token = "pdf_front_fp_property_popups"
   token = "pdf_front_fp_property_popups"
 }
-registerPlotParam(PlotParamPdfFrontFpPropertyPopups)
+SxClass.register(PlotParamPdfFrontFpPropertyPopups)
 
 export class PlotParamPdfBackFpPropertyPopups extends PlotParamProperty<string> {
   static override token = "pdf_back_fp_property_popups"
   token = "pdf_back_fp_property_popups"
 }
-registerPlotParam(PlotParamPdfBackFpPropertyPopups)
+SxClass.register(PlotParamPdfBackFpPropertyPopups)
 
 export class PlotParamPdfMetadata extends PlotParamProperty<string> {
   static override token = "pdf_metadata"
   token = "pdf_metadata"
 }
-registerPlotParam(PlotParamPdfMetadata)
+SxClass.register(PlotParamPdfMetadata)
 
 export class PlotParamPdfSingleDocument extends PlotParamProperty<string> {
   static override token = "pdf_single_document"
   token = "pdf_single_document"
 }
-registerPlotParam(PlotParamPdfSingleDocument)
+SxClass.register(PlotParamPdfSingleDocument)
 
 export class PlotParamDxfPolygonMode extends PlotParamProperty<string> {
   static override token = "dxfpolygonmode"
   token = "dxfpolygonmode"
 }
-registerPlotParam(PlotParamDxfPolygonMode)
+SxClass.register(PlotParamDxfPolygonMode)
 
 export class PlotParamDxfImperialUnits extends PlotParamProperty<string> {
   static override token = "dxfimperialunits"
   token = "dxfimperialunits"
 }
-registerPlotParam(PlotParamDxfImperialUnits)
+SxClass.register(PlotParamDxfImperialUnits)
 
 export class PlotParamDxfUsePcbnewFont extends PlotParamProperty<string> {
   static override token = "dxfusepcbnewfont"
   token = "dxfusepcbnewfont"
 }
-registerPlotParam(PlotParamDxfUsePcbnewFont)
+SxClass.register(PlotParamDxfUsePcbnewFont)
 
 export class PlotParamPsNegative extends PlotParamProperty<string> {
   static override token = "psnegative"
   token = "psnegative"
 }
-registerPlotParam(PlotParamPsNegative)
-
+SxClass.register(PlotParamPsNegative)

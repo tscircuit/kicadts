@@ -1,105 +1,105 @@
-import { registerPlotParam, PlotParamProperty } from "./PcbPlotParamsBase"
+import { SxClass } from "lib/sexpr/base-classes/SxClass"
+import { PlotParamProperty } from "./PcbPlotParamsBase"
 
 export class PlotParamPsA4Output extends PlotParamProperty<string> {
   static override token = "psa4output"
   token = "psa4output"
 }
-registerPlotParam(PlotParamPsA4Output)
+SxClass.register(PlotParamPsA4Output)
 
 export class PlotParamPlotReference extends PlotParamProperty<string> {
   static override token = "plotreference"
   token = "plotreference"
 }
-registerPlotParam(PlotParamPlotReference)
+SxClass.register(PlotParamPlotReference)
 
 export class PlotParamPlotValue extends PlotParamProperty<string> {
   static override token = "plotvalue"
   token = "plotvalue"
 }
-registerPlotParam(PlotParamPlotValue)
+SxClass.register(PlotParamPlotValue)
 
 export class PlotParamPlotOtherText extends PlotParamProperty<string> {
   static override token = "plotothertext"
   token = "plotothertext"
 }
-registerPlotParam(PlotParamPlotOtherText)
+SxClass.register(PlotParamPlotOtherText)
 
 export class PlotParamPlotInvisibleText extends PlotParamProperty<string> {
   static override token = "plotinvisibletext"
   token = "plotinvisibletext"
 }
-registerPlotParam(PlotParamPlotInvisibleText)
+SxClass.register(PlotParamPlotInvisibleText)
 
 export class PlotParamPadOnSilk extends PlotParamProperty<string> {
   static override token = "padsonsilk"
   token = "padsonsilk"
 }
-registerPlotParam(PlotParamPadOnSilk)
+SxClass.register(PlotParamPadOnSilk)
 
 export class PlotParamSketchPadsOnFab extends PlotParamProperty<string> {
   static override token = "sketchpadsonfab"
   token = "sketchpadsonfab"
 }
-registerPlotParam(PlotParamSketchPadsOnFab)
+SxClass.register(PlotParamSketchPadsOnFab)
 
 export class PlotParamPlotPadNumbers extends PlotParamProperty<string> {
   static override token = "plotpadnumbers"
   token = "plotpadnumbers"
 }
-registerPlotParam(PlotParamPlotPadNumbers)
+SxClass.register(PlotParamPlotPadNumbers)
 
 export class PlotParamHideDnpOnFab extends PlotParamProperty<string> {
   static override token = "hidednponfab"
   token = "hidednponfab"
 }
-registerPlotParam(PlotParamHideDnpOnFab)
+SxClass.register(PlotParamHideDnpOnFab)
 
 export class PlotParamSketchDnpOnFab extends PlotParamProperty<string> {
   static override token = "sketchdnponfab"
   token = "sketchdnponfab"
 }
-registerPlotParam(PlotParamSketchDnpOnFab)
+SxClass.register(PlotParamSketchDnpOnFab)
 
 export class PlotParamCrossoutDnpOnFab extends PlotParamProperty<string> {
   static override token = "crossoutdnponfab"
   token = "crossoutdnponfab"
 }
-registerPlotParam(PlotParamCrossoutDnpOnFab)
+SxClass.register(PlotParamCrossoutDnpOnFab)
 
 export class PlotParamSubtractMaskFromSilk extends PlotParamProperty<string> {
   static override token = "subtractmaskfromsilk"
   token = "subtractmaskfromsilk"
 }
-registerPlotParam(PlotParamSubtractMaskFromSilk)
+SxClass.register(PlotParamSubtractMaskFromSilk)
 
 export class PlotParamPlotBlackAndWhite extends PlotParamProperty<string> {
   static override token = "plot_black_and_white"
   token = "plot_black_and_white"
 }
-registerPlotParam(PlotParamPlotBlackAndWhite)
+SxClass.register(PlotParamPlotBlackAndWhite)
 
 export class PlotParamMirror extends PlotParamProperty<string> {
   static override token = "mirror"
   token = "mirror"
 }
-registerPlotParam(PlotParamMirror)
+SxClass.register(PlotParamMirror)
 
 export class PlotParamOutputDirectory extends PlotParamProperty<string> {
   static override token = "outputdirectory"
   token = "outputdirectory"
   protected override quoteStringValue = true
 }
-registerPlotParam(PlotParamOutputDirectory)
+SxClass.register(PlotParamOutputDirectory)
 
 export class PlotParamPlotOnAllLayers extends PlotParamProperty<string> {
   static override token = "plot_on_all_layers"
   token = "plot_on_all_layers"
 }
-registerPlotParam(PlotParamPlotOnAllLayers)
+SxClass.register(PlotParamPlotOnAllLayers)
 
 export class PlotParamPlotInvisible extends PlotParamProperty<string> {
   static override token = "plotinvisible"
   token = "plotinvisible"
 }
-registerPlotParam(PlotParamPlotInvisible)
-
+SxClass.register(PlotParamPlotInvisible)

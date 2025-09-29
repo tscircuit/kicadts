@@ -6,6 +6,7 @@ import {
   Sheet,
   SxClass,
   TitleBlock,
+  Wire,
 } from "lib/sexpr"
 import { expect, test } from "bun:test"
 
@@ -59,12 +60,8 @@ test("KicadSch parse", () => {
   expect(schematic.symbols).toHaveLength(1)
   expect(schematic.symbols[0]).toBeInstanceOf(SchematicSymbol)
 
-  expect(schematic.extras).toHaveLength(1)
-  const [extra] = schematic.extras
-  expect(Array.isArray(extra)).toBe(true)
-  if (Array.isArray(extra)) {
-    expect(extra[0]).toBe("wire")
-  }
+  expect(schematic.wires).toHaveLength(1)
+  expect(schematic.wires[0]).toBeInstanceOf(Wire)
 
   expect(schematic.getString()).toMatchInlineSnapshot(`
     "(kicad_sch
