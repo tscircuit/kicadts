@@ -1,5 +1,6 @@
 import { SxClass } from "../../base-classes/SxClass"
-import { type PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { toStringValue } from "../../utils/toStringValue"
 
 import { SingleValueProperty } from "./base"
 
@@ -34,19 +35,41 @@ SxClass.register(SetupUviasAllowed)
 export class SetupTenting extends SxClass {
   static override token = "tenting"
   static override parentToken = "setup"
-  static override rawArgs = true
   token = "tenting"
 
-  sides: string[]
+  private _sides: string[] = []
 
-  constructor(args: PrimitiveSExpr[]) {
+  constructor(sides: string[] = []) {
     super()
-    this.sides = args.filter((side): side is string => typeof side === "string")
+    this.sides = sides
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SetupTenting {
+    const sides = primitiveSexprs
+      .map((primitive) => toStringValue(primitive))
+      .filter((value): value is string => value !== undefined)
+    return new SetupTenting(sides)
+  }
+
+  get sides(): string[] {
+    return [...this._sides]
+  }
+
+  set sides(sides: string[]) {
+    this._sides = sides.map((side) => String(side))
+  }
+
+  override getChildren(): SxClass[] {
+    return []
   }
 
   override getString(): string {
-    return `(tenting ${this.sides.join(" ")})`
+    if (this._sides.length === 0) {
+      return "(tenting)"
+    }
+    return `(tenting ${this._sides.join(" ")})`
   }
 }
 SxClass.register(SetupTenting)
-

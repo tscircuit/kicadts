@@ -1,9 +1,21 @@
 import { SxClass } from "../../base-classes/SxClass"
+import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
+import { toNumberValue } from "../../utils/toNumberValue"
 
 import { SingleValueProperty } from "./base"
 
 abstract class SetupNumberProperty extends SingleValueProperty<number> {
   static override parentToken = "setup"
+
+  protected static override parsePrimitiveValue(
+    value: PrimitiveSExpr | undefined,
+  ): number {
+    const parsed = toNumberValue(value)
+    if (parsed === undefined) {
+      throw new Error(`${this.name} expects a numeric value`)
+    }
+    return parsed
+  }
 }
 
 export class SetupPadToMaskClearance extends SetupNumberProperty {
@@ -137,4 +149,3 @@ export class SetupPadDrill extends SetupNumberProperty {
   token = "pad_drill"
 }
 SxClass.register(SetupPadDrill)
-
