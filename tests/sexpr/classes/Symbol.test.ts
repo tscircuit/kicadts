@@ -49,14 +49,13 @@ test("Symbol parse", () => {
   expect(sym.instances).toBeDefined()
 
   expect(sym.getString()).toMatchInlineSnapshot(`
-    "(symbol
-      (lib_id \"Device:R\")
+    "(symbol "Device:R"
       (at 10 20 90)
       (unit 2)
       (in_bom yes)
       (on_board no)
       (uuid 12345678-1234-1234-1234-123456789abc)
-      (property \"Reference\" \"R?\"
+      (property "Reference" "R?"
         (id 0)
         (at 0 0 0)
         (effects
@@ -69,14 +68,14 @@ test("Symbol parse", () => {
       (pin input line
         (at 0 -5.08 90)
         (length 2.54)
-        (name \"A\"
+        (name "A"
           (effects
             (font
               (size 1.27 1.27)
             )
           )
         )
-        (number \"1\"
+        (number "1"
           (effects
             (font
               (size 1.27 1.27)
@@ -85,9 +84,9 @@ test("Symbol parse", () => {
         )
       )
       (instances
-        (project \"Project\"
-          (path \"/0001\"
-            (reference \"R1\")
+        (project "Project"
+          (path "/0001"
+            (reference "R1")
             (unit 1)
           )
         )
