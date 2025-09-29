@@ -1,7 +1,11 @@
 {
   "name": "kicadts",
-  "module": "index.ts",
+  "module": "dist/index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tscircuit/kicadts"
+  },
   "scripts": {
     "build": "tsup-node lib/index.ts --format esm --dts",
     "download-references": "bun run scripts/download-references.ts",
