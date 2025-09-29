@@ -799,7 +799,7 @@ export class SchematicSymbol extends SxClass {
       const first = remaining[0]
       inlineId = toStringValue(first)
       if (inlineId !== undefined) {
-        symbol.libraryId = inlineId
+        symbol._inlineLibId = inlineId
         remaining = remaining.slice(1)
       }
     }
@@ -810,8 +810,8 @@ export class SchematicSymbol extends SxClass {
     const libIdClass = propertyMap.lib_id as SymbolLibId | undefined
     if (libIdClass) {
       symbol._sxLibId = libIdClass
-    } else if (!symbol._sxLibId && inlineId !== undefined) {
-      symbol._sxLibId = new SymbolLibId(inlineId)
+    } else if (inlineId !== undefined) {
+      symbol._inlineLibId = inlineId
     }
     symbol._sxAt = propertyMap.at as At
     symbol._sxUnit = propertyMap.unit as SymbolUnit
