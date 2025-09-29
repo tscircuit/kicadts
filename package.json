@@ -3,6 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
+    "build": "tsup-node lib/index.ts --format esm --dts",
     "download-references": "bun run scripts/download-references.ts",
     "download-demos": "git clone --depth 1 --filter=blob:none --sparse git@gitlab.com:kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos",
     "typecheck": "bunx tsc --noEmit",
@@ -11,7 +12,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsup": "^8.5.0"
   },
   "peerDependencies": {
     "typescript": "^5"
