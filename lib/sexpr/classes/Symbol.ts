@@ -12,6 +12,7 @@ import { EmbeddedFonts } from "./EmbeddedFonts"
 import { ExcludeFromSim } from "./ExcludeFromSim"
 import { InBom } from "./InBom"
 import { OnBoard } from "./OnBoard"
+import { FieldsAutoplaced } from "./FieldsAutoplaced"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Pts } from "./Pts"
@@ -82,10 +83,30 @@ export class SymbolPinNumbers extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolPinNumbers {
     const pinNumbers = new SymbolPinNumbers()
+    const primitiveStrings: string[] = []
+    const primitiveNodes: PrimitiveSExpr[] = []
+    for (const primitive of primitiveSexprs) {
+      if (typeof primitive === "string") {
+        primitiveStrings.push(primitive)
+        continue
+      }
+      primitiveNodes.push(primitive)
+    }
+
     const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+      SxClass.parsePrimitivesToClassProperties(primitiveNodes, this.token)
 
     pinNumbers._sxHide = propertyMap.hide as SymbolPinNumbersHide
+
+    for (const flag of primitiveStrings) {
+      if (flag === "hide") {
+        pinNumbers._sxHide = new SymbolPinNumbersHide(true, { inline: true })
+        continue
+      }
+      throw new Error(
+        `symbol pin_numbers encountered unsupported flag "${flag}"`,
+      )
+    }
 
     return pinNumbers
   }
@@ -108,6 +129,20 @@ export class SymbolPinNumbersHide extends SxPrimitiveBoolean {
   static override token = "hide"
   static override parentToken = "pin_numbers"
   token = "hide"
+
+  private inline = false
+
+  constructor(value?: boolean, options: { inline?: boolean } = {}) {
+    super(value ?? true)
+    this.inline = options.inline ?? false
+  }
+
+  override getString(): string {
+    if (this.inline) {
+      return this.value ? "hide" : "(hide no)"
+    }
+    return super.getString()
+  }
 }
 SxClass.register(SymbolPinNumbersHide)
 
@@ -667,6 +702,7 @@ export class SchematicSymbol extends SxClass {
   _sxDnp?: Dnp
   _sxUuid?: Uuid
   _sxDuplicatePinNumbersAreJumpers?: SymbolDuplicatePinNumbersAreJumpers
+  _sxFieldsAutoplaced?: FieldsAutoplaced
   properties: SymbolProperty[] = []
   pins: SymbolPin[] = []
   subSymbols: SchematicSymbol[] = []
@@ -760,6 +796,14 @@ export class SchematicSymbol extends SxClass {
     this._sxDnp = new Dnp(value)
   }
 
+  get fieldsAutoplaced(): boolean {
+    return this._sxFieldsAutoplaced?.value ?? false
+  }
+
+  set fieldsAutoplaced(value: boolean) {
+    this._sxFieldsAutoplaced = new FieldsAutoplaced(value)
+  }
+
   get uuid(): string | undefined {
     return this._sxUuid?.value
   }
@@ -824,6 +868,8 @@ export class SchematicSymbol extends SxClass {
     symbol._sxUuid = propertyMap.uuid as Uuid
     symbol._sxDuplicatePinNumbersAreJumpers =
       propertyMap.duplicate_pin_numbers_are_jumpers as SymbolDuplicatePinNumbersAreJumpers
+    symbol._sxFieldsAutoplaced =
+      propertyMap.fields_autoplaced as FieldsAutoplaced
     symbol._sxPower = propertyMap.power as SymbolPower
     symbol._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts
     symbol.properties = (arrayPropertyMap.property as SymbolProperty[]) ?? []
@@ -854,6 +900,7 @@ export class SchematicSymbol extends SxClass {
     if (this._sxDuplicatePinNumbersAreJumpers) {
       children.push(this._sxDuplicatePinNumbersAreJumpers)
     }
+    if (this._sxFieldsAutoplaced) children.push(this._sxFieldsAutoplaced)
     children.push(...this.properties)
     children.push(...this.pins)
     children.push(...this.subSymbols)
@@ -1173,8 +1220,18 @@ export class SymbolPin extends SxClass {
 
     const remaining = args.slice(index)
 
+    const primitiveStrings: string[] = []
+    const primitiveNodes: PrimitiveSExpr[] = []
+    for (const primitive of remaining) {
+      if (typeof primitive === "string") {
+        primitiveStrings.push(primitive)
+        continue
+      }
+      primitiveNodes.push(primitive)
+    }
+
     const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(remaining, this.token)
+      SxClass.parsePrimitivesToClassProperties(primitiveNodes, this.token)
 
     symbolPin._sxAt = propertyMap.at as At
     symbolPin._sxLength = propertyMap.length as SymbolPinLength
@@ -1182,6 +1239,14 @@ export class SymbolPin extends SxClass {
     symbolPin._sxNumber = propertyMap.number as SymbolPinNumber
     symbolPin._sxUuid = propertyMap.uuid as Uuid
     symbolPin._sxHide = propertyMap.hide as SymbolPinHide | undefined
+
+    for (const flag of primitiveStrings) {
+      if (flag === "hide") {
+        symbolPin._sxHide = new SymbolPinHide(true, { inline: true })
+        continue
+      }
+      throw new Error(`symbol pin encountered unsupported flag "${flag}"`)
+    }
 
     return symbolPin
   }
@@ -1320,11 +1385,17 @@ class SymbolPinHide extends SxPrimitiveBoolean {
   static override parentToken = "pin"
   token = "hide"
 
-  constructor(value?: boolean) {
+  private inline = false
+
+  constructor(value?: boolean, options: { inline?: boolean } = {}) {
     super(value ?? true)
+    this.inline = options.inline ?? false
   }
 
   override getString(): string {
+    if (this.inline) {
+      return this.value ? "hide" : "(hide no)"
+    }
     return this.value ? "(hide yes)" : "(hide no)"
   }
 }

@@ -5,8 +5,9 @@ import { toStringValue } from "../utils/toStringValue"
 import { At } from "./At"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
+import { FieldsAutoplaced } from "./FieldsAutoplaced"
 
-const SUPPORTED_TOKENS = new Set(["at", "effects", "uuid"])
+const SUPPORTED_TOKENS = new Set(["at", "effects", "uuid", "fields_autoplaced"])
 
 export class Label extends SxClass {
   static override token = "label"
@@ -17,6 +18,7 @@ export class Label extends SxClass {
   private _sxAt?: At
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
+  private _sxFieldsAutoplaced?: FieldsAutoplaced
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -62,6 +64,9 @@ export class Label extends SxClass {
     label._sxUuid =
       (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
       (propertyMap.uuid as Uuid | undefined)
+    label._sxFieldsAutoplaced =
+      (arrayPropertyMap.fields_autoplaced?.[0] as FieldsAutoplaced | undefined) ??
+      (propertyMap.fields_autoplaced as FieldsAutoplaced | undefined)
 
     return label
   }
@@ -102,11 +107,20 @@ export class Label extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get fieldsAutoplaced(): boolean {
+    return this._sxFieldsAutoplaced?.value ?? false
+  }
+
+  set fieldsAutoplaced(value: boolean) {
+    this._sxFieldsAutoplaced = new FieldsAutoplaced(value)
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxEffects) children.push(this._sxEffects)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxFieldsAutoplaced) children.push(this._sxFieldsAutoplaced)
     return children
   }
 

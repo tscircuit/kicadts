@@ -23,12 +23,14 @@ import { PadSolderPasteMargin } from "./PadSolderPasteMargin"
 import { PadSolderPasteMarginRatio } from "./PadSolderPasteMarginRatio"
 import { PadThermalGap } from "./PadThermalGap"
 import { PadThermalWidth } from "./PadThermalWidth"
+import { PadThermalBridgeAngle } from "./PadThermalBridgeAngle"
 import { PadZoneConnect } from "./PadZoneConnect"
 import { Property } from "./Property"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { PadTeardrops } from "./PadTeardrops"
+import { PadRectDelta } from "./PadRectDelta"
 
 const SINGLE_TOKENS = new Set([
   "at",
@@ -37,6 +39,7 @@ const SINGLE_TOKENS = new Set([
   "layers",
   "width",
   "stroke",
+  "rect_delta",
   "roundrect_rratio",
   "chamfer_ratio",
   "chamfer",
@@ -52,6 +55,7 @@ const SINGLE_TOKENS = new Set([
   "zone_connect",
   "thermal_width",
   "thermal_gap",
+  "thermal_bridge_angle",
   "options",
   "primitives",
   "remove_unused_layers",
@@ -94,6 +98,7 @@ export class FootprintPad extends SxClass {
   private _sxRoundrectRatio?: PadRoundrectRratio
   private _sxChamferRatio?: PadChamferRatio
   private _sxChamfer?: PadChamfer
+  private _sxRectDelta?: PadRectDelta
   private _sxNet?: PadNet
   private _sxUuid?: Uuid
   private _sxPinFunction?: PadPinFunction
@@ -106,6 +111,7 @@ export class FootprintPad extends SxClass {
   private _sxZoneConnect?: PadZoneConnect
   private _sxThermalWidth?: PadThermalWidth
   private _sxThermalGap?: PadThermalGap
+  private _sxThermalBridgeAngle?: PadThermalBridgeAngle
   private _sxOptions?: PadOptions
   private _sxPrimitives?: PadPrimitives
   private _sxTeardrops?: PadTeardrops
@@ -195,6 +201,7 @@ export class FootprintPad extends SxClass {
     ensureSingle(arrayPropertyMap, "layers")
     ensureSingle(arrayPropertyMap, "width")
     ensureSingle(arrayPropertyMap, "stroke")
+    ensureSingle(arrayPropertyMap, "rect_delta")
     ensureSingle(arrayPropertyMap, "roundrect_rratio")
     ensureSingle(arrayPropertyMap, "chamfer_ratio")
     ensureSingle(arrayPropertyMap, "chamfer")
@@ -210,6 +217,7 @@ export class FootprintPad extends SxClass {
     ensureSingle(arrayPropertyMap, "zone_connect")
     ensureSingle(arrayPropertyMap, "thermal_width")
     ensureSingle(arrayPropertyMap, "thermal_gap")
+    ensureSingle(arrayPropertyMap, "thermal_bridge_angle")
     ensureSingle(arrayPropertyMap, "options")
     ensureSingle(arrayPropertyMap, "primitives")
 
@@ -219,6 +227,7 @@ export class FootprintPad extends SxClass {
     pad._sxLayers = propertyMap.layers as PadLayers | undefined
     pad._sxWidth = propertyMap.width as Width | undefined
     pad._sxStroke = propertyMap.stroke as Stroke | undefined
+    pad._sxRectDelta = propertyMap.rect_delta as PadRectDelta | undefined
 
     pad._properties = (arrayPropertyMap.property as Property[]) ?? []
 
@@ -244,6 +253,8 @@ export class FootprintPad extends SxClass {
     pad._sxZoneConnect = propertyMap.zone_connect as PadZoneConnect | undefined
     pad._sxThermalWidth = propertyMap.thermal_width as PadThermalWidth | undefined
     pad._sxThermalGap = propertyMap.thermal_gap as PadThermalGap | undefined
+    pad._sxThermalBridgeAngle =
+      propertyMap.thermal_bridge_angle as PadThermalBridgeAngle | undefined
     pad._sxOptions = propertyMap.options as PadOptions | undefined
     pad._sxPrimitives = propertyMap.primitives as PadPrimitives | undefined
     pad._sxRemoveUnusedLayers =
@@ -398,6 +409,22 @@ export class FootprintPad extends SxClass {
     return this._sxChamfer?.corners
   }
 
+  get rectDelta(): PadRectDelta | undefined {
+    return this._sxRectDelta
+  }
+
+  set rectDelta(value: PadRectDelta | { x: number; y: number } | undefined) {
+    if (value === undefined) {
+      this._sxRectDelta = undefined
+      return
+    }
+    if (value instanceof PadRectDelta) {
+      this._sxRectDelta = value
+      return
+    }
+    this._sxRectDelta = new PadRectDelta(value.x, value.y)
+  }
+
   get net(): PadNet | undefined {
     return this._sxNet
   }
@@ -502,6 +529,15 @@ export class FootprintPad extends SxClass {
     this._sxThermalGap = value === undefined ? undefined : new PadThermalGap(value)
   }
 
+  get thermalBridgeAngle(): number | undefined {
+    return this._sxThermalBridgeAngle?.value
+  }
+
+  set thermalBridgeAngle(value: number | undefined) {
+    this._sxThermalBridgeAngle =
+      value === undefined ? undefined : new PadThermalBridgeAngle(value)
+  }
+
   get options(): PadOptions | undefined {
     return this._sxOptions
   }
@@ -538,6 +574,7 @@ export class FootprintPad extends SxClass {
     if (this._sxRoundrectRatio) children.push(this._sxRoundrectRatio)
     if (this._sxChamferRatio) children.push(this._sxChamferRatio)
     if (this._sxChamfer) children.push(this._sxChamfer)
+    if (this._sxRectDelta) children.push(this._sxRectDelta)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxPinFunction) children.push(this._sxPinFunction)
     if (this._sxPinType) children.push(this._sxPinType)
@@ -550,6 +587,8 @@ export class FootprintPad extends SxClass {
     if (this._sxZoneConnect) children.push(this._sxZoneConnect)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
+    if (this._sxThermalBridgeAngle)
+      children.push(this._sxThermalBridgeAngle)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxRemoveUnusedLayers) children.push(this._sxRemoveUnusedLayers)
     if (this._sxKeepEndLayers) children.push(this._sxKeepEndLayers)

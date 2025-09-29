@@ -1,7 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { parseYesNo } from "../utils/parseYesNo"
 import { At } from "./At"
 import { FootprintAttr } from "./FootprintAttr"
 import { FootprintAutoplaceCost180 } from "./FootprintAutoplaceCost180"
@@ -35,9 +34,13 @@ import { FootprintSheetfile } from "./FootprintSheetfile"
 import { FpLine } from "./FpLine"
 import { FootprintModel } from "./FootprintModel"
 import { EmbeddedFonts } from "./EmbeddedFonts"
+import { FootprintLocked } from "./FootprintLocked"
+import { FootprintPlaced } from "./FootprintPlaced"
 
 const SINGLE_TOKENS = new Set([
   "layer",
+  "locked",
+  "placed",
   "tedit",
   "uuid",
   "at",
@@ -82,9 +85,9 @@ export class Footprint extends SxClass {
   token = "footprint"
 
   private _libraryLink?: string
-  private _locked = false
-  private _placed = false
-
+  private _sxLocked?: FootprintLocked
+  private _sxPlaced?: FootprintPlaced
+  
   private _sxLayer?: Layer
   private _sxTedit?: FootprintTedit
   private _sxUuid?: Uuid
@@ -134,41 +137,6 @@ export class Footprint extends SxClass {
         continue
       }
       if (Array.isArray(primitive)) {
-        const [token] = primitive
-        if (token === "locked") {
-          if (footprint._locked) {
-            throw new Error("footprint encountered duplicate locked tokens")
-          }
-          if (primitive.length === 1) {
-            footprint._locked = true
-            continue
-          }
-          const parsed = parseYesNo(primitive[1])
-          if (parsed === undefined) {
-            throw new Error(
-              `footprint locked expects yes/no, received ${JSON.stringify(primitive[1])}`,
-            )
-          }
-          footprint._locked = parsed
-          continue
-        }
-        if (token === "placed") {
-          if (footprint._placed) {
-            throw new Error("footprint encountered duplicate placed tokens")
-          }
-          if (primitive.length === 1) {
-            footprint._placed = true
-            continue
-          }
-          const parsed = parseYesNo(primitive[1])
-          if (parsed === undefined) {
-            throw new Error(
-              `footprint placed expects yes/no, received ${JSON.stringify(primitive[1])}`,
-            )
-          }
-          footprint._placed = parsed
-          continue
-        }
         rawNodes.push(primitive)
         continue
       }
@@ -177,19 +145,10 @@ export class Footprint extends SxClass {
       )
     }
 
+    let pendingFlags: string[] = []
     if (rawStrings.length > 0) {
       footprint._libraryLink = rawStrings[0]
-      for (const flag of rawStrings.slice(1)) {
-        if (flag === "locked") {
-          footprint._locked = true
-          continue
-        }
-        if (flag === "placed") {
-          footprint._placed = true
-          continue
-        }
-        throw new Error(`footprint encountered unsupported flag "${flag}"`)
-      }
+      pendingFlags = rawStrings.slice(1)
     }
 
     const { propertyMap, arrayPropertyMap } =
@@ -210,6 +169,14 @@ export class Footprint extends SxClass {
       }
     }
 
+    footprint._sxLocked = propertyMap.locked as FootprintLocked | undefined
+    if (footprint._sxLocked && !footprint._sxLocked.value) {
+      footprint._sxLocked = undefined
+    }
+    footprint._sxPlaced = propertyMap.placed as FootprintPlaced | undefined
+    if (footprint._sxPlaced && !footprint._sxPlaced.value) {
+      footprint._sxPlaced = undefined
+    }
     footprint._sxLayer = propertyMap.layer as Layer | undefined
     footprint._sxTedit = propertyMap.tedit as FootprintTedit | undefined
     footprint._sxUuid = propertyMap.uuid as Uuid | undefined
@@ -267,6 +234,24 @@ export class Footprint extends SxClass {
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
 
+    for (const flag of pendingFlags) {
+      if (flag === "locked") {
+        if (footprint._sxLocked) {
+          throw new Error("footprint encountered duplicate locked tokens")
+        }
+        footprint._sxLocked = new FootprintLocked(true)
+        continue
+      }
+      if (flag === "placed") {
+        if (footprint._sxPlaced) {
+          throw new Error("footprint encountered duplicate placed tokens")
+        }
+        footprint._sxPlaced = new FootprintPlaced(true)
+        continue
+      }
+      throw new Error(`footprint encountered unsupported flag "${flag}"`)
+    }
+
     return footprint
   }
 
@@ -279,19 +264,35 @@ export class Footprint extends SxClass {
   }
 
   get locked(): boolean {
-    return this._locked
+    return this._sxLocked?.value ?? false
   }
 
-  set locked(value: boolean) {
-    this._locked = value
+  set locked(value: FootprintLocked | boolean | undefined) {
+    if (value === undefined) {
+      this._sxLocked = undefined
+      return
+    }
+    if (value instanceof FootprintLocked) {
+      this._sxLocked = value.value ? value : undefined
+      return
+    }
+    this._sxLocked = value ? new FootprintLocked(true) : undefined
   }
 
   get placed(): boolean {
-    return this._placed
+    return this._sxPlaced?.value ?? false
   }
 
-  set placed(value: boolean) {
-    this._placed = value
+  set placed(value: FootprintPlaced | boolean | undefined) {
+    if (value === undefined) {
+      this._sxPlaced = undefined
+      return
+    }
+    if (value instanceof FootprintPlaced) {
+      this._sxPlaced = value.value ? value : undefined
+      return
+    }
+    this._sxPlaced = value ? new FootprintPlaced(true) : undefined
   }
 
   get layer(): Layer | undefined {
@@ -665,6 +666,8 @@ export class Footprint extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxLocked) children.push(this._sxLocked)
+    if (this._sxPlaced) children.push(this._sxPlaced)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxTedit) children.push(this._sxTedit)
     if (this._sxUuid) children.push(this._sxUuid)
@@ -705,12 +708,6 @@ export class Footprint extends SxClass {
     const lines = ["(footprint"]
     if (this._libraryLink !== undefined) {
       lines.push(`  ${quoteSExprString(this._libraryLink)}`)
-    }
-    if (this._locked) {
-      lines.push("  locked")
-    }
-    if (this._placed) {
-      lines.push("  placed")
     }
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())

@@ -3,8 +3,15 @@ import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Pts } from "./Pts"
 import { Width } from "./Width"
+import { PadPrimitiveGrLine } from "./PadPrimitiveGrLine"
+import { PadPrimitiveGrArc } from "./PadPrimitiveGrArc"
+import { PadPrimitiveGrCircle } from "./PadPrimitiveGrCircle"
 
-type PadPrimitiveGraphic = PadPrimitiveGrPoly
+type PadPrimitiveGraphic =
+  | PadPrimitiveGrPoly
+  | PadPrimitiveGrLine
+  | PadPrimitiveGrArc
+  | PadPrimitiveGrCircle
 
 export class PadPrimitives extends SxClass {
   static override token = "primitives"
@@ -54,6 +61,21 @@ export class PadPrimitives extends SxClass {
       }
 
       if (parsed instanceof PadPrimitiveGrPoly) {
+        primitives._graphics.push(parsed)
+        continue
+      }
+
+      if (parsed instanceof PadPrimitiveGrLine) {
+        primitives._graphics.push(parsed)
+        continue
+      }
+
+      if (parsed instanceof PadPrimitiveGrArc) {
+        primitives._graphics.push(parsed)
+        continue
+      }
+
+      if (parsed instanceof PadPrimitiveGrCircle) {
         primitives._graphics.push(parsed)
         continue
       }

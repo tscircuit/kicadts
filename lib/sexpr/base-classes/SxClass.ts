@@ -92,7 +92,7 @@ export abstract class SxClass {
 
     if (
       Array.isArray(primitiveSexpr) &&
-      primitiveSexpr.length > 1 &&
+      primitiveSexpr.length >= 1 &&
       typeof primitiveSexpr[0] === "string"
     ) {
       const classToken = primitiveSexpr[0] as string

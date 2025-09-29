@@ -99,6 +99,9 @@ export class TextEffects extends SxClass {
     if (this._sxJustify) {
       lines.push(this._sxJustify.getStringIndented())
     }
+    if (this._hiddenText) {
+      lines.push(new TextEffectsHide(true).getStringIndented())
+    }
     lines.push(")")
     return lines.join("\n")
   }
