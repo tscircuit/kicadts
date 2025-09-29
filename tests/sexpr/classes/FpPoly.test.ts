@@ -36,8 +36,8 @@ test("FpPoly", () => {
         (color 0 0 0 1)
       )
       (fill yes)
+      (locked yes)
       (uuid 10101010-2020-3030-4040-505050505050)
-      locked
     )"
   `)
 })

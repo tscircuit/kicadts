@@ -1,156 +1,266 @@
 import { SxClass } from "../base-classes/SxClass"
-import { strokeFromArgs } from "../utils/strokeFromArgs"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
-import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
+import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { Pts } from "./Pts"
 import { Xy } from "./Xy"
+import { FpPolyFill } from "./FpPolyFill"
+import { FpPolyLocked } from "./FpPolyLocked"
+
+const SUPPORTED_TOKENS = new Set([
+  "pts",
+  "xy",
+  "layer",
+  "width",
+  "stroke",
+  "fill",
+  "locked",
+  "uuid",
+])
 
 export class FpPoly extends SxClass {
   static override token = "fp_poly"
-  static override rawArgs = true
-  token = "fp_poly"
+  override token = "fp_poly"
 
-  points?: Pts
-  layer?: Layer
-  width?: Width
-  stroke?: Stroke
-  fill?: FpPolyFill
-  uuid?: Uuid
-  locked = false
-  extras: PrimitiveSExpr[] = []
+  private _sxPts?: Pts
+  private _sxLayer?: Layer
+  private _sxWidth?: Width
+  private _sxStroke?: Stroke
+  private _sxFill?: FpPolyFill
+  private _sxLocked?: FpPolyLocked
+  private _sxUuid?: Uuid
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): FpPoly {
+    const fpPoly = new FpPoly()
 
-    const xyPoints: Xy[] = []
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    for (const arg of args) {
-      if (typeof arg === "string") {
-        if (arg === "locked") {
-          this.locked = true
-          continue
+    const unexpectedTokens = new Set<string>()
+    for (const token of Object.keys(propertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        unexpectedTokens.add(token)
+      }
+    }
+    for (const token of Object.keys(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        unexpectedTokens.add(token)
+      }
+      if (token !== "xy" && arrayPropertyMap[token]!.length > 1) {
+        unexpectedTokens.add(token)
+      }
+    }
+
+    if (unexpectedTokens.size > 0) {
+      throw new Error(
+        `Unsupported child tokens inside fp_poly expression: ${[...unexpectedTokens].join(", ")}`,
+      )
+    }
+
+    const ptsEntries = arrayPropertyMap.pts as Pts[] | undefined
+    if (ptsEntries && ptsEntries.length > 1) {
+      throw new Error("fp_poly does not support repeated pts tokens")
+    }
+
+    const xyEntries = arrayPropertyMap.xy as Xy[] | undefined
+    let pts = propertyMap.pts as Pts | undefined
+
+    if (pts && xyEntries && xyEntries.length > 0) {
+      throw new Error("fp_poly cannot mix pts and xy child tokens")
+    }
+
+    if (!pts && ptsEntries?.length) {
+      pts = ptsEntries[0]
+    }
+
+    if (!pts && xyEntries && xyEntries.length > 0) {
+      pts = new Pts(xyEntries)
+    }
+
+    fpPoly._sxPts = pts
+    fpPoly._sxLayer = propertyMap.layer as Layer | undefined
+    fpPoly._sxWidth = propertyMap.width as Width | undefined
+    fpPoly._sxStroke = propertyMap.stroke as Stroke | undefined
+    fpPoly._sxFill = propertyMap.fill as FpPolyFill | undefined
+    const lockedClass = propertyMap.locked as FpPolyLocked | undefined
+    fpPoly._sxLocked = lockedClass && lockedClass.value ? lockedClass : undefined
+    fpPoly._sxUuid = propertyMap.uuid as Uuid | undefined
+
+    for (const primitive of primitiveSexprs) {
+      if (primitive === "locked") {
+        if (!fpPoly._sxLocked) {
+          fpPoly._sxLocked = new FpPolyLocked(true)
         }
-        this.extras.push(arg)
         continue
       }
 
-      if (!Array.isArray(arg) || arg.length === 0) {
-        this.extras.push(arg)
-        continue
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        throw new Error(
+          `fp_poly encountered unexpected primitive child: ${JSON.stringify(primitive)}`,
+        )
       }
 
-      const [token, ...rest] = arg
+      const [token, ...rest] = primitive
       if (typeof token !== "string") {
-        this.extras.push(arg)
-        continue
+        throw new Error(
+          `fp_poly child token must be a string, received: ${JSON.stringify(token)}`,
+        )
       }
 
-      switch (token) {
-        case "pts": {
-          const parsed = SxClass.parsePrimitiveSexpr(arg as PrimitiveSExpr)
-          if (parsed instanceof Pts) {
-            this.points = parsed
-          } else {
-            this.extras.push(arg)
-          }
-          break
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child token inside fp_poly expression: ${token}`,
+        )
+      }
+
+      if (token === "locked" && !fpPoly._sxLocked) {
+        fpPoly._sxLocked = FpPolyLocked.fromSexprPrimitives(
+          rest as PrimitiveSExpr[],
+        )
+        if (!fpPoly._sxLocked.value) {
+          fpPoly._sxLocked = undefined
         }
-        case "xy": {
-          const parsed = SxClass.parsePrimitiveSexpr(arg as PrimitiveSExpr)
-          if (parsed instanceof Xy) {
-            xyPoints.push(parsed)
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "layer": {
-          this.layer = Layer.fromSexprPrimitives(rest as PrimitiveSExpr[])
-          break
-        }
-        case "width": {
-          this.width = new Width(rest as [number])
-          break
-        }
-        case "stroke": {
-          const parsed = strokeFromArgs(rest)
-          this.stroke = parsed ?? undefined
-          if (!parsed) this.extras.push(arg)
-          break
-        }
-        case "fill": {
-          const fillValue = rest[0]
-          if (fillValue === "yes" || fillValue === "no") {
-            this.fill = new FpPolyFill([fillValue === "yes"])
-          } else {
-            this.extras.push(arg)
-          }
-          break
-        }
-        case "uuid": {
-          this.uuid = new Uuid(rest as [string])
-          break
-        }
-        default:
-          this.extras.push(arg)
-          break
       }
     }
 
-    if (!this.points && xyPoints.length > 0) {
-      this.points = new Pts(xyPoints)
+    if (!fpPoly._sxPts) {
+      throw new Error("fp_poly requires pts or xy child tokens")
     }
+    if (!fpPoly._sxLayer) {
+      throw new Error("fp_poly requires a layer child token")
+    }
+    if (!fpPoly._sxUuid) {
+      throw new Error("fp_poly requires a uuid child token")
+    }
+
+    return fpPoly
   }
 
-  override getString(): string {
-    const lines = ["(fp_poly"]
+  get points(): Pts | undefined {
+    return this._sxPts
+  }
 
-    const push = (value?: SxClass) => {
-      if (!value) return
-      const segments = value.getString().split("\n")
-      for (const segment of segments) {
-        lines.push(`  ${segment}`)
-      }
+  set points(value: Pts | Xy[] | Array<{ x: number; y: number }> | undefined) {
+    if (value === undefined) {
+      this._sxPts = undefined
+      return
     }
 
-    push(this.points)
-    push(this.layer)
-    push(this.width)
-    push(this.stroke)
-    push(this.fill)
-    push(this.uuid)
-
-    if (this.locked) {
-      lines.push("  locked")
+    if (value instanceof Pts) {
+      this._sxPts = value
+      return
     }
 
-    for (const extra of this.extras) {
-      lines.push(`  ${printSExpr(extra)}`)
+    if (Array.isArray(value) && value.every((point) => point instanceof Xy)) {
+      this._sxPts = new Pts(value as Xy[])
+      return
     }
 
-    lines.push(")")
-    return lines.join("\n")
+    if (Array.isArray(value)) {
+      this._sxPts = new Pts(
+        value.map(({ x, y }) => new Xy(x, y)),
+      )
+      return
+    }
+
+    throw new Error("Unsupported points value provided to fp_poly")
+  }
+
+  get layer(): Layer | undefined {
+    return this._sxLayer
+  }
+
+  set layer(value: Layer | string | Array<string | number> | undefined) {
+    if (value === undefined) {
+      this._sxLayer = undefined
+      return
+    }
+    if (value instanceof Layer) {
+      this._sxLayer = value
+      return
+    }
+    const names = Array.isArray(value) ? value : [value]
+    this._sxLayer = new Layer(names)
+  }
+
+  get width(): number | undefined {
+    return this._sxWidth?.value
+  }
+
+  set width(value: Width | number | undefined) {
+    if (value === undefined) {
+      this._sxWidth = undefined
+      return
+    }
+    this._sxWidth = value instanceof Width ? value : new Width(value)
+  }
+
+  get widthClass(): Width | undefined {
+    return this._sxWidth
+  }
+
+  set widthClass(value: Width | undefined) {
+    this._sxWidth = value
+  }
+
+  get stroke(): Stroke | undefined {
+    return this._sxStroke
+  }
+
+  set stroke(value: Stroke | undefined) {
+    this._sxStroke = value
+  }
+
+  get fill(): FpPolyFill | undefined {
+    return this._sxFill
+  }
+
+  set fill(value: FpPolyFill | boolean | undefined) {
+    if (value === undefined) {
+      this._sxFill = undefined
+      return
+    }
+    if (value instanceof FpPolyFill) {
+      this._sxFill = value
+      return
+    }
+    this._sxFill = new FpPolyFill(value)
+  }
+
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: boolean) {
+    this._sxLocked = value ? new FpPolyLocked(true) : undefined
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
+  }
+
+  set uuid(value: Uuid | string | undefined) {
+    if (value === undefined) {
+      this._sxUuid = undefined
+      return
+    }
+    this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
+  }
+
+  override getChildren(): SxClass[] {
+    const children: SxClass[] = []
+    if (this._sxPts) children.push(this._sxPts)
+    if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxWidth) children.push(this._sxWidth)
+    if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxFill) children.push(this._sxFill)
+    if (this._sxLocked) children.push(this._sxLocked)
+    if (this._sxUuid) children.push(this._sxUuid)
+    return children
   }
 }
 SxClass.register(FpPoly)
-
-export class FpPolyFill extends SxClass {
-  static override token = "fill"
-  static override parentToken = "fp_poly"
-  token = "fill"
-
-  filled: boolean
-
-  constructor(args: [boolean]) {
-    super()
-    this.filled = args[0]
-  }
-
-  override getString(): string {
-    return `(fill ${this.filled ? "yes" : "no"})`
-  }
-}
-SxClass.register(FpPolyFill)
