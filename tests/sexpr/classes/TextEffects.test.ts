@@ -35,7 +35,10 @@ test("TextEffects", () => {
   expect(textEffects.hiddenText).toBe(true)
 
   textEffects.hiddenText = false
-  textEffects.justify = new TextEffectsJustify(["right", "bottom"])
+  textEffects.justify = new TextEffectsJustify({
+    horizontal: "right",
+    vertical: "bottom",
+  })
 
   expect(textEffects.getString()).toMatchInlineSnapshot(`
     "(effects

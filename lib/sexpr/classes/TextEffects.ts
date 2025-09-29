@@ -2,7 +2,6 @@ import { SxClass } from "../base-classes/SxClass"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { SxPrimitiveString } from "../base-classes/SxPrimitiveString"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
@@ -16,7 +15,6 @@ export class TextEffects extends SxClass {
   _sxFont?: TextEffectsFont
   _sxJustify?: TextEffectsJustify
   private _hiddenText = false
-  extras: PrimitiveSExpr[] = []
 
   get font(): TextEffectsFont {
     if (!this._sxFont) {
@@ -55,8 +53,8 @@ export class TextEffects extends SxClass {
       this.token,
     )
 
-    effects._sxFont = propertyMap.font as TextEffectsFont
-    effects._sxJustify = propertyMap.justify as TextEffectsJustify
+    effects._sxFont = propertyMap.font as TextEffectsFont | undefined
+    effects._sxJustify = propertyMap.justify as TextEffectsJustify | undefined
 
     for (const primitive of primitiveSexprs) {
       if (typeof primitive === "string") {
@@ -64,18 +62,17 @@ export class TextEffects extends SxClass {
           effects._hiddenText = true
           continue
         }
-        effects.extras.push(primitive)
-        continue
+        throw new Error(`Unknown text effects token: ${primitive}`)
       }
+
       if (Array.isArray(primitive)) {
-        const [token] = primitive
-        if (token === "font" || token === "justify") {
-          continue
-        }
-        effects.extras.push(primitive)
+        // Arrays are parsed via parsePrimitivesToClassProperties already.
         continue
       }
-      effects.extras.push(primitive)
+
+      throw new Error(
+        `Unsupported text effects primitive: ${JSON.stringify(primitive)}`,
+      )
     }
 
     return effects
@@ -99,9 +96,6 @@ export class TextEffects extends SxClass {
     if (this._hiddenText) {
       lines.push("  hide")
     }
-    for (const extra of this.extras) {
-      lines.push(`  ${printSExpr(extra)}`)
-    }
     lines.push(")")
     return lines.join("\n")
   }
@@ -123,9 +117,8 @@ export class TextEffectsFont extends SxClass {
   _sxSize?: TextEffectsFontSize
   _sxThickness?: TextEffectsFontThickness
   _sxLineSpacing?: TextEffectsFontLineSpacing
-  bold = false
-  italic = false
-  extras: PrimitiveSExpr[] = []
+  private _bold = false
+  private _italic = false
 
   get face(): string | undefined {
     return this._sxFace?.value
@@ -141,11 +134,20 @@ export class TextEffectsFont extends SxClass {
     return { height: this._sxSize.height, width: this._sxSize.width }
   }
 
-  set size(value: { height: number; width: number } | undefined) {
-    this._sxSize =
-      value === undefined
-        ? undefined
-        : new TextEffectsFontSize([value.height, value.width])
+  set size(
+    value: TextEffectsFontSize | { height: number; width: number } | undefined,
+  ) {
+    if (value === undefined) {
+      this._sxSize = undefined
+      return
+    }
+
+    if (value instanceof TextEffectsFontSize) {
+      this._sxSize = value
+      return
+    }
+
+    this._sxSize = new TextEffectsFontSize(value.height, value.width)
   }
 
   get thickness(): number | undefined {
@@ -166,6 +168,22 @@ export class TextEffectsFont extends SxClass {
       value === undefined ? undefined : new TextEffectsFontLineSpacing(value)
   }
 
+  get bold(): boolean {
+    return this._bold
+  }
+
+  set bold(value: boolean) {
+    this._bold = value
+  }
+
+  get italic(): boolean {
+    return this._italic
+  }
+
+  set italic(value: boolean) {
+    this._italic = value
+  }
+
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): TextEffectsFont {
@@ -183,32 +201,23 @@ export class TextEffectsFont extends SxClass {
     for (const primitive of primitiveSexprs) {
       if (typeof primitive === "string") {
         if (primitive === "bold") {
-          font.bold = true
+          font._bold = true
           continue
         }
         if (primitive === "italic") {
-          font.italic = true
+          font._italic = true
           continue
         }
-        font.extras.push(primitive)
-        continue
+        throw new Error(`Unknown font token: ${primitive}`)
       }
 
       if (Array.isArray(primitive)) {
-        const [token] = primitive
-        if (
-          token === "face" ||
-          token === "size" ||
-          token === "thickness" ||
-          token === "line_spacing"
-        ) {
-          continue
-        }
-        font.extras.push(primitive)
         continue
       }
 
-      font.extras.push(primitive)
+      throw new Error(
+        `Unsupported font primitive: ${JSON.stringify(primitive)}`,
+      )
     }
 
     return font
@@ -234,17 +243,14 @@ export class TextEffectsFont extends SxClass {
     if (this._sxThickness) {
       lines.push(this._sxThickness.getStringIndented())
     }
-    if (this.bold) {
+    if (this._bold) {
       lines.push("  bold")
     }
-    if (this.italic) {
+    if (this._italic) {
       lines.push("  italic")
     }
     if (this._sxLineSpacing) {
       lines.push(this._sxLineSpacing.getStringIndented())
-    }
-    for (const extra of this.extras) {
-      lines.push(`  ${printSExpr(extra)}`)
     }
     lines.push(")")
     return lines.join("\n")
@@ -268,13 +274,13 @@ export class TextEffectsFontSize extends SxClass {
   static override parentToken = "font"
   token = "size"
 
-  height = 0
-  width = 0
+  private _height = 0
+  private _width = 0
 
-  constructor(args: [height: number, width: number]) {
+  constructor(height = 0, width = 0) {
     super()
-    this.height = args[0]
-    this.width = args[1]
+    this._height = height
+    this._width = width
   }
 
   static override fromSexprPrimitives(
@@ -282,11 +288,27 @@ export class TextEffectsFontSize extends SxClass {
   ): TextEffectsFontSize {
     const height = toNumberValue(primitiveSexprs[0]) ?? 0
     const width = toNumberValue(primitiveSexprs[1]) ?? 0
-    return new TextEffectsFontSize([height, width])
+    return new TextEffectsFontSize(height, width)
+  }
+
+  get height(): number {
+    return this._height
+  }
+
+  set height(value: number) {
+    this._height = value
+  }
+
+  get width(): number {
+    return this._width
+  }
+
+  set width(value: number) {
+    this._width = value
   }
 
   override getString(): string {
-    return `(size ${this.height} ${this.width})`
+    return `(size ${this._height} ${this._width})`
   }
 }
 SxClass.register(TextEffectsFontSize)
@@ -310,62 +332,89 @@ export class TextEffectsJustify extends SxClass {
   static override parentToken = "effects"
   token = "justify"
 
-  horizontal?: "left" | "right"
-  vertical?: "top" | "bottom"
-  mirror = false
-  extras: PrimitiveSExpr[] = []
+  private _horizontal?: "left" | "right"
+  private _vertical?: "top" | "bottom"
+  private _mirror = false
 
-  constructor(args: PrimitiveSExpr[] = []) {
+  constructor(options: {
+    horizontal?: "left" | "right"
+    vertical?: "top" | "bottom"
+    mirror?: boolean
+  } = {}) {
     super()
-    this.applyArgs(args)
+    this._horizontal = options.horizontal
+    this._vertical = options.vertical
+    this._mirror = options.mirror ?? false
   }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): TextEffectsJustify {
-    return new TextEffectsJustify(primitiveSexprs)
-  }
+    const justify = new TextEffectsJustify()
 
-  private applyArgs(primitiveSexprs: PrimitiveSExpr[]) {
     for (const primitive of primitiveSexprs) {
       const value = toStringValue(primitive)
-      if (!value) {
-        this.extras.push(primitive)
-        continue
+      if (value === undefined) {
+        throw new Error(
+          `Unsupported justify primitive: ${JSON.stringify(primitive)}`,
+        )
       }
 
       if (value === "left" || value === "right") {
-        this.horizontal = value
+        justify._horizontal = value
         continue
       }
 
       if (value === "top" || value === "bottom") {
-        this.vertical = value
+        justify._vertical = value
         continue
       }
 
       if (value === "mirror") {
-        this.mirror = true
+        justify._mirror = true
         continue
       }
 
-      this.extras.push(primitive)
+      throw new Error(`Unknown justify token: ${value}`)
     }
+
+    return justify
+  }
+
+  get horizontal(): "left" | "right" | undefined {
+    return this._horizontal
+  }
+
+  set horizontal(value: "left" | "right" | undefined) {
+    this._horizontal = value
+  }
+
+  get vertical(): "top" | "bottom" | undefined {
+    return this._vertical
+  }
+
+  set vertical(value: "top" | "bottom" | undefined) {
+    this._vertical = value
+  }
+
+  get mirror(): boolean {
+    return this._mirror
+  }
+
+  set mirror(value: boolean) {
+    this._mirror = value
   }
 
   override getString(): string {
     const parts = ["(justify"]
-    if (this.horizontal) {
-      parts.push(` ${this.horizontal}`)
+    if (this._horizontal) {
+      parts.push(` ${this._horizontal}`)
     }
-    if (this.vertical) {
-      parts.push(` ${this.vertical}`)
+    if (this._vertical) {
+      parts.push(` ${this._vertical}`)
     }
-    if (this.mirror) {
+    if (this._mirror) {
       parts.push(" mirror")
-    }
-    for (const extra of this.extras) {
-      parts.push(` ${toStringValue(extra) ?? printSExpr(extra)}`)
     }
     parts.push(")")
     return parts.join("")
