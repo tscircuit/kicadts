@@ -51,7 +51,9 @@ export class Label extends SxClass {
         )
       }
       if (entries.length > 1) {
-        throw new Error(`label does not support repeated child tokens: ${token}`)
+        throw new Error(
+          `label does not support repeated child tokens: ${token}`,
+        )
       }
     }
 
@@ -65,7 +67,9 @@ export class Label extends SxClass {
       (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
       (propertyMap.uuid as Uuid | undefined)
     label._sxFieldsAutoplaced =
-      (arrayPropertyMap.fields_autoplaced?.[0] as FieldsAutoplaced | undefined) ??
+      (arrayPropertyMap.fields_autoplaced?.[0] as
+        | FieldsAutoplaced
+        | undefined) ??
       (propertyMap.fields_autoplaced as FieldsAutoplaced | undefined)
 
     return label

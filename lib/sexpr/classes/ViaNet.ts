@@ -25,7 +25,8 @@ export class ViaNet extends SxClass {
     if (id === undefined) {
       throw new Error("via net requires a numeric id")
     }
-    const name = primitiveSexprs.length > 1 ? toStringValue(primitiveSexprs[1]) : undefined
+    const name =
+      primitiveSexprs.length > 1 ? toStringValue(primitiveSexprs[1]) : undefined
     return new ViaNet(id, name)
   }
 

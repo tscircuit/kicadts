@@ -31,7 +31,9 @@ const ensureSingleChild = (
   }
 }
 
-const primitiveToString = (value: PrimitiveSExpr | undefined): string | undefined => {
+const primitiveToString = (
+  value: PrimitiveSExpr | undefined,
+): string | undefined => {
   if (value === undefined) {
     return undefined
   }

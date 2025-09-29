@@ -14,14 +14,14 @@ export class Pts extends SxClass {
     this.points = points
   }
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Pts {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Pts {
     const points: Xy[] = []
 
     for (const primitive of primitiveSexprs) {
       if (!Array.isArray(primitive) || primitive.length === 0) {
-        throw new Error(`Unexpected primitive inside pts: ${printSExpr(primitive)}`)
+        throw new Error(
+          `Unexpected primitive inside pts: ${printSExpr(primitive)}`,
+        )
       }
 
       const parsed = SxClass.parsePrimitiveSexpr(primitive, {
@@ -39,7 +39,9 @@ export class Pts extends SxClass {
         )
       }
 
-      throw new Error(`Unable to parse child inside pts: ${printSExpr(primitive)}`)
+      throw new Error(
+        `Unable to parse child inside pts: ${printSExpr(primitive)}`,
+      )
     }
 
     return new Pts(points)

@@ -100,13 +100,14 @@ export const expectEqualPrimitiveSExpr = (
   const normalizedExpected = canonicalizePrimitiveSExpr(expected)
 
   const rootPath = options.path ?? "sexpr"
-  const contextEntries = options.context
-    ? Object.entries(options.context)
-    : []
+  const contextEntries = options.context ? Object.entries(options.context) : []
 
   const formatPath = (segments: readonly string[]): string => segments.join("")
 
-  const buildPayload = (path: string, value: unknown): Record<string, unknown> => {
+  const buildPayload = (
+    path: string,
+    value: unknown,
+  ): Record<string, unknown> => {
     if (contextEntries.length === 0) {
       return { path, value }
     }
@@ -131,9 +132,7 @@ export const expectEqualPrimitiveSExpr = (
     )
   }
 
-  const getNodeToken = (
-    value: CanonicalPrimitiveSExpr,
-  ): string | undefined => {
+  const getNodeToken = (value: CanonicalPrimitiveSExpr): string | undefined => {
     if (!Array.isArray(value)) {
       return undefined
     }

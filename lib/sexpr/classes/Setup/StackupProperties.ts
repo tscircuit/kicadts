@@ -38,4 +38,3 @@ export class StackupEdgePlating extends StackupSingleValueProperty<string> {
   token = "edge_plating"
 }
 SxClass.register(StackupEdgePlating)
-

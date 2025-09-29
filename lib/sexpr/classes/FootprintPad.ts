@@ -234,7 +234,9 @@ export class FootprintPad extends SxClass {
     pad._sxRoundrectRatio = propertyMap.roundrect_rratio as
       | PadRoundrectRratio
       | undefined
-    pad._sxChamferRatio = propertyMap.chamfer_ratio as PadChamferRatio | undefined
+    pad._sxChamferRatio = propertyMap.chamfer_ratio as
+      | PadChamferRatio
+      | undefined
     pad._sxChamfer = propertyMap.chamfer as PadChamfer | undefined
     pad._sxNet = propertyMap.net as PadNet | undefined
     pad._sxUuid = propertyMap.uuid as Uuid | undefined
@@ -247,21 +249,24 @@ export class FootprintPad extends SxClass {
     pad._sxSolderPasteMargin = propertyMap.solder_paste_margin as
       | PadSolderPasteMargin
       | undefined
-    pad._sxSolderPasteMarginRatio =
-      propertyMap.solder_paste_margin_ratio as PadSolderPasteMarginRatio | undefined
+    pad._sxSolderPasteMarginRatio = propertyMap.solder_paste_margin_ratio as
+      | PadSolderPasteMarginRatio
+      | undefined
     pad._sxClearance = propertyMap.clearance as PadClearance | undefined
     pad._sxZoneConnect = propertyMap.zone_connect as PadZoneConnect | undefined
-    pad._sxThermalWidth = propertyMap.thermal_width as PadThermalWidth | undefined
+    pad._sxThermalWidth = propertyMap.thermal_width as
+      | PadThermalWidth
+      | undefined
     pad._sxThermalGap = propertyMap.thermal_gap as PadThermalGap | undefined
-    pad._sxThermalBridgeAngle =
-      propertyMap.thermal_bridge_angle as PadThermalBridgeAngle | undefined
+    pad._sxThermalBridgeAngle = propertyMap.thermal_bridge_angle as
+      | PadThermalBridgeAngle
+      | undefined
     pad._sxOptions = propertyMap.options as PadOptions | undefined
     pad._sxPrimitives = propertyMap.primitives as PadPrimitives | undefined
     pad._sxRemoveUnusedLayers =
       (arrayPropertyMap.remove_unused_layers?.[0] as
         | PadRemoveUnusedLayers
-        | undefined) ??
-      pad._sxRemoveUnusedLayers
+        | undefined) ?? pad._sxRemoveUnusedLayers
     pad._sxKeepEndLayers =
       (arrayPropertyMap.keep_end_layers?.[0] as PadKeepEndLayers | undefined) ??
       pad._sxKeepEndLayers
@@ -318,9 +323,7 @@ export class FootprintPad extends SxClass {
   }
 
   set keepEndLayers(value: boolean) {
-    this._sxKeepEndLayers = value
-      ? new PadKeepEndLayers({ value })
-      : undefined
+    this._sxKeepEndLayers = value ? new PadKeepEndLayers({ value }) : undefined
   }
 
   get at(): At | undefined {
@@ -467,7 +470,8 @@ export class FootprintPad extends SxClass {
   }
 
   set dieLength(value: number | undefined) {
-    this._sxDieLength = value === undefined ? undefined : new PadDieLength(value)
+    this._sxDieLength =
+      value === undefined ? undefined : new PadDieLength(value)
   }
 
   get solderMaskMargin(): number | undefined {
@@ -502,7 +506,8 @@ export class FootprintPad extends SxClass {
   }
 
   set clearance(value: number | undefined) {
-    this._sxClearance = value === undefined ? undefined : new PadClearance(value)
+    this._sxClearance =
+      value === undefined ? undefined : new PadClearance(value)
   }
 
   get zoneConnect(): number | undefined {
@@ -510,7 +515,8 @@ export class FootprintPad extends SxClass {
   }
 
   set zoneConnect(value: number | undefined) {
-    this._sxZoneConnect = value === undefined ? undefined : new PadZoneConnect(value)
+    this._sxZoneConnect =
+      value === undefined ? undefined : new PadZoneConnect(value)
   }
 
   get thermalWidth(): number | undefined {
@@ -518,7 +524,8 @@ export class FootprintPad extends SxClass {
   }
 
   set thermalWidth(value: number | undefined) {
-    this._sxThermalWidth = value === undefined ? undefined : new PadThermalWidth(value)
+    this._sxThermalWidth =
+      value === undefined ? undefined : new PadThermalWidth(value)
   }
 
   get thermalGap(): number | undefined {
@@ -526,7 +533,8 @@ export class FootprintPad extends SxClass {
   }
 
   set thermalGap(value: number | undefined) {
-    this._sxThermalGap = value === undefined ? undefined : new PadThermalGap(value)
+    this._sxThermalGap =
+      value === undefined ? undefined : new PadThermalGap(value)
   }
 
   get thermalBridgeAngle(): number | undefined {
@@ -587,8 +595,7 @@ export class FootprintPad extends SxClass {
     if (this._sxZoneConnect) children.push(this._sxZoneConnect)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
-    if (this._sxThermalBridgeAngle)
-      children.push(this._sxThermalBridgeAngle)
+    if (this._sxThermalBridgeAngle) children.push(this._sxThermalBridgeAngle)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxRemoveUnusedLayers) children.push(this._sxRemoveUnusedLayers)
     if (this._sxKeepEndLayers) children.push(this._sxKeepEndLayers)

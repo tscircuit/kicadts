@@ -101,7 +101,12 @@ export function tokenize(input: string): Token[] {
     }
 
     // Number or symbol
-    if (isSymbolInitial(current) || current === "-" || current === "+" || current === ".") {
+    if (
+      isSymbolInitial(current) ||
+      current === "-" ||
+      current === "+" ||
+      current === "."
+    ) {
       // read a maximal token until delimiter
       let start = i
       while (i < input.length) {

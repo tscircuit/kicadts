@@ -47,7 +47,9 @@ export class SegmentNet extends SxClass {
   }
 
   toObject(): { id: number; name?: string } {
-    return this._name === undefined ? { id: this._id } : { id: this._id, name: this._name }
+    return this._name === undefined
+      ? { id: this._id }
+      : { id: this._id, name: this._name }
   }
 
   override getChildren(): SxClass[] {

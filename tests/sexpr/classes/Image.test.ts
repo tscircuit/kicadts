@@ -1,4 +1,12 @@
-import { At, Image, ImageData, ImageScale, Layer, SxClass, Uuid } from "lib/sexpr"
+import {
+  At,
+  Image,
+  ImageData,
+  ImageScale,
+  Layer,
+  SxClass,
+  Uuid,
+} from "lib/sexpr"
 import { expect, test } from "bun:test"
 
 test("Image", () => {

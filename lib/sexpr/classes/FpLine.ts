@@ -133,7 +133,8 @@ export class FpLine extends SxClass {
       this._sxEnd = undefined
       return
     }
-    this._sxEnd = value instanceof FpLineEnd ? value : new FpLineEnd(value.x, value.y)
+    this._sxEnd =
+      value instanceof FpLineEnd ? value : new FpLineEnd(value.x, value.y)
   }
 
   get layer(): Layer | undefined {
@@ -211,7 +212,10 @@ export class FpLineStart extends SxClass {
   static override parentToken = "fp_line"
   override token = "start"
 
-  constructor(public x: number, public y: number) {
+  constructor(
+    public x: number,
+    public y: number,
+  ) {
     super()
   }
 
@@ -242,7 +246,10 @@ export class FpLineEnd extends SxClass {
   static override parentToken = "fp_line"
   override token = "end"
 
-  constructor(public x: number, public y: number) {
+  constructor(
+    public x: number,
+    public y: number,
+  ) {
     super()
   }
 

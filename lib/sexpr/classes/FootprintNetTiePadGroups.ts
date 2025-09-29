@@ -43,7 +43,9 @@ export class FootprintNetTiePadGroups extends SxClass {
   }
 
   override getString(): string {
-    const rendered = this._groups.map((group) => quoteSExprString(group)).join(" ")
+    const rendered = this._groups
+      .map((group) => quoteSExprString(group))
+      .join(" ")
     return `(net_tie_pad_groups ${rendered})`
   }
 }

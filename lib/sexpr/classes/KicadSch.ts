@@ -121,8 +121,12 @@ export class KicadSch extends SxClass {
     kicadSch._sxPaper = propertyMap.paper as Paper | undefined
     kicadSch._sxTitleBlock = propertyMap.title_block as TitleBlock | undefined
     kicadSch._sxLibSymbols = propertyMap.lib_symbols as LibSymbols | undefined
-    kicadSch._sxSheetInstances = propertyMap.sheet_instances as SheetInstances | undefined
-    kicadSch._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts | undefined
+    kicadSch._sxSheetInstances = propertyMap.sheet_instances as
+      | SheetInstances
+      | undefined
+    kicadSch._sxEmbeddedFonts = propertyMap.embedded_fonts as
+      | EmbeddedFonts
+      | undefined
     kicadSch._properties = (arrayPropertyMap.property as Property[]) ?? []
     kicadSch._images = (arrayPropertyMap.image as Image[]) ?? []
     kicadSch._sheets = (arrayPropertyMap.sheet as Sheet[]) ?? []

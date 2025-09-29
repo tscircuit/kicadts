@@ -51,17 +51,13 @@ export class Image extends SxClass {
 
     for (const token of Object.keys(propertyMap)) {
       if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
-        throw new Error(
-          `image encountered unsupported child token "${token}"`,
-        )
+        throw new Error(`image encountered unsupported child token "${token}"`)
       }
     }
 
     for (const [token, entries] of Object.entries(arrayPropertyMap)) {
       if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
-        throw new Error(
-          `image encountered unsupported child token "${token}"`,
-        )
+        throw new Error(`image encountered unsupported child token "${token}"`)
       }
       if (!SUPPORTED_MULTI_TOKENS.has(token) && entries.length > 1) {
         throw new Error(
@@ -209,7 +205,9 @@ export class ImageData extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): ImageData {
-    const chunks = primitiveSexprs.map((primitive) => primitiveToChunk(primitive))
+    const chunks = primitiveSexprs.map((primitive) =>
+      primitiveToChunk(primitive),
+    )
     return new ImageData(chunks)
   }
 
@@ -241,7 +239,9 @@ export class ImageData extends SxClass {
     if (this._chunks.length === 0) {
       return "(data)"
     }
-    const rendered = this._chunks.map((chunk) => quoteSExprString(chunk)).join(" ")
+    const rendered = this._chunks
+      .map((chunk) => quoteSExprString(chunk))
+      .join(" ")
     return `(data ${rendered})`
   }
 }

@@ -62,7 +62,9 @@ export class FpText extends SxClass {
       if (typeof primitive === "string") {
         if (primitive === "unlocked") {
           if (sawBareUnlocked) {
-            throw new Error("fp_text encountered duplicate bare unlocked tokens")
+            throw new Error(
+              "fp_text encountered duplicate bare unlocked tokens",
+            )
           }
           sawBareUnlocked = true
           continue
@@ -74,9 +76,7 @@ export class FpText extends SxClass {
           sawBareHide = true
           continue
         }
-        throw new Error(
-          `fp_text encountered unsupported flag "${primitive}"`,
-        )
+        throw new Error(`fp_text encountered unsupported flag "${primitive}"`)
       }
 
       if (!Array.isArray(primitive) || primitive.length === 0) {
@@ -287,7 +287,8 @@ class FpTextUnlocked extends SxClass {
   ): FpTextUnlocked {
     const [raw] = primitiveSexprs
     const rawString = toStringValue(raw)
-    const value = rawString === undefined ? true : !/^(no|false)$/iu.test(rawString)
+    const value =
+      rawString === undefined ? true : !/^(no|false)$/iu.test(rawString)
     return new FpTextUnlocked({ value, bare: false })
   }
 
@@ -323,7 +324,8 @@ class FpTextHide extends SxClass {
   ): FpTextHide {
     const [raw] = primitiveSexprs
     const rawString = toStringValue(raw)
-    const value = rawString === undefined ? true : !/^(no|false)$/iu.test(rawString)
+    const value =
+      rawString === undefined ? true : !/^(no|false)$/iu.test(rawString)
     return new FpTextHide({ value, bare: false })
   }
 

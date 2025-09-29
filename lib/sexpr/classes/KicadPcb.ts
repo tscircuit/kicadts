@@ -155,7 +155,8 @@ export class KicadPcb extends SxClass {
   }
 
   set generator(value: string | undefined) {
-    this._sxGenerator = value === undefined ? undefined : new PcbGenerator(value)
+    this._sxGenerator =
+      value === undefined ? undefined : new PcbGenerator(value)
   }
 
   get generatorVersion(): string | undefined {

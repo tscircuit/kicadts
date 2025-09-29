@@ -208,11 +208,7 @@ export class PcbPlotParams extends SxClass {
   private setStringProperty<
     K extends PlotParamKey,
     T extends { new (value: string): PlotParamProperty<any> },
-  >(
-    key: K,
-    value: string | undefined,
-    ClassRef: T,
-  ) {
+  >(key: K, value: string | undefined, ClassRef: T) {
     if (value === undefined) {
       this.clearProperty(key)
       return
@@ -223,11 +219,7 @@ export class PcbPlotParams extends SxClass {
   private setNumberProperty<
     K extends PlotParamKey,
     T extends { new (value: number): PlotParamProperty<any> },
-  >(
-    key: K,
-    value: number | undefined,
-    ClassRef: T,
-  ) {
+  >(key: K, value: number | undefined, ClassRef: T) {
     if (value === undefined) {
       this.clearProperty(key)
       return
@@ -335,11 +327,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set excludeedgelayer(value: string | undefined) {
-    this.setStringProperty(
-      "excludeedgelayer",
-      value,
-      PlotParamExcludeEdgeLayer,
-    )
+    this.setStringProperty("excludeedgelayer", value, PlotParamExcludeEdgeLayer)
   }
 
   get dashed_line_dash_ratio(): number | undefined {
@@ -447,11 +435,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set sketchpadsonfab(value: string | undefined) {
-    this.setStringProperty(
-      "sketchpadsonfab",
-      value,
-      PlotParamSketchPadsOnFab,
-    )
+    this.setStringProperty("sketchpadsonfab", value, PlotParamSketchPadsOnFab)
   }
 
   get hidednponfab(): string | undefined {
@@ -475,11 +459,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set crossoutdnponfab(value: string | undefined) {
-    this.setStringProperty(
-      "crossoutdnponfab",
-      value,
-      PlotParamCrossoutDnpOnFab,
-    )
+    this.setStringProperty("crossoutdnponfab", value, PlotParamCrossoutDnpOnFab)
   }
 
   get subtractmaskfromsilk(): string | undefined {
@@ -571,11 +551,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set hpglpendiameter(value: number | undefined) {
-    this.setNumberProperty(
-      "hpglpendiameter",
-      value,
-      PlotParamHpglPenDiameter,
-    )
+    this.setNumberProperty("hpglpendiameter", value, PlotParamHpglPenDiameter)
   }
 
   get hpglpenoverlay(): number | undefined {
@@ -583,11 +559,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set hpglpenoverlay(value: number | undefined) {
-    this.setNumberProperty(
-      "hpglpenoverlay",
-      value,
-      PlotParamHpglPenOverlay,
-    )
+    this.setNumberProperty("hpglpenoverlay", value, PlotParamHpglPenOverlay)
   }
 
   get pdf_front_fp_property_popups(): string | undefined {
@@ -647,11 +619,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set dxfimperialunits(value: string | undefined) {
-    this.setStringProperty(
-      "dxfimperialunits",
-      value,
-      PlotParamDxfImperialUnits,
-    )
+    this.setStringProperty("dxfimperialunits", value, PlotParamDxfImperialUnits)
   }
 
   get dxfusepcbnewfont(): string | undefined {
@@ -659,11 +627,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set dxfusepcbnewfont(value: string | undefined) {
-    this.setStringProperty(
-      "dxfusepcbnewfont",
-      value,
-      PlotParamDxfUsePcbnewFont,
-    )
+    this.setStringProperty("dxfusepcbnewfont", value, PlotParamDxfUsePcbnewFont)
   }
 
   get psnegative(): string | undefined {
@@ -719,11 +683,7 @@ export class PcbPlotParams extends SxClass {
   }
 
   set outputdirectory(value: string | undefined) {
-    this.setStringProperty(
-      "outputdirectory",
-      value,
-      PlotParamOutputDirectory,
-    )
+    this.setStringProperty("outputdirectory", value, PlotParamOutputDirectory)
   }
 }
 SxClass.register(PcbPlotParams)

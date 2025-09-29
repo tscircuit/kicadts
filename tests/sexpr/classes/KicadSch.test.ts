@@ -40,9 +40,7 @@ test("KicadSch parse", () => {
 
   expect(schematic.version).toBe(20240101)
   expect(schematic.generator).toBe("kicad-cli")
-  expect(schematic.uuid?.value).toBe(
-    "01234567-89ab-cdef-0123-456789abcdef",
-  )
+  expect(schematic.uuid?.value).toBe("01234567-89ab-cdef-0123-456789abcdef")
 
   expect(schematic.paper).toBeInstanceOf(Paper)
   expect(schematic.titleBlock).toBeInstanceOf(TitleBlock)

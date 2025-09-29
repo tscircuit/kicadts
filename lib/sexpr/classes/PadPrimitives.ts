@@ -80,7 +80,9 @@ export class PadPrimitives extends SxClass {
         continue
       }
 
-      throw new Error(`pad primitives encountered unsupported token "${parsed.token}"`)
+      throw new Error(
+        `pad primitives encountered unsupported token "${parsed.token}"`,
+      )
     }
 
     return primitives

@@ -134,7 +134,9 @@ export class FpTextBox extends SxClass {
     fpTextBox._sxUuid = propertyMap.uuid as Uuid | undefined
     fpTextBox._sxEffects = propertyMap.effects as TextEffects | undefined
     fpTextBox._sxStroke = propertyMap.stroke as Stroke | undefined
-    fpTextBox._sxRenderCache = propertyMap.render_cache as RenderCache | undefined
+    fpTextBox._sxRenderCache = propertyMap.render_cache as
+      | RenderCache
+      | undefined
 
     return fpTextBox
   }
@@ -164,7 +166,10 @@ export class FpTextBox extends SxClass {
       this._sxStart = undefined
       return
     }
-    this._sxStart = value instanceof FpTextBoxStart ? value : new FpTextBoxStart([value.x, value.y])
+    this._sxStart =
+      value instanceof FpTextBoxStart
+        ? value
+        : new FpTextBoxStart([value.x, value.y])
   }
 
   get end(): FpTextBoxEnd | undefined {
@@ -176,7 +181,10 @@ export class FpTextBox extends SxClass {
       this._sxEnd = undefined
       return
     }
-    this._sxEnd = value instanceof FpTextBoxEnd ? value : new FpTextBoxEnd([value.x, value.y])
+    this._sxEnd =
+      value instanceof FpTextBoxEnd
+        ? value
+        : new FpTextBoxEnd([value.x, value.y])
   }
 
   get pts(): Pts | undefined {
@@ -196,7 +204,8 @@ export class FpTextBox extends SxClass {
       this._sxAngle = undefined
       return
     }
-    this._sxAngle = value instanceof FpTextBoxAngle ? value : new FpTextBoxAngle([value])
+    this._sxAngle =
+      value instanceof FpTextBoxAngle ? value : new FpTextBoxAngle([value])
   }
 
   get layer(): Layer | undefined {
@@ -378,7 +387,7 @@ export class FpTextBoxAngle extends SxClass {
     const numeric =
       typeof raw === "number"
         ? raw
-        : toNumberValue(raw as PrimitiveSExpr) ?? 0
+        : (toNumberValue(raw as PrimitiveSExpr) ?? 0)
     return new FpTextBoxAngle([numeric])
   }
 

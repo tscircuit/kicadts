@@ -96,7 +96,8 @@ export class TitleBlock extends SxClass {
   }
 
   set rev(value: string | undefined) {
-    this._sxRev = value === undefined ? undefined : new TitleBlockRevision(value)
+    this._sxRev =
+      value === undefined ? undefined : new TitleBlockRevision(value)
   }
 
   get company(): string | undefined {
@@ -132,9 +133,7 @@ export class TitleBlock extends SxClass {
     if (this._sxRev) children.push(this._sxRev)
     if (this._sxCompany) children.push(this._sxCompany)
 
-    const sortedComments = [...this.comments].sort(
-      (a, b) => a.index - b.index,
-    )
+    const sortedComments = [...this.comments].sort((a, b) => a.index - b.index)
     children.push(...sortedComments)
     return children
   }

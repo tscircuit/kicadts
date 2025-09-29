@@ -66,9 +66,10 @@ export class PadPrimitiveGrArc extends SxClass {
     return this._sxStart
   }
 
-  set start(
-    value: PadPrimitiveGrArcStart | { x: number; y: number } | undefined,
-  ) {
+  set start(value:
+    | PadPrimitiveGrArcStart
+    | { x: number; y: number }
+    | undefined,) {
     this._sxStart = normalizeArcPoint(value, PadPrimitiveGrArcStart)
   }
 
@@ -195,7 +196,9 @@ class PadPrimitiveGrArcStart extends PadPrimitiveGrArcPoint {
     const y = toNumberValue(rawY)
 
     if (x === undefined || y === undefined) {
-      throw new Error("pad primitive gr_arc start expects two numeric arguments")
+      throw new Error(
+        "pad primitive gr_arc start expects two numeric arguments",
+      )
     }
 
     return new PadPrimitiveGrArcStart(x, y)

@@ -1,4 +1,11 @@
-import { FootprintPad, PadLayers, PadNet, PadSize, PadDrill, SxClass } from "lib/sexpr"
+import {
+  FootprintPad,
+  PadLayers,
+  PadNet,
+  PadSize,
+  PadDrill,
+  SxClass,
+} from "lib/sexpr"
 import { expect, test } from "bun:test"
 
 test("FootprintPad", () => {

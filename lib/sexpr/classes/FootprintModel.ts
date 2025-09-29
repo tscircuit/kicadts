@@ -120,10 +120,7 @@ export class FootprintModel extends SxClass {
 }
 SxClass.register(FootprintModel)
 
-function parseVectorArgs(
-  args: PrimitiveSExpr[],
-  token: string,
-): ModelVector {
+function parseVectorArgs(args: PrimitiveSExpr[], token: string): ModelVector {
   if (args.length !== 1) {
     throw new Error(`model ${token} expects a single xyz child`)
   }

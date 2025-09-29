@@ -92,7 +92,8 @@ export class Junction extends SxClass {
   }
 
   set diameter(value: number | undefined) {
-    this._sxDiameter = value === undefined ? undefined : new JunctionDiameter(value)
+    this._sxDiameter =
+      value === undefined ? undefined : new JunctionDiameter(value)
   }
 
   get color(): Color | undefined {

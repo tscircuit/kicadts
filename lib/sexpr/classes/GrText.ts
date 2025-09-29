@@ -125,9 +125,7 @@ export class GrText extends SxClass {
     return this._sxPosition
   }
 
-  set position(
-    value: At | Xy | GrTextPosition | undefined,
-  ) {
+  set position(value: At | Xy | GrTextPosition | undefined,) {
     if (value === undefined) {
       this._sxPosition = undefined
       return

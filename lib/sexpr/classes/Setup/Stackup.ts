@@ -22,14 +22,16 @@ export class Stackup extends SxClass {
   private _sxCastellatedPads?: StackupCastellatedPads
   private _sxEdgePlating?: StackupEdgePlating
 
-  constructor(opts: {
-    layers?: StackupLayer[]
-    copperFinish?: StackupCopperFinish
-    dielectricConstraints?: StackupDielectricConstraints
-    edgeConnector?: StackupEdgeConnector
-    castellatedPads?: StackupCastellatedPads
-    edgePlating?: StackupEdgePlating
-  } = {}) {
+  constructor(
+    opts: {
+      layers?: StackupLayer[]
+      copperFinish?: StackupCopperFinish
+      dielectricConstraints?: StackupDielectricConstraints
+      edgeConnector?: StackupEdgeConnector
+      castellatedPads?: StackupCastellatedPads
+      edgePlating?: StackupEdgePlating
+    } = {},
+  ) {
     super()
     this.layers = opts.layers ?? []
     this._sxCopperFinish = opts.copperFinish
@@ -51,8 +53,7 @@ export class Stackup extends SxClass {
       dielectricConstraints:
         propertyMap.dielectric_constraints as StackupDielectricConstraints,
       edgeConnector: propertyMap.edge_connector as StackupEdgeConnector,
-      castellatedPads:
-        propertyMap.castellated_pads as StackupCastellatedPads,
+      castellatedPads: propertyMap.castellated_pads as StackupCastellatedPads,
       edgePlating: propertyMap.edge_plating as StackupEdgePlating,
     })
   }
@@ -75,9 +76,7 @@ export class Stackup extends SxClass {
   }
 
   set copperFinish(value: string | undefined) {
-    this._sxCopperFinish = value
-      ? new StackupCopperFinish(value)
-      : undefined
+    this._sxCopperFinish = value ? new StackupCopperFinish(value) : undefined
   }
 
   get dielectricConstraints(): string | undefined {
@@ -95,9 +94,7 @@ export class Stackup extends SxClass {
   }
 
   set edgeConnector(value: string | undefined) {
-    this._sxEdgeConnector = value
-      ? new StackupEdgeConnector(value)
-      : undefined
+    this._sxEdgeConnector = value ? new StackupEdgeConnector(value) : undefined
   }
 
   get castellatedPads(): string | undefined {
@@ -115,9 +112,7 @@ export class Stackup extends SxClass {
   }
 
   set edgePlating(value: string | undefined) {
-    this._sxEdgePlating = value
-      ? new StackupEdgePlating(value)
-      : undefined
+    this._sxEdgePlating = value ? new StackupEdgePlating(value) : undefined
   }
 
   override getChildren(): SxClass[] {

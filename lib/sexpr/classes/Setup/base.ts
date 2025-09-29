@@ -56,9 +56,7 @@ export abstract class SingleValueProperty<
 
   protected formatValue(): string {
     if (typeof this._value === "string") {
-      return this.quoteStringValue
-        ? quoteSExprString(this._value)
-        : this._value
+      return this.quoteStringValue ? quoteSExprString(this._value) : this._value
     }
     return `${this._value}`
   }

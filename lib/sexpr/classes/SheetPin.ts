@@ -48,7 +48,10 @@ export class SheetPin extends SxClass {
     }
 
     const electricalType = toStringValue(rawType)
-    if (!electricalType || !electricalTypes.has(electricalType as SheetPinElectricalType)) {
+    if (
+      !electricalType ||
+      !electricalTypes.has(electricalType as SheetPinElectricalType)
+    ) {
       throw new Error(
         `sheet pin electrical type must be one of: ${Array.from(electricalTypes).join(", ")}`,
       )

@@ -87,7 +87,7 @@ export class Footprint extends SxClass {
   private _libraryLink?: string
   private _sxLocked?: FootprintLocked
   private _sxPlaced?: FootprintPlaced
-  
+
   private _sxLayer?: Layer
   private _sxTedit?: FootprintTedit
   private _sxUuid?: Uuid
@@ -156,16 +156,22 @@ export class Footprint extends SxClass {
 
     for (const token of Object.keys(propertyMap)) {
       if (!SUPPORTED_TOKENS.has(token)) {
-        throw new Error(`footprint encountered unsupported child token "${token}"`)
+        throw new Error(
+          `footprint encountered unsupported child token "${token}"`,
+        )
       }
     }
 
     for (const [token, entries] of Object.entries(arrayPropertyMap)) {
       if (!SUPPORTED_TOKENS.has(token)) {
-        throw new Error(`footprint encountered unsupported child token "${token}"`)
+        throw new Error(
+          `footprint encountered unsupported child token "${token}"`,
+        )
       }
       if (!MULTI_TOKENS.has(token) && entries.length > 1) {
-        throw new Error(`footprint does not support repeated child token "${token}"`)
+        throw new Error(
+          `footprint does not support repeated child token "${token}"`,
+        )
       }
     }
 
@@ -203,14 +209,18 @@ export class Footprint extends SxClass {
     footprint._sxSolderPasteRatio = propertyMap.solder_paste_ratio as
       | FootprintSolderPasteRatio
       | undefined
-    footprint._sxClearance = propertyMap.clearance as FootprintClearance | undefined
+    footprint._sxClearance = propertyMap.clearance as
+      | FootprintClearance
+      | undefined
     footprint._sxZoneConnect = propertyMap.zone_connect as
       | FootprintZoneConnect
       | undefined
     footprint._sxThermalWidth = propertyMap.thermal_width as
       | FootprintThermalWidth
       | undefined
-    footprint._sxThermalGap = propertyMap.thermal_gap as FootprintThermalGap | undefined
+    footprint._sxThermalGap = propertyMap.thermal_gap as
+      | FootprintThermalGap
+      | undefined
     footprint._sxAttr = propertyMap.attr as FootprintAttr | undefined
     footprint._sxPrivateLayers = propertyMap.private_layers as
       | FootprintPrivateLayers
@@ -218,9 +228,15 @@ export class Footprint extends SxClass {
     footprint._sxNetTiePadGroups = propertyMap.net_tie_pad_groups as
       | FootprintNetTiePadGroups
       | undefined
-    footprint._sxSheetname = propertyMap.sheetname as FootprintSheetname | undefined
-    footprint._sxSheetfile = propertyMap.sheetfile as FootprintSheetfile | undefined
-    footprint._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts | undefined
+    footprint._sxSheetname = propertyMap.sheetname as
+      | FootprintSheetname
+      | undefined
+    footprint._sxSheetfile = propertyMap.sheetfile as
+      | FootprintSheetfile
+      | undefined
+    footprint._sxEmbeddedFonts = propertyMap.embedded_fonts as
+      | EmbeddedFonts
+      | undefined
 
     footprint._properties = (arrayPropertyMap.property as Property[]) ?? []
     footprint._fpTexts = (arrayPropertyMap["fp_text"] as FpText[]) ?? []
@@ -321,7 +337,8 @@ export class Footprint extends SxClass {
       this._sxTedit = undefined
       return
     }
-    this._sxTedit = value instanceof FootprintTedit ? value : new FootprintTedit(value)
+    this._sxTedit =
+      value instanceof FootprintTedit ? value : new FootprintTedit(value)
   }
 
   get uuid(): Uuid | undefined {
@@ -364,7 +381,8 @@ export class Footprint extends SxClass {
       this._sxDescr = undefined
       return
     }
-    this._sxDescr = value instanceof FootprintDescr ? value : new FootprintDescr(value)
+    this._sxDescr =
+      value instanceof FootprintDescr ? value : new FootprintDescr(value)
   }
 
   get tags(): FootprintTags | undefined {
@@ -376,7 +394,8 @@ export class Footprint extends SxClass {
       this._sxTags = undefined
       return
     }
-    this._sxTags = value instanceof FootprintTags ? value : new FootprintTags(value)
+    this._sxTags =
+      value instanceof FootprintTags ? value : new FootprintTags(value)
   }
 
   get path(): FootprintPath | undefined {
@@ -388,7 +407,8 @@ export class Footprint extends SxClass {
       this._sxPath = undefined
       return
     }
-    this._sxPath = value instanceof FootprintPath ? value : new FootprintPath(value)
+    this._sxPath =
+      value instanceof FootprintPath ? value : new FootprintPath(value)
   }
 
   get autoplaceCost90(): FootprintAutoplaceCost90 | undefined {
@@ -440,7 +460,10 @@ export class Footprint extends SxClass {
     return this._sxSolderPasteMargin
   }
 
-  set solderPasteMargin(value: FootprintSolderPasteMargin | number | undefined) {
+  set solderPasteMargin(value:
+    | FootprintSolderPasteMargin
+    | number
+    | undefined) {
     if (value === undefined) {
       this._sxSolderPasteMargin = undefined
       return
@@ -476,7 +499,9 @@ export class Footprint extends SxClass {
       return
     }
     this._sxClearance =
-      value instanceof FootprintClearance ? value : new FootprintClearance(value)
+      value instanceof FootprintClearance
+        ? value
+        : new FootprintClearance(value)
   }
 
   get zoneConnect(): FootprintZoneConnect | undefined {
@@ -489,7 +514,9 @@ export class Footprint extends SxClass {
       return
     }
     this._sxZoneConnect =
-      value instanceof FootprintZoneConnect ? value : new FootprintZoneConnect(value)
+      value instanceof FootprintZoneConnect
+        ? value
+        : new FootprintZoneConnect(value)
   }
 
   get thermalWidth(): FootprintThermalWidth | undefined {
@@ -517,7 +544,9 @@ export class Footprint extends SxClass {
       return
     }
     this._sxThermalGap =
-      value instanceof FootprintThermalGap ? value : new FootprintThermalGap(value)
+      value instanceof FootprintThermalGap
+        ? value
+        : new FootprintThermalGap(value)
   }
 
   get attr(): FootprintAttr | undefined {

@@ -7,9 +7,7 @@ export class Zone extends SxClass {
 
   private _rawChildren: PrimitiveSExpr[] = []
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Zone {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Zone {
     const zone = new Zone()
     zone._rawChildren = [...primitiveSexprs]
     return zone

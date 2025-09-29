@@ -51,9 +51,7 @@ export class FpCircle extends SxClass {
     return this._sxCenter
   }
 
-  set center(
-    value: FpCircleCenter | { x: number; y: number } | undefined,
-  ) {
+  set center(value: FpCircleCenter | { x: number; y: number } | undefined,) {
     if (value === undefined) {
       this._sxCenter = undefined
       return

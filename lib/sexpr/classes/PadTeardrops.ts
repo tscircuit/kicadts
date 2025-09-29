@@ -194,7 +194,9 @@ export class PadTeardrops extends SxClass {
       lines.push(`  (enabled ${this._enabled ? "yes" : "no"})`)
     }
     if (this._allowTwoSegments !== undefined) {
-      lines.push(`  (allow_two_segments ${this._allowTwoSegments ? "yes" : "no"})`)
+      lines.push(
+        `  (allow_two_segments ${this._allowTwoSegments ? "yes" : "no"})`,
+      )
     }
     if (this._preferZoneConnections !== undefined) {
       lines.push(

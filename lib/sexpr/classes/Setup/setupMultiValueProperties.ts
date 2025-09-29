@@ -51,4 +51,3 @@ export class SetupGridOrigin extends SetupCoordinateProperty {
   token = "grid_origin"
 }
 SxClass.register(SetupGridOrigin)
-

@@ -87,7 +87,8 @@ export class FpPoly extends SxClass {
     fpPoly._sxStroke = propertyMap.stroke as Stroke | undefined
     fpPoly._sxFill = propertyMap.fill as FpPolyFill | undefined
     const lockedClass = propertyMap.locked as FpPolyLocked | undefined
-    fpPoly._sxLocked = lockedClass && lockedClass.value ? lockedClass : undefined
+    fpPoly._sxLocked =
+      lockedClass && lockedClass.value ? lockedClass : undefined
     fpPoly._sxUuid = propertyMap.uuid as Uuid | undefined
 
     for (const primitive of primitiveSexprs) {
@@ -161,9 +162,7 @@ export class FpPoly extends SxClass {
     }
 
     if (Array.isArray(value)) {
-      this._sxPts = new Pts(
-        value.map(({ x, y }) => new Xy(x, y)),
-      )
+      this._sxPts = new Pts(value.map(({ x, y }) => new Xy(x, y)))
       return
     }
 

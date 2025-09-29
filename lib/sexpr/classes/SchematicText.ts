@@ -7,12 +7,7 @@ import { ExcludeFromSim } from "./ExcludeFromSim"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 
-const SUPPORTED_TOKENS = new Set([
-  "exclude_from_sim",
-  "at",
-  "effects",
-  "uuid",
-])
+const SUPPORTED_TOKENS = new Set(["exclude_from_sim", "at", "effects", "uuid"])
 
 export class SchematicText extends SxClass {
   static override token = "text"

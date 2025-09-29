@@ -66,9 +66,10 @@ export class PadPrimitiveGrCircle extends SxClass {
     return this._sxCenter
   }
 
-  set center(
-    value: PadPrimitiveGrCircleCenter | { x: number; y: number } | undefined,
-  ) {
+  set center(value:
+    | PadPrimitiveGrCircleCenter
+    | { x: number; y: number }
+    | undefined,) {
     this._sxCenter = normalizeCirclePoint(value, PadPrimitiveGrCircleCenter)
   }
 
@@ -76,7 +77,10 @@ export class PadPrimitiveGrCircle extends SxClass {
     return this._sxEnd
   }
 
-  set end(value: PadPrimitiveGrCircleEnd | { x: number; y: number } | undefined) {
+  set end(value:
+    | PadPrimitiveGrCircleEnd
+    | { x: number; y: number }
+    | undefined) {
     this._sxEnd = normalizeCirclePoint(value, PadPrimitiveGrCircleEnd)
   }
 

@@ -5,10 +5,7 @@ import { toStringValue } from "../utils/toStringValue"
 export type PadOptionsClearanceType = "outline" | "convexhull"
 export type PadOptionsAnchorShape = "rect" | "circle"
 
-const CLEARANCE_TYPES: PadOptionsClearanceType[] = [
-  "outline",
-  "convexhull",
-]
+const CLEARANCE_TYPES: PadOptionsClearanceType[] = ["outline", "convexhull"]
 
 const ANCHOR_SHAPES: PadOptionsAnchorShape[] = ["rect", "circle"]
 
@@ -58,7 +55,9 @@ export class PadOptions extends SxClass {
         continue
       }
 
-      throw new Error(`pad options encountered unsupported token "${parsed.token}"`)
+      throw new Error(
+        `pad options encountered unsupported token "${parsed.token}"`,
+      )
     }
 
     return options

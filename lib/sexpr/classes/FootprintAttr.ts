@@ -35,7 +35,9 @@ export class FootprintAttr extends SxClass {
         attr._type = primitive
         continue
       }
-      throw new Error(`attr encountered duplicate or unknown token "${primitive}"`)
+      throw new Error(
+        `attr encountered duplicate or unknown token "${primitive}"`,
+      )
     }
     return attr
   }

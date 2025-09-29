@@ -47,7 +47,10 @@ export class PadLayers extends SxClass {
     }
     const rendered = this._layers
       .map((layer) => {
-        if (/^[^\s()"]+$/u.test(layer) && !["nil", "#t", "#f"].includes(layer)) {
+        if (
+          /^[^\s()"]+$/u.test(layer) &&
+          !["nil", "#t", "#f"].includes(layer)
+        ) {
           return layer
         }
         return quoteSExprString(layer)

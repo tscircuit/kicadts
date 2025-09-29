@@ -140,9 +140,10 @@ export class TextEffectsFont extends SxClass {
     return { height: this._sxSize.height, width: this._sxSize.width }
   }
 
-  set size(
-    value: TextEffectsFontSize | { height: number; width: number } | undefined,
-  ) {
+  set size(value:
+    | TextEffectsFontSize
+    | { height: number; width: number }
+    | undefined,) {
     if (value === undefined) {
       this._sxSize = undefined
       return
@@ -357,11 +358,13 @@ export class TextEffectsJustify extends SxClass {
   private _vertical?: "top" | "bottom"
   private _mirror = false
 
-  constructor(options: {
-    horizontal?: "left" | "right"
-    vertical?: "top" | "bottom"
-    mirror?: boolean
-  } = {}) {
+  constructor(
+    options: {
+      horizontal?: "left" | "right"
+      vertical?: "top" | "bottom"
+      mirror?: boolean
+    } = {},
+  ) {
     super()
     this._horizontal = options.horizontal
     this._vertical = options.vertical

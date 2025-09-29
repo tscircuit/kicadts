@@ -164,10 +164,7 @@ export class Setup extends SxClass {
     return children
   }
 
-  private setProperty(
-    key: SetupPropertyKey,
-    instance: SxClass | undefined,
-  ) {
+  private setProperty(key: SetupPropertyKey, instance: SxClass | undefined) {
     if (instance) {
       this._properties[key] = instance
       return
@@ -247,7 +244,11 @@ export class Setup extends SxClass {
   }
 
   set padToPasteClearance(value: number | undefined) {
-    this.setNumberProperty("padToPasteClearance", value, SetupPadToPasteClearance)
+    this.setNumberProperty(
+      "padToPasteClearance",
+      value,
+      SetupPadToPasteClearance,
+    )
   }
 
   get padToPasteClearanceRatio(): number | undefined {
@@ -266,10 +267,8 @@ export class Setup extends SxClass {
   }
 
   get lastTraceWidth(): number | undefined {
-    return this.getPropertyInstance(
-      "lastTraceWidth",
-      SetupLastTraceWidth,
-    )?.value
+    return this.getPropertyInstance("lastTraceWidth", SetupLastTraceWidth)
+      ?.value
   }
 
   set lastTraceWidth(value: number | undefined) {
@@ -277,7 +276,8 @@ export class Setup extends SxClass {
   }
 
   get traceClearance(): number | undefined {
-    return this.getPropertyInstance("traceClearance", SetupTraceClearance)?.value
+    return this.getPropertyInstance("traceClearance", SetupTraceClearance)
+      ?.value
   }
 
   set traceClearance(value: number | undefined) {
@@ -530,7 +530,8 @@ export class Setup extends SxClass {
   }
 
   get visibleElements(): string | undefined {
-    return this.getPropertyInstance("visibleElements", SetupVisibleElements)?.value
+    return this.getPropertyInstance("visibleElements", SetupVisibleElements)
+      ?.value
   }
 
   set visibleElements(value: string | undefined) {

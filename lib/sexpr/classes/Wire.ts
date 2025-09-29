@@ -15,9 +15,7 @@ export class Wire extends SxClass {
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Wire {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Wire {
     const wire = new Wire()
 
     const { propertyMap, arrayPropertyMap } =

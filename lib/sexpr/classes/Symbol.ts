@@ -93,8 +93,10 @@ export class SymbolPinNumbers extends SxClass {
       primitiveNodes.push(primitive)
     }
 
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveNodes, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveNodes,
+      this.token,
+    )
 
     pinNumbers._sxHide = propertyMap.hide as SymbolPinNumbersHide
 
@@ -158,8 +160,10 @@ export class SymbolPinNames extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolPinNames {
     const pinNames = new SymbolPinNames()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     pinNames._sxOffset = propertyMap.offset as SymbolPinNamesOffset
     pinNames._sxHide = propertyMap.hide as SymbolPinNamesHide
@@ -255,7 +259,10 @@ abstract class SymbolPointBase extends SxClass {
     if (x === undefined || y === undefined) {
       throw new Error(`${this.name} expects two numeric arguments`)
     }
-    const Ctor = this as unknown as new (x: number, y: number) => SymbolPointBase
+    const Ctor = this as unknown as new (
+      x: number,
+      y: number,
+    ) => SymbolPointBase
     return new Ctor(x, y)
   }
 
@@ -344,8 +351,10 @@ abstract class SymbolFillBase extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolFillBase {
     const fill = new (this as unknown as new () => SymbolFillBase)()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, "fill")
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      "fill",
+    )
     fill._sxType = propertyMap.type as SymbolFillType
     return fill
   }
@@ -441,8 +450,10 @@ export class SymbolPolyline extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolPolyline {
     const polyline = new SymbolPolyline()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     polyline._sxPts = propertyMap.pts as Pts
     polyline._sxStroke = propertyMap.stroke as Stroke
@@ -499,8 +510,10 @@ export class SymbolRectangle extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolRectangle {
     const rectangle = new SymbolRectangle()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     rectangle._sxStart = propertyMap.start as SymbolRectangleStart
     rectangle._sxEnd = propertyMap.end as SymbolRectangleEnd
@@ -535,8 +548,10 @@ export class SymbolCircle extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolCircle {
     const circle = new SymbolCircle()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     circle._sxCenter = propertyMap.center as SymbolCircleCenter
     circle._sxRadius = propertyMap.radius as SymbolCircleRadius
@@ -572,8 +587,10 @@ export class SymbolArc extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolArc {
     const arc = new SymbolArc()
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     arc._sxStart = propertyMap.start as SymbolArcStart
     arc._sxMid = propertyMap.mid as SymbolArcMid
@@ -617,8 +634,10 @@ export class SymbolText extends SxClass {
     const text = new SymbolText()
     text._value = value
 
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     text._sxAt = propertyMap.at as At
     text._sxEffects = propertyMap.effects as TextEffects
@@ -821,7 +840,8 @@ export class SchematicSymbol extends SxClass {
       this._sxDuplicatePinNumbersAreJumpers = undefined
       return
     }
-    this._sxDuplicatePinNumbersAreJumpers = new SymbolDuplicatePinNumbersAreJumpers(value)
+    this._sxDuplicatePinNumbersAreJumpers =
+      new SymbolDuplicatePinNumbersAreJumpers(value)
   }
 
   get instances(): SymbolInstances | undefined {
@@ -967,7 +987,8 @@ export class SymbolProperty extends SxClass {
     super()
     this.key = params.key
     this.value = params.value
-    this._sxId = params.id !== undefined ? SymbolPropertyId.from(params.id) : undefined
+    this._sxId =
+      params.id !== undefined ? SymbolPropertyId.from(params.id) : undefined
     this._sxAt = params.at
     this._sxEffects = params.effects
   }
@@ -980,8 +1001,10 @@ export class SymbolProperty extends SxClass {
     const key = toStringValue(inputKey) ?? ""
     const value = toStringValue(inputValue) ?? ""
 
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     return new SymbolProperty({
       key,
@@ -1070,8 +1093,31 @@ type PinGraphicStyle =
   | "edge_clock_high"
   | "non_logic"
 
-const electricalTypeSet = new Set<PinElectricalType>(["input", "output", "bidirectional", "tri_state", "passive", "free", "unspecified", "power_in", "power_out", "open_collector", "open_emitter", "no_connect"])
-const graphicStyleSet = new Set<PinGraphicStyle>(["line", "inverted", "clock", "inverted_clock", "input_low", "clock_low", "output_low", "edge_clock_high", "non_logic"])
+const electricalTypeSet = new Set<PinElectricalType>([
+  "input",
+  "output",
+  "bidirectional",
+  "tri_state",
+  "passive",
+  "free",
+  "unspecified",
+  "power_in",
+  "power_out",
+  "open_collector",
+  "open_emitter",
+  "no_connect",
+])
+const graphicStyleSet = new Set<PinGraphicStyle>([
+  "line",
+  "inverted",
+  "clock",
+  "inverted_clock",
+  "input_low",
+  "clock_low",
+  "output_low",
+  "edge_clock_high",
+  "non_logic",
+])
 
 export class SymbolPinLength extends SxPrimitiveNumber {
   static override token = "length"
@@ -1099,8 +1145,10 @@ export class SymbolPinName extends SxClass {
   ): SymbolPinName {
     const [valuePrimitive, ...rest] = primitiveSexprs
     const value = toStringValue(valuePrimitive) ?? ""
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     return new SymbolPinName({
       value,
@@ -1150,8 +1198,10 @@ export class SymbolPinNumber extends SxClass {
   ): SymbolPinNumber {
     const [valuePrimitive, ...rest] = primitiveSexprs
     const value = toStringValue(valuePrimitive) ?? ""
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     return new SymbolPinNumber({
       value,
@@ -1204,12 +1254,18 @@ export class SymbolPin extends SxClass {
     const first = args[0]
     const firstString = toStringValue(first)
 
-    if (firstString && electricalTypeSet.has(firstString as PinElectricalType)) {
+    if (
+      firstString &&
+      electricalTypeSet.has(firstString as PinElectricalType)
+    ) {
       symbolPin.pinElectricalType = firstString as PinElectricalType
       index = 1
       const second = args[1]
       const secondString = toStringValue(second)
-      if (secondString && graphicStyleSet.has(secondString as PinGraphicStyle)) {
+      if (
+        secondString &&
+        graphicStyleSet.has(secondString as PinGraphicStyle)
+      ) {
         symbolPin.pinGraphicStyle = secondString as PinGraphicStyle
         index = 2
       }
@@ -1230,8 +1286,10 @@ export class SymbolPin extends SxClass {
       primitiveNodes.push(primitive)
     }
 
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveNodes, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveNodes,
+      this.token,
+    )
 
     symbolPin._sxAt = propertyMap.at as At
     symbolPin._sxLength = propertyMap.length as SymbolPinLength
@@ -1264,7 +1322,8 @@ export class SymbolPin extends SxClass {
   }
 
   set length(value: number | undefined) {
-    this._sxLength = value === undefined ? undefined : new SymbolPinLength(value)
+    this._sxLength =
+      value === undefined ? undefined : new SymbolPinLength(value)
   }
 
   get name(): string | undefined {
@@ -1356,8 +1415,10 @@ export class SymbolInstances extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolInstances {
     const symbolInstances = new SymbolInstances()
-    const { arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    const { arrayPropertyMap } = SxClass.parsePrimitivesToClassProperties(
+      primitiveSexprs,
+      this.token,
+    )
 
     symbolInstances.projects =
       (arrayPropertyMap.project as SymbolInstancesProject[]) ?? []
@@ -1421,8 +1482,10 @@ export class SymbolInstancesProject extends SxClass {
     const name = toStringValue(namePrimitive) ?? ""
     const project = new SymbolInstancesProject(name)
 
-    const { arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { arrayPropertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     project.paths = (arrayPropertyMap.path as SymbolInstancePath[]) ?? []
 
@@ -1465,8 +1528,10 @@ export class SymbolInstancePath extends SxClass {
     const value = toStringValue(pathPrimitive) ?? ""
     const path = new SymbolInstancePath(value)
 
-    const { propertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+      rest,
+      this.token,
+    )
 
     path._sxReference = propertyMap.reference as SymbolInstanceReference
     path._sxUnit = propertyMap.unit as SymbolInstanceUnit
@@ -1479,7 +1544,8 @@ export class SymbolInstancePath extends SxClass {
   }
 
   set reference(value: string | undefined) {
-    this._sxReference = value === undefined ? undefined : new SymbolInstanceReference(value)
+    this._sxReference =
+      value === undefined ? undefined : new SymbolInstanceReference(value)
   }
 
   get unit(): number | undefined {
@@ -1487,7 +1553,8 @@ export class SymbolInstancePath extends SxClass {
   }
 
   set unit(value: number | undefined) {
-    this._sxUnit = value === undefined ? undefined : new SymbolInstanceUnit(value)
+    this._sxUnit =
+      value === undefined ? undefined : new SymbolInstanceUnit(value)
   }
 
   override getChildren(): SxClass[] {

@@ -51,9 +51,7 @@ export class FpRect extends SxClass {
     return this._sxStart
   }
 
-  set start(
-    value: FpRectStart | { x: number; y: number } | undefined,
-  ) {
+  set start(value: FpRectStart | { x: number; y: number } | undefined,) {
     if (value === undefined) {
       this._sxStart = undefined
       return

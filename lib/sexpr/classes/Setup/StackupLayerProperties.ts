@@ -4,7 +4,9 @@ import { toNumberValue } from "../../utils/toNumberValue"
 
 import { SingleValueProperty } from "./base"
 
-abstract class StackupLayerProperty<T extends string | number> extends SingleValueProperty<T> {
+abstract class StackupLayerProperty<
+  T extends string | number,
+> extends SingleValueProperty<T> {
   static override parentToken = "layer"
 }
 

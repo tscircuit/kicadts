@@ -15,9 +15,7 @@ export class Xy extends SxClass {
     this.y = y
   }
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Xy {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Xy {
     const [rawX, rawY] = primitiveSexprs
     const x = toNumberValue(rawX) ?? 0
     const y = toNumberValue(rawY) ?? 0

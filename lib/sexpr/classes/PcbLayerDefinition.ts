@@ -85,7 +85,11 @@ export class PcbLayerDefinition extends SxClass {
   }
 
   override getString(): string {
-    if (this._index === undefined || this._name === undefined || this._type === undefined) {
+    if (
+      this._index === undefined ||
+      this._name === undefined ||
+      this._type === undefined
+    ) {
       return "()"
     }
     const tokens = [

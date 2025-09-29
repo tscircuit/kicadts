@@ -15,9 +15,7 @@ export class Bus extends SxClass {
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Bus {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Bus {
     const bus = new Bus()
 
     const { propertyMap, arrayPropertyMap } =

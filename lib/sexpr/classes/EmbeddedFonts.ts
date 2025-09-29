@@ -41,9 +41,7 @@ export class EmbeddedFonts extends SxClass {
       if (normalized === "no") {
         return new EmbeddedFonts(false)
       }
-      throw new Error(
-        `embedded_fonts expects "yes" or "no", received "${raw}"`,
-      )
+      throw new Error(`embedded_fonts expects "yes" or "no", received "${raw}"`)
     }
 
     throw new Error(
