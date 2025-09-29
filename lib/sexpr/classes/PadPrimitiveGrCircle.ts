@@ -158,9 +158,8 @@ abstract class PadPrimitiveGrCirclePoint extends SxClass {
   protected _x: number
   protected _y: number
 
-  constructor(token: string, x: number, y: number) {
+  protected constructor(x: number, y: number) {
     super()
-    this.token = token
     this._x = x
     this._y = y
   }
@@ -193,9 +192,10 @@ abstract class PadPrimitiveGrCirclePoint extends SxClass {
 class PadPrimitiveGrCircleCenter extends PadPrimitiveGrCirclePoint {
   static override token = "center"
   static override parentToken = "gr_circle"
+  override token = "center"
 
   constructor(x: number, y: number) {
-    super("center", x, y)
+    super(x, y)
   }
 
   static override fromSexprPrimitives(
@@ -219,9 +219,10 @@ SxClass.register(PadPrimitiveGrCircleCenter)
 class PadPrimitiveGrCircleEnd extends PadPrimitiveGrCirclePoint {
   static override token = "end"
   static override parentToken = "gr_circle"
+  override token = "end"
 
   constructor(x: number, y: number) {
-    super("end", x, y)
+    super(x, y)
   }
 
   static override fromSexprPrimitives(

@@ -147,9 +147,8 @@ abstract class PadPrimitiveGrArcPoint extends SxClass {
   protected _x: number
   protected _y: number
 
-  constructor(token: string, x: number, y: number) {
+  protected constructor(x: number, y: number) {
     super()
-    this.token = token
     this._x = x
     this._y = y
   }
@@ -182,9 +181,10 @@ abstract class PadPrimitiveGrArcPoint extends SxClass {
 class PadPrimitiveGrArcStart extends PadPrimitiveGrArcPoint {
   static override token = "start"
   static override parentToken = "gr_arc"
+  override token = "start"
 
   constructor(x: number, y: number) {
-    super("start", x, y)
+    super(x, y)
   }
 
   static override fromSexprPrimitives(
@@ -206,9 +206,10 @@ SxClass.register(PadPrimitiveGrArcStart)
 class PadPrimitiveGrArcMid extends PadPrimitiveGrArcPoint {
   static override token = "mid"
   static override parentToken = "gr_arc"
+  override token = "mid"
 
   constructor(x: number, y: number) {
-    super("mid", x, y)
+    super(x, y)
   }
 
   static override fromSexprPrimitives(
@@ -230,9 +231,10 @@ SxClass.register(PadPrimitiveGrArcMid)
 class PadPrimitiveGrArcEnd extends PadPrimitiveGrArcPoint {
   static override token = "end"
   static override parentToken = "gr_arc"
+  override token = "end"
 
   constructor(x: number, y: number) {
-    super("end", x, y)
+    super(x, y)
   }
 
   static override fromSexprPrimitives(

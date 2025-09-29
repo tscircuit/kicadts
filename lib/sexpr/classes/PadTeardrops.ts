@@ -3,7 +3,20 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { toNumberValue } from "../utils/toNumberValue"
 import { parseYesNo } from "../utils/parseYesNo"
 
-const NUMERIC_TOKENS = new Map<string, keyof PadTeardrops>([
+type NumericTeardropProperty =
+  | "bestLengthRatio"
+  | "maxLength"
+  | "bestWidthRatio"
+  | "maxWidth"
+  | "filterRatio"
+
+type BooleanTeardropProperty =
+  | "curvedEdges"
+  | "enabled"
+  | "allowTwoSegments"
+  | "preferZoneConnections"
+
+const NUMERIC_TOKENS = new Map<string, NumericTeardropProperty>([
   ["best_length_ratio", "bestLengthRatio"],
   ["max_length", "maxLength"],
   ["best_width_ratio", "bestWidthRatio"],
@@ -11,7 +24,7 @@ const NUMERIC_TOKENS = new Map<string, keyof PadTeardrops>([
   ["filter_ratio", "filterRatio"],
 ])
 
-const BOOLEAN_TOKENS = new Map<string, keyof PadTeardrops>([
+const BOOLEAN_TOKENS = new Map<string, BooleanTeardropProperty>([
   ["curved_edges", "curvedEdges"],
   ["enabled", "enabled"],
   ["allow_two_segments", "allowTwoSegments"],
