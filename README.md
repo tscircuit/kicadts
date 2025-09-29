@@ -28,9 +28,10 @@ import {
   Xy,
 } from "kicadts"
 
-const schematic = new KicadSch()
-schematic.version = 20240101
-schematic.generator = "kicadts-demo"
+const schematic = new KicadSch({
+  version: 20240101,
+  generator: "kicadts-demo",
+})
 
 const title = new TitleBlock()
 title.title = "Demo Schematic"

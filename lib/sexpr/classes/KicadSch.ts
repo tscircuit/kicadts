@@ -46,6 +46,26 @@ const SUPPORTED_CHILD_TOKENS = new Set([
   ...MULTI_CHILD_TOKENS,
 ])
 
+export interface KicadSchConstructorParams {
+  version?: number | KicadSchVersion
+  generator?: string | KicadSchGenerator
+  generatorVersion?: string | KicadSchGeneratorVersion
+  uuid?: string | Uuid
+  paper?: Paper
+  titleBlock?: TitleBlock
+  libSymbols?: LibSymbols
+  sheetInstances?: SheetInstances
+  embeddedFonts?: EmbeddedFonts
+  properties?: Property[]
+  images?: Image[]
+  sheets?: Sheet[]
+  symbols?: SchematicSymbol[]
+  texts?: SchematicText[]
+  labels?: Label[]
+  wires?: Wire[]
+  junctions?: Junction[]
+}
+
 export class KicadSch extends SxClass {
   static override token = "kicad_sch"
   token = "kicad_sch"
@@ -68,11 +88,87 @@ export class KicadSch extends SxClass {
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
 
+  constructor(params: KicadSchConstructorParams = {}) {
+    super()
+
+    if (params.version instanceof KicadSchVersion) {
+      this._sxVersion = params.version
+    } else if (params.version !== undefined) {
+      this.version = params.version
+    }
+
+    if (params.generator instanceof KicadSchGenerator) {
+      this._sxGenerator = params.generator
+    } else if (params.generator !== undefined) {
+      this.generator = params.generator
+    }
+
+    if (params.generatorVersion instanceof KicadSchGeneratorVersion) {
+      this._sxGeneratorVersion = params.generatorVersion
+    } else if (params.generatorVersion !== undefined) {
+      this.generatorVersion = params.generatorVersion
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+
+    if (params.paper !== undefined) {
+      this.paper = params.paper
+    }
+
+    if (params.titleBlock !== undefined) {
+      this.titleBlock = params.titleBlock
+    }
+
+    if (params.libSymbols !== undefined) {
+      this.libSymbols = params.libSymbols
+    }
+
+    if (params.sheetInstances !== undefined) {
+      this.sheetInstances = params.sheetInstances
+    }
+
+    if (params.embeddedFonts !== undefined) {
+      this.embeddedFonts = params.embeddedFonts
+    }
+
+    if (params.properties !== undefined) {
+      this.properties = params.properties
+    }
+
+    if (params.images !== undefined) {
+      this.images = params.images
+    }
+
+    if (params.sheets !== undefined) {
+      this.sheets = params.sheets
+    }
+
+    if (params.symbols !== undefined) {
+      this.symbols = params.symbols
+    }
+
+    if (params.texts !== undefined) {
+      this.texts = params.texts
+    }
+
+    if (params.labels !== undefined) {
+      this.labels = params.labels
+    }
+
+    if (params.wires !== undefined) {
+      this.wires = params.wires
+    }
+
+    if (params.junctions !== undefined) {
+      this.junctions = params.junctions
+    }
+  }
+
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): KicadSch {
-    const kicadSch = new KicadSch()
-
     for (const primitive of primitiveSexprs) {
       if (!Array.isArray(primitive)) {
         throw new Error(
@@ -110,33 +206,27 @@ export class KicadSch extends SxClass {
       }
     }
 
-    kicadSch._sxVersion = propertyMap.version as KicadSchVersion | undefined
-    kicadSch._sxGenerator = propertyMap.generator as
-      | KicadSchGenerator
-      | undefined
-    kicadSch._sxGeneratorVersion = propertyMap.generator_version as
-      | KicadSchGeneratorVersion
-      | undefined
-    kicadSch._sxUuid = propertyMap.uuid as Uuid | undefined
-    kicadSch._sxPaper = propertyMap.paper as Paper | undefined
-    kicadSch._sxTitleBlock = propertyMap.title_block as TitleBlock | undefined
-    kicadSch._sxLibSymbols = propertyMap.lib_symbols as LibSymbols | undefined
-    kicadSch._sxSheetInstances = propertyMap.sheet_instances as
-      | SheetInstances
-      | undefined
-    kicadSch._sxEmbeddedFonts = propertyMap.embedded_fonts as
-      | EmbeddedFonts
-      | undefined
-    kicadSch._properties = (arrayPropertyMap.property as Property[]) ?? []
-    kicadSch._images = (arrayPropertyMap.image as Image[]) ?? []
-    kicadSch._sheets = (arrayPropertyMap.sheet as Sheet[]) ?? []
-    kicadSch._symbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
-    kicadSch._texts = (arrayPropertyMap.text as SchematicText[]) ?? []
-    kicadSch._labels = (arrayPropertyMap.label as Label[]) ?? []
-    kicadSch._junctions = (arrayPropertyMap.junction as Junction[]) ?? []
-    kicadSch._wires = (arrayPropertyMap.wire as Wire[]) ?? []
-
-    return kicadSch
+    return new KicadSch({
+      version: propertyMap.version as KicadSchVersion | undefined,
+      generator: propertyMap.generator as KicadSchGenerator | undefined,
+      generatorVersion: propertyMap.generator_version as
+        | KicadSchGeneratorVersion
+        | undefined,
+      uuid: propertyMap.uuid as Uuid | undefined,
+      paper: propertyMap.paper as Paper | undefined,
+      titleBlock: propertyMap.title_block as TitleBlock | undefined,
+      libSymbols: propertyMap.lib_symbols as LibSymbols | undefined,
+      sheetInstances: propertyMap.sheet_instances as SheetInstances | undefined,
+      embeddedFonts: propertyMap.embedded_fonts as EmbeddedFonts | undefined,
+      properties: (arrayPropertyMap.property as Property[]) ?? [],
+      images: (arrayPropertyMap.image as Image[]) ?? [],
+      sheets: (arrayPropertyMap.sheet as Sheet[]) ?? [],
+      symbols: (arrayPropertyMap.symbol as SchematicSymbol[]) ?? [],
+      texts: (arrayPropertyMap.text as SchematicText[]) ?? [],
+      labels: (arrayPropertyMap.label as Label[]) ?? [],
+      junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
+      wires: (arrayPropertyMap.wire as Wire[]) ?? [],
+    })
   }
 
   get version(): number | undefined {
