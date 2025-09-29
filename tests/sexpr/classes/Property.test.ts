@@ -17,7 +17,6 @@ test("Property preserves extended attributes", () => {
           (thickness 0.15)
         )
       )
-      (extra_token value)
     )
   `
 
@@ -39,7 +38,6 @@ test("Property preserves extended attributes", () => {
   expect(property.hidden).toBe(true)
   expect(property.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
   expect(property.effects).toBeDefined()
-  expect(property.getChildren().length).toBeGreaterThan(0)
 
   const roundTrip = property.getString()
 

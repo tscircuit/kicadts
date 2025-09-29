@@ -40,13 +40,6 @@ export class SchematicText extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(rest, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `text does not support repeated child tokens: ${tokens}`,
-      )
-    }
-
     const unsupportedTokens = Object.keys(propertyMap).filter(
       (token) => !SUPPORTED_TOKENS.has(token),
     )
@@ -56,10 +49,29 @@ export class SchematicText extends SxClass {
       )
     }
 
-    text._sxExcludeFromSim = propertyMap.exclude_from_sim as ExcludeFromSim
-    text._sxAt = propertyMap.at as At | undefined
-    text._sxEffects = propertyMap.effects as TextEffects | undefined
-    text._sxUuid = propertyMap.uuid as Uuid | undefined
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside text expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(`text does not support repeated child tokens: ${token}`)
+      }
+    }
+
+    text._sxExcludeFromSim =
+      (arrayPropertyMap.exclude_from_sim?.[0] as ExcludeFromSim | undefined) ??
+      (propertyMap.exclude_from_sim as ExcludeFromSim | undefined)
+    text._sxAt =
+      (arrayPropertyMap.at?.[0] as At | undefined) ??
+      (propertyMap.at as At | undefined)
+    text._sxEffects =
+      (arrayPropertyMap.effects?.[0] as TextEffects | undefined) ??
+      (propertyMap.effects as TextEffects | undefined)
+    text._sxUuid =
+      (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
+      (propertyMap.uuid as Uuid | undefined)
 
     return text
   }

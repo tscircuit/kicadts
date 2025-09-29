@@ -678,17 +678,22 @@ export class SchematicSymbol extends SxClass {
   _sxPower?: SymbolPower
   _sxEmbeddedFonts?: EmbeddedFonts
   _sxInstances?: SymbolInstances
+  private _inlineLibId?: string
 
   get libraryId(): string | undefined {
-    return this._sxLibId?.value
+    return this._sxLibId?.value ?? this._inlineLibId
   }
 
   set libraryId(value: string | undefined) {
     if (value === undefined || value === "") {
-      this._sxLibId = undefined
+      this._inlineLibId = undefined
+      if (this._sxLibId) {
+        this._sxLibId = undefined
+      }
       return
     }
-    this._sxLibId = new SymbolLibId(value)
+    this._inlineLibId = value
+    this._sxLibId = undefined
   }
 
   get at(): At | undefined {

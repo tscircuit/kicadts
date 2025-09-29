@@ -4,13 +4,19 @@ import { Image } from "./Image"
 import { KicadSchGenerator } from "./KicadSchGenerator"
 import { KicadSchGeneratorVersion } from "./KicadSchGeneratorVersion"
 import { KicadSchVersion } from "./KicadSchVersion"
+import { LibSymbols } from "./LibSymbols"
 import { Paper } from "./Paper"
 import { Property } from "./Property"
+import { Label } from "./Label"
 import { SchematicSymbol } from "./Symbol"
+import { SchematicText } from "./SchematicText"
 import { Sheet } from "./Sheet"
+import { EmbeddedFonts } from "./EmbeddedFonts"
+import { SheetInstances } from "./SheetInstances"
 import { TitleBlock } from "./TitleBlock"
 import { Uuid } from "./Uuid"
 import { Wire } from "./Wire"
+import { Junction } from "./Junction"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -19,6 +25,9 @@ const SINGLE_CHILD_TOKENS = new Set([
   "uuid",
   "paper",
   "title_block",
+  "lib_symbols",
+  "sheet_instances",
+  "embedded_fonts",
 ])
 
 const MULTI_CHILD_TOKENS = new Set([
@@ -26,6 +35,9 @@ const MULTI_CHILD_TOKENS = new Set([
   "image",
   "sheet",
   "symbol",
+  "text",
+  "label",
+  "junction",
   "wire",
 ])
 
@@ -44,11 +56,17 @@ export class KicadSch extends SxClass {
   private _sxUuid?: Uuid
   private _sxPaper?: Paper
   private _sxTitleBlock?: TitleBlock
+  private _sxLibSymbols?: LibSymbols
+  private _sxSheetInstances?: SheetInstances
+  private _sxEmbeddedFonts?: EmbeddedFonts
   private _properties: Property[] = []
   private _images: Image[] = []
   private _sheets: Sheet[] = []
   private _symbols: SchematicSymbol[] = []
+  private _texts: SchematicText[] = []
+  private _labels: Label[] = []
   private _wires: Wire[] = []
+  private _junctions: Junction[] = []
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -102,10 +120,16 @@ export class KicadSch extends SxClass {
     kicadSch._sxUuid = propertyMap.uuid as Uuid | undefined
     kicadSch._sxPaper = propertyMap.paper as Paper | undefined
     kicadSch._sxTitleBlock = propertyMap.title_block as TitleBlock | undefined
+    kicadSch._sxLibSymbols = propertyMap.lib_symbols as LibSymbols | undefined
+    kicadSch._sxSheetInstances = propertyMap.sheet_instances as SheetInstances | undefined
+    kicadSch._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts | undefined
     kicadSch._properties = (arrayPropertyMap.property as Property[]) ?? []
     kicadSch._images = (arrayPropertyMap.image as Image[]) ?? []
     kicadSch._sheets = (arrayPropertyMap.sheet as Sheet[]) ?? []
     kicadSch._symbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
+    kicadSch._texts = (arrayPropertyMap.text as SchematicText[]) ?? []
+    kicadSch._labels = (arrayPropertyMap.label as Label[]) ?? []
+    kicadSch._junctions = (arrayPropertyMap.junction as Junction[]) ?? []
     kicadSch._wires = (arrayPropertyMap.wire as Wire[]) ?? []
 
     return kicadSch
@@ -166,6 +190,30 @@ export class KicadSch extends SxClass {
     this._sxTitleBlock = value
   }
 
+  get libSymbols(): LibSymbols | undefined {
+    return this._sxLibSymbols
+  }
+
+  set libSymbols(value: LibSymbols | undefined) {
+    this._sxLibSymbols = value
+  }
+
+  get sheetInstances(): SheetInstances | undefined {
+    return this._sxSheetInstances
+  }
+
+  set sheetInstances(value: SheetInstances | undefined) {
+    this._sxSheetInstances = value
+  }
+
+  get embeddedFonts(): EmbeddedFonts | undefined {
+    return this._sxEmbeddedFonts
+  }
+
+  set embeddedFonts(value: EmbeddedFonts | undefined) {
+    this._sxEmbeddedFonts = value
+  }
+
   get properties(): Property[] {
     return [...this._properties]
   }
@@ -198,6 +246,30 @@ export class KicadSch extends SxClass {
     this._symbols = [...value]
   }
 
+  get texts(): SchematicText[] {
+    return [...this._texts]
+  }
+
+  set texts(value: SchematicText[]) {
+    this._texts = [...value]
+  }
+
+  get labels(): Label[] {
+    return [...this._labels]
+  }
+
+  set labels(value: Label[]) {
+    this._labels = [...value]
+  }
+
+  get junctions(): Junction[] {
+    return [...this._junctions]
+  }
+
+  set junctions(value: Junction[]) {
+    this._junctions = [...value]
+  }
+
   get wires(): Wire[] {
     return [...this._wires]
   }
@@ -214,10 +286,16 @@ export class KicadSch extends SxClass {
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxPaper) children.push(this._sxPaper)
     if (this._sxTitleBlock) children.push(this._sxTitleBlock)
+    if (this._sxLibSymbols) children.push(this._sxLibSymbols)
+    if (this._sxSheetInstances) children.push(this._sxSheetInstances)
+    if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     children.push(...this._properties)
     children.push(...this._images)
     children.push(...this._sheets)
     children.push(...this._symbols)
+    children.push(...this._texts)
+    children.push(...this._labels)
+    children.push(...this._junctions)
     children.push(...this._wires)
     return children
   }

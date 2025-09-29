@@ -19,10 +19,12 @@ export class LibSymbols extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(propertyMap).length > 0) {
-      const tokens = Object.keys(propertyMap).join(", ")
+    const unsupportedSingularTokens = Object.keys(propertyMap).filter(
+      (token) => !SUPPORTED_ARRAY_TOKENS.has(token),
+    )
+    if (unsupportedSingularTokens.length > 0) {
       throw new Error(
-        `Unsupported singular child tokens inside lib_symbols expression: ${tokens}`,
+        `Unsupported child tokens inside lib_symbols expression: ${unsupportedSingularTokens.join(", ")}`,
       )
     }
 
@@ -35,7 +37,11 @@ export class LibSymbols extends SxClass {
       )
     }
 
-    libSymbols._symbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
+    const symbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
+    if (!symbols.length && propertyMap.symbol) {
+      symbols.push(propertyMap.symbol as SchematicSymbol)
+    }
+    libSymbols._symbols = symbols
 
     return libSymbols
   }

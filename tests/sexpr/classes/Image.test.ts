@@ -44,7 +44,7 @@ test("Image", () => {
       (scale 1.2)
       (layer F.Cu)
       (uuid aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee)
-      (data ZGF0YQ==)
+      (data \"ZGF0YQ==\")
     )"
   `)
 })

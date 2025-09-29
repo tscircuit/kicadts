@@ -31,6 +31,7 @@ export class Via extends SxClass {
   private _sxNet?: ViaNet
   private _sxUuid?: Uuid
   private _tstamp?: string
+  private _sxTeardrops?: PadTeardrops
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -140,6 +141,10 @@ export class Via extends SxClass {
       }
       case "net": {
         this._sxNet = ViaNet.fromSexprPrimitives(args)
+        return
+      }
+      case "teardrops": {
+        this._sxTeardrops = PadTeardrops.fromSexprPrimitives(args)
         return
       }
       case "uuid": {
@@ -268,6 +273,14 @@ export class Via extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get teardrops(): PadTeardrops | undefined {
+    return this._sxTeardrops
+  }
+
+  set teardrops(value: PadTeardrops | undefined) {
+    this._sxTeardrops = value
+  }
+
   get tstamp(): string | undefined {
     return this._tstamp
   }
@@ -282,6 +295,7 @@ export class Via extends SxClass {
     if (this._sxLayers) children.push(this._sxLayers)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxTeardrops) children.push(this._sxTeardrops)
     return children
   }
 
@@ -303,6 +317,9 @@ export class Via extends SxClass {
     if (this._sxUuid) lines.push(this._sxUuid.getStringIndented())
     if (this._tstamp !== undefined) {
       lines.push(`  (tstamp ${quoteSExprString(this._tstamp)})`)
+    }
+    if (this._sxTeardrops) {
+      lines.push(this._sxTeardrops.getStringIndented())
     }
 
     lines.push(")")

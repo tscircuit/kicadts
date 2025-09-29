@@ -34,32 +34,33 @@ export function tokenize(input: string): Token[] {
     if (ch === undefined) {
       break
     }
+    const current: string = ch
 
     // Skip whitespace
-    if (isWhitespace(ch)) {
+    if (isWhitespace(current)) {
       i++
       continue
     }
 
     // Comments ;...<EOL>
-    if (ch === ";") {
+    if (current === ";") {
       while (i < input.length && input[i] !== "\n") i++
       continue
     }
 
-    if (ch === "(") {
+    if (current === "(") {
       tokens.push({ type: "lparen" })
       i++
       continue
     }
-    if (ch === ")") {
+    if (current === ")") {
       tokens.push({ type: "rparen" })
       i++
       continue
     }
 
     // String literal
-    if (ch === '"') {
+    if (current === '"') {
       i++ // skip opening quote
       let out = ""
       while (i < input.length) {
@@ -100,16 +101,19 @@ export function tokenize(input: string): Token[] {
     }
 
     // Number or symbol
-    if (isSymbolInitial(ch) || ch === "-" || ch === "+" || ch === ".") {
+    if (isSymbolInitial(current) || current === "-" || current === "+" || current === ".") {
       // read a maximal token until delimiter
       let start = i
-      while (
-        i < input.length &&
-        !isWhitespace(input[i]) &&
-        input[i] !== "(" &&
-        input[i] !== ")" &&
-        input[i] !== '"'
-      ) {
+      while (i < input.length) {
+        const nextChar = input[i]!
+        if (
+          isWhitespace(nextChar) ||
+          nextChar === "(" ||
+          nextChar === ")" ||
+          nextChar === '"'
+        ) {
+          break
+        }
         i++
       }
       const raw = input.slice(start, i)

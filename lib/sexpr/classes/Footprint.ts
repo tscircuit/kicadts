@@ -1,6 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
+import { parseYesNo } from "../utils/parseYesNo"
 import { At } from "./At"
 import { FootprintAttr } from "./FootprintAttr"
 import { FootprintAutoplaceCost180 } from "./FootprintAutoplaceCost180"
@@ -29,6 +30,11 @@ import { FpArc } from "./FpArc"
 import { FpPoly } from "./FpPoly"
 import { Uuid } from "./Uuid"
 import { Xy } from "./Xy"
+import { FootprintSheetname } from "./FootprintSheetname"
+import { FootprintSheetfile } from "./FootprintSheetfile"
+import { FpLine } from "./FpLine"
+import { FootprintModel } from "./FootprintModel"
+import { EmbeddedFonts } from "./EmbeddedFonts"
 
 const SINGLE_TOKENS = new Set([
   "layer",
@@ -51,17 +57,22 @@ const SINGLE_TOKENS = new Set([
   "attr",
   "private_layers",
   "net_tie_pad_groups",
+  "sheetname",
+  "sheetfile",
+  "embedded_fonts",
 ])
 
 const MULTI_TOKENS = new Set([
   "property",
   "fp_text",
   "fp_text_box",
+  "fp_line",
   "fp_rect",
   "fp_circle",
   "fp_arc",
   "fp_poly",
   "pad",
+  "model",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -94,15 +105,20 @@ export class Footprint extends SxClass {
   private _sxAttr?: FootprintAttr
   private _sxPrivateLayers?: FootprintPrivateLayers
   private _sxNetTiePadGroups?: FootprintNetTiePadGroups
+  private _sxSheetname?: FootprintSheetname
+  private _sxSheetfile?: FootprintSheetfile
+  private _sxEmbeddedFonts?: EmbeddedFonts
 
   private _properties: Property[] = []
   private _fpTexts: FpText[] = []
   private _fpTextBoxes: FpTextBox[] = []
+  private _fpLines: FpLine[] = []
   private _fpRects: FpRect[] = []
   private _fpCircles: FpCircle[] = []
   private _fpArcs: FpArc[] = []
   private _fpPolys: FpPoly[] = []
   private _fpPads: FootprintPad[] = []
+  private _models: FootprintModel[] = []
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -118,6 +134,41 @@ export class Footprint extends SxClass {
         continue
       }
       if (Array.isArray(primitive)) {
+        const [token] = primitive
+        if (token === "locked") {
+          if (footprint._locked) {
+            throw new Error("footprint encountered duplicate locked tokens")
+          }
+          if (primitive.length === 1) {
+            footprint._locked = true
+            continue
+          }
+          const parsed = parseYesNo(primitive[1])
+          if (parsed === undefined) {
+            throw new Error(
+              `footprint locked expects yes/no, received ${JSON.stringify(primitive[1])}`,
+            )
+          }
+          footprint._locked = parsed
+          continue
+        }
+        if (token === "placed") {
+          if (footprint._placed) {
+            throw new Error("footprint encountered duplicate placed tokens")
+          }
+          if (primitive.length === 1) {
+            footprint._placed = true
+            continue
+          }
+          const parsed = parseYesNo(primitive[1])
+          if (parsed === undefined) {
+            throw new Error(
+              `footprint placed expects yes/no, received ${JSON.stringify(primitive[1])}`,
+            )
+          }
+          footprint._placed = parsed
+          continue
+        }
         rawNodes.push(primitive)
         continue
       }
@@ -200,16 +251,21 @@ export class Footprint extends SxClass {
     footprint._sxNetTiePadGroups = propertyMap.net_tie_pad_groups as
       | FootprintNetTiePadGroups
       | undefined
+    footprint._sxSheetname = propertyMap.sheetname as FootprintSheetname | undefined
+    footprint._sxSheetfile = propertyMap.sheetfile as FootprintSheetfile | undefined
+    footprint._sxEmbeddedFonts = propertyMap.embedded_fonts as EmbeddedFonts | undefined
 
     footprint._properties = (arrayPropertyMap.property as Property[]) ?? []
     footprint._fpTexts = (arrayPropertyMap["fp_text"] as FpText[]) ?? []
     footprint._fpTextBoxes =
       (arrayPropertyMap["fp_text_box"] as FpTextBox[]) ?? []
+    footprint._fpLines = (arrayPropertyMap["fp_line"] as FpLine[]) ?? []
     footprint._fpRects = (arrayPropertyMap["fp_rect"] as FpRect[]) ?? []
     footprint._fpCircles = (arrayPropertyMap["fp_circle"] as FpCircle[]) ?? []
     footprint._fpArcs = (arrayPropertyMap["fp_arc"] as FpArc[]) ?? []
     footprint._fpPolys = (arrayPropertyMap["fp_poly"] as FpPoly[]) ?? []
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
+    footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
 
     return footprint
   }
@@ -501,6 +557,32 @@ export class Footprint extends SxClass {
         : new FootprintNetTiePadGroups(value)
   }
 
+  get sheetname(): string | undefined {
+    return this._sxSheetname?.value
+  }
+
+  set sheetname(value: string | undefined) {
+    this._sxSheetname =
+      value === undefined ? undefined : new FootprintSheetname(value)
+  }
+
+  get sheetfile(): string | undefined {
+    return this._sxSheetfile?.value
+  }
+
+  set sheetfile(value: string | undefined) {
+    this._sxSheetfile =
+      value === undefined ? undefined : new FootprintSheetfile(value)
+  }
+
+  get embeddedFonts(): EmbeddedFonts | undefined {
+    return this._sxEmbeddedFonts
+  }
+
+  set embeddedFonts(value: EmbeddedFonts | undefined) {
+    this._sxEmbeddedFonts = value
+  }
+
   get properties(): Property[] {
     return [...this._properties]
   }
@@ -523,6 +605,14 @@ export class Footprint extends SxClass {
 
   set fpTextBoxes(value: FpTextBox[]) {
     this._fpTextBoxes = [...value]
+  }
+
+  get fpLines(): FpLine[] {
+    return [...this._fpLines]
+  }
+
+  set fpLines(value: FpLine[]) {
+    this._fpLines = [...value]
   }
 
   get fpRects(): FpRect[] {
@@ -565,6 +655,14 @@ export class Footprint extends SxClass {
     this._fpPads = [...value]
   }
 
+  get models(): FootprintModel[] {
+    return [...this._models]
+  }
+
+  set models(value: FootprintModel[]) {
+    this._models = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxLayer) children.push(this._sxLayer)
@@ -587,14 +685,19 @@ export class Footprint extends SxClass {
     if (this._sxAttr) children.push(this._sxAttr)
     if (this._sxPrivateLayers) children.push(this._sxPrivateLayers)
     if (this._sxNetTiePadGroups) children.push(this._sxNetTiePadGroups)
+    if (this._sxSheetname) children.push(this._sxSheetname)
+    if (this._sxSheetfile) children.push(this._sxSheetfile)
+    if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     children.push(...this._properties)
     children.push(...this._fpTexts)
     children.push(...this._fpTextBoxes)
+    children.push(...this._fpLines)
     children.push(...this._fpRects)
     children.push(...this._fpCircles)
     children.push(...this._fpArcs)
     children.push(...this._fpPolys)
     children.push(...this._fpPads)
+    children.push(...this._models)
     return children
   }
 

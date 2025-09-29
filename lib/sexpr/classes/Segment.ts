@@ -47,21 +47,41 @@ export class Segment extends SxClass {
       )
     }
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `Segment does not support repeated child tokens: ${tokens}`,
-      )
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside segment expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(
+          `Segment does not support repeated child tokens: ${token}`,
+        )
+      }
     }
 
-    segment._sxStart = propertyMap.start as SegmentStart | undefined
-    segment._sxEnd = propertyMap.end as SegmentEnd | undefined
-    segment._sxWidth = propertyMap.width as Width | undefined
-    segment._sxLayer = propertyMap.layer as Layer | undefined
-    segment._sxNet = propertyMap.net as SegmentNet | undefined
-    const locked = propertyMap.locked as SegmentLocked | undefined
+    segment._sxStart =
+      (arrayPropertyMap.start?.[0] as SegmentStart | undefined) ??
+      (propertyMap.start as SegmentStart | undefined)
+    segment._sxEnd =
+      (arrayPropertyMap.end?.[0] as SegmentEnd | undefined) ??
+      (propertyMap.end as SegmentEnd | undefined)
+    segment._sxWidth =
+      (arrayPropertyMap.width?.[0] as Width | undefined) ??
+      (propertyMap.width as Width | undefined)
+    segment._sxLayer =
+      (arrayPropertyMap.layer?.[0] as Layer | undefined) ??
+      (propertyMap.layer as Layer | undefined)
+    segment._sxNet =
+      (arrayPropertyMap.net?.[0] as SegmentNet | undefined) ??
+      (propertyMap.net as SegmentNet | undefined)
+    const locked =
+      (arrayPropertyMap.locked?.[0] as SegmentLocked | undefined) ??
+      (propertyMap.locked as SegmentLocked | undefined)
     segment._sxLocked = locked && locked.value ? locked : undefined
-    segment._sxUuid = propertyMap.uuid as Uuid | undefined
+    segment._sxUuid =
+      (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
+      (propertyMap.uuid as Uuid | undefined)
 
     return segment
   }

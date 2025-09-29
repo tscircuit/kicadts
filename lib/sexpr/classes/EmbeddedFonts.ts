@@ -1,99 +1,62 @@
 import { SxClass } from "../base-classes/SxClass"
-import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export class EmbeddedFonts extends SxClass {
   static override token = "embedded_fonts"
-  token = "embedded_fonts"
+  override token = "embedded_fonts"
 
-  private _children: SxClass[] = []
-  private _rawItems: EmbeddedFontsRawItem[] = []
+  private _enabled = false
+
+  constructor(enabled = false) {
+    super()
+    this._enabled = enabled
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): EmbeddedFonts {
-    const embeddedFonts = new EmbeddedFonts()
+    if (primitiveSexprs.length === 0) {
+      return new EmbeddedFonts(false)
+    }
 
-    for (const primitive of primitiveSexprs) {
-      if (Array.isArray(primitive) && primitive.length > 0) {
-        try {
-          const parsed = SxClass.parsePrimitiveSexpr(primitive, {
-            parentToken: this.token,
-          })
-          if (parsed instanceof SxClass) {
-            embeddedFonts._children.push(parsed)
-            continue
-          }
-        } catch (error) {
-          // fall through to raw handling
-        }
+    if (primitiveSexprs.length > 1) {
+      throw new Error("embedded_fonts accepts at most a single value")
+    }
+
+    const [raw] = primitiveSexprs
+
+    if (raw === undefined) {
+      return new EmbeddedFonts(false)
+    }
+
+    if (typeof raw === "boolean") {
+      return new EmbeddedFonts(raw)
+    }
+
+    if (typeof raw === "string") {
+      const normalized = raw.toLowerCase()
+      if (normalized === "yes") {
+        return new EmbeddedFonts(true)
       }
-
-      embeddedFonts._rawItems.push(new EmbeddedFontsRawItem(primitive))
+      if (normalized === "no") {
+        return new EmbeddedFonts(false)
+      }
+      throw new Error(
+        `embedded_fonts expects "yes" or "no", received "${raw}"`,
+      )
     }
 
-    return embeddedFonts
+    throw new Error(
+      `embedded_fonts encountered unsupported value ${JSON.stringify(raw)}`,
+    )
   }
 
-  get childrenEntries(): SxClass[] {
-    return [...this._children]
+  get enabled(): boolean {
+    return this._enabled
   }
 
-  set childrenEntries(children: SxClass[]) {
-    this._children = [...children]
-  }
-
-  get rawItems(): EmbeddedFontsRawItem[] {
-    return [...this._rawItems]
-  }
-
-  set rawItems(values: EmbeddedFontsRawItem[]) {
-    this._rawItems = [...values]
-  }
-
-  override getChildren(): SxClass[] {
-    return [...this._children, ...this._rawItems]
-  }
-
-  override getString(): string {
-    if (this._children.length === 0 && this._rawItems.length === 0) {
-      return "(embedded_fonts)"
-    }
-
-    const lines = ["(embedded_fonts"]
-    for (const child of this._children) {
-      lines.push(child.getStringIndented())
-    }
-    for (const raw of this._rawItems) {
-      lines.push(raw.getStringIndented())
-    }
-    lines.push(")")
-    return lines.join("\n")
-  }
-}
-SxClass.register(EmbeddedFonts)
-
-class EmbeddedFontsRawItem extends SxClass {
-  static override token = "__embedded_fonts_raw__"
-  token: string
-  private readonly primitive: PrimitiveSExpr
-
-  constructor(primitive: PrimitiveSExpr) {
-    super()
-    this.primitive = primitive
-    this.token = this.resolveToken(primitive)
-  }
-
-  private resolveToken(value: PrimitiveSExpr): string {
-    if (typeof value === "string") return value
-    if (Array.isArray(value) && value.length > 0) {
-      const [token] = value
-      if (typeof token === "string") return token
-    }
-    return "__embedded_fonts_raw__"
-  }
-
-  get primitiveValue(): PrimitiveSExpr {
-    return this.primitive
+  set enabled(value: boolean) {
+    this._enabled = value
   }
 
   override getChildren(): SxClass[] {
@@ -101,6 +64,7 @@ class EmbeddedFontsRawItem extends SxClass {
   }
 
   override getString(): string {
-    return printSExpr(this.primitive)
+    return `(embedded_fonts ${this._enabled ? "yes" : "no"})`
   }
 }
+SxClass.register(EmbeddedFonts)

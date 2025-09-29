@@ -1,4 +1,4 @@
-import { SxClass } from "lib/sexpr/base-classes/SxClass"
+import { SxClass } from "../../base-classes/SxClass"
 import { PlotParamProperty } from "./PcbPlotParamsBase"
 
 export class PlotParamPsA4Output extends PlotParamProperty<string> {

@@ -17,6 +17,7 @@ import {
   PlotParamScaleSelection,
   PlotParamSvgPrecision,
 } from "./PcbPlotParamsNumericProperties"
+import { PlotParamProperty } from "./PcbPlotParamsBase"
 import {
   PlotParamCreateGerberJobFile,
   PlotParamDisableApertMacros,
@@ -56,60 +57,7 @@ import {
   PlotParamSubtractMaskFromSilk,
 } from "./PcbPlotParamsStringPropertiesB"
 
-type PcbPlotParamValues = {
-  layerselection?: PlotParamLayerSelection
-  plot_on_all_layers_selection?: PlotParamPlotOnAllLayersSelection
-  disableapertmacros?: PlotParamDisableApertMacros
-  usegerberextensions?: PlotParamUseGerberExtensions
-  usegerberattributes?: PlotParamUseGerberAttributes
-  usegerberadvancedattributes?: PlotParamUseGerberAdvancedAttributes
-  creategerberjobfile?: PlotParamCreateGerberJobFile
-  excludeedgelayer?: PlotParamExcludeEdgeLayer
-  dashed_line_dash_ratio?: PlotParamDashedLineDashRatio
-  dashed_line_gap_ratio?: PlotParamDashedLineGapRatio
-  svgprecision?: PlotParamSvgPrecision
-  linewidth?: PlotParamLineWidth
-  plotframeref?: PlotParamPlotFrameRef
-  plotreference?: PlotParamPlotReference
-  plotvalue?: PlotParamPlotValue
-  plotothertext?: PlotParamPlotOtherText
-  plotinvisibletext?: PlotParamPlotInvisibleText
-  padsonsilk?: PlotParamPadOnSilk
-  sketchpadsonfab?: PlotParamSketchPadsOnFab
-  plotpadnumbers?: PlotParamPlotPadNumbers
-  hidednponfab?: PlotParamHideDnpOnFab
-  sketchdnponfab?: PlotParamSketchDnpOnFab
-  crossoutdnponfab?: PlotParamCrossoutDnpOnFab
-  subtractmaskfromsilk?: PlotParamSubtractMaskFromSilk
-  plot_black_and_white?: PlotParamPlotBlackAndWhite
-  plot_on_all_layers?: PlotParamPlotOnAllLayers
-  plotinvisible?: PlotParamPlotInvisible
-  mode?: PlotParamMode
-  useauxorigin?: PlotParamUseAuxOrigin
-  viasonmask?: PlotParamViaOnMask
-  hpglpennumber?: PlotParamHpglPenNumber
-  hpglpenspeed?: PlotParamHpglPenSpeed
-  hpglpendiameter?: PlotParamHpglPenDiameter
-  hpglpenoverlay?: PlotParamHpglPenOverlay
-  pdf_front_fp_property_popups?: PlotParamPdfFrontFpPropertyPopups
-  pdf_back_fp_property_popups?: PlotParamPdfBackFpPropertyPopups
-  pdf_metadata?: PlotParamPdfMetadata
-  pdf_single_document?: PlotParamPdfSingleDocument
-  dxfpolygonmode?: PlotParamDxfPolygonMode
-  dxfimperialunits?: PlotParamDxfImperialUnits
-  dxfusepcbnewfont?: PlotParamDxfUsePcbnewFont
-  psnegative?: PlotParamPsNegative
-  psa4output?: PlotParamPsA4Output
-  mirror?: PlotParamMirror
-  outputformat?: PlotParamOutputFormat
-  drillshape?: PlotParamDrillShape
-  scaleselection?: PlotParamScaleSelection
-  outputdirectory?: PlotParamOutputDirectory
-}
-
-type PlotParamKey = keyof PcbPlotParamValues
-
-const TOKEN_TO_KEY: Record<string, PlotParamKey> = {
+const TOKEN_TO_KEY = {
   layerselection: "layerselection",
   plot_on_all_layers_selection: "plot_on_all_layers_selection",
   disableapertmacros: "disableapertmacros",
@@ -158,7 +106,11 @@ const TOKEN_TO_KEY: Record<string, PlotParamKey> = {
   drillshape: "drillshape",
   scaleselection: "scaleselection",
   outputdirectory: "outputdirectory",
-}
+} as const
+
+type PlotParamKey = (typeof TOKEN_TO_KEY)[keyof typeof TOKEN_TO_KEY]
+
+type PcbPlotParamValues = Partial<Record<PlotParamKey, PlotParamProperty<any>>>
 
 const PCB_PLOT_PARAM_CHILD_ORDER: PlotParamKey[] = [
   "layerselection",
@@ -216,7 +168,7 @@ export class PcbPlotParams extends SxClass {
   static override parentToken = "setup"
   token = "pcbplotparams"
 
-  private _properties: Partial<PcbPlotParamValues> = {}
+  private _properties: PcbPlotParamValues = {}
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -228,11 +180,11 @@ export class PcbPlotParams extends SxClass {
     )
 
     for (const [token, instance] of Object.entries(propertyMap)) {
-      const key = TOKEN_TO_KEY[token]
+      const key = TOKEN_TO_KEY[token as keyof typeof TOKEN_TO_KEY]
       if (!key) {
         throw new Error(`Unsupported pcbplotparams token: ${token}`)
       }
-      params._properties[key] = instance as PcbPlotParamValues[typeof key]
+      params._properties[key] = instance as PlotParamProperty<any>
     }
 
     return params
@@ -253,7 +205,10 @@ export class PcbPlotParams extends SxClass {
     delete this._properties[key]
   }
 
-  private setStringProperty<K extends PlotParamKey, T extends { new (value: string): PcbPlotParamValues[K] }>(
+  private setStringProperty<
+    K extends PlotParamKey,
+    T extends { new (value: string): PlotParamProperty<any> },
+  >(
     key: K,
     value: string | undefined,
     ClassRef: T,
@@ -262,10 +217,13 @@ export class PcbPlotParams extends SxClass {
       this.clearProperty(key)
       return
     }
-    this._properties[key] = new ClassRef(value) as PcbPlotParamValues[K]
+    this._properties[key] = new ClassRef(value)
   }
 
-  private setNumberProperty<K extends PlotParamKey, T extends { new (value: number): PcbPlotParamValues[K] }>(
+  private setNumberProperty<
+    K extends PlotParamKey,
+    T extends { new (value: number): PlotParamProperty<any> },
+  >(
     key: K,
     value: number | undefined,
     ClassRef: T,
@@ -274,18 +232,18 @@ export class PcbPlotParams extends SxClass {
       this.clearProperty(key)
       return
     }
-    this._properties[key] = new ClassRef(value) as PcbPlotParamValues[K]
+    this._properties[key] = new ClassRef(value)
   }
 
   private setStringOrNumberProperty<
     K extends PlotParamKey,
-    T extends { new (value: string | number): PcbPlotParamValues[K] },
+    T extends { new (value: string | number): PlotParamProperty<any> },
   >(key: K, value: string | number | undefined, ClassRef: T) {
     if (value === undefined) {
       this.clearProperty(key)
       return
     }
-    this._properties[key] = new ClassRef(value) as PcbPlotParamValues[K]
+    this._properties[key] = new ClassRef(value)
   }
 
   get layerselection(): string | number | undefined {

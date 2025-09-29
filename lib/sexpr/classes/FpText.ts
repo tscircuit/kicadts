@@ -10,7 +10,17 @@ import { Xy } from "./Xy"
 
 export type FpTextType = "reference" | "value" | "user" | string
 
-type FpTextUnknownKind = FpTextUnknown
+const SUPPORTED_SINGLE_TOKENS = new Set([
+  "at",
+  "xy",
+  "layer",
+  "effects",
+  "uuid",
+  "unlocked",
+  "hide",
+])
+
+const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
 export class FpText extends SxClass {
   static override token = "fp_text"
@@ -24,98 +34,120 @@ export class FpText extends SxClass {
   private _sxLayer?: Layer
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
-  private _additionalChildren: SxClass[] = []
-  private _unknownChildren: FpTextUnknownKind[] = []
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): FpText {
+    if (primitiveSexprs.length < 2) {
+      throw new Error("fp_text requires a type and text value")
+    }
+
     const [rawType, rawText, ...rest] = primitiveSexprs
     const fpText = new FpText()
 
-    if (typeof rawType === "string") {
-      fpText._type = rawType
-    } else if (rawType !== undefined) {
-      fpText.addUnknown(rawType)
+    if (typeof rawType !== "string") {
+      throw new Error(
+        `fp_text type must be a string token, received ${JSON.stringify(rawType)}`,
+      )
     }
+    fpText._type = rawType
 
     fpText._text = primitiveToString(rawText)
 
+    const structuredPrimitives: PrimitiveSExpr[] = []
+    let sawBareUnlocked = false
+    let sawBareHide = false
+
     for (const primitive of rest) {
-      fpText.consumePrimitive(primitive)
+      if (typeof primitive === "string") {
+        if (primitive === "unlocked") {
+          if (sawBareUnlocked) {
+            throw new Error("fp_text encountered duplicate bare unlocked tokens")
+          }
+          sawBareUnlocked = true
+          continue
+        }
+        if (primitive === "hide") {
+          if (sawBareHide) {
+            throw new Error("fp_text encountered duplicate bare hide tokens")
+          }
+          sawBareHide = true
+          continue
+        }
+        throw new Error(
+          `fp_text encountered unsupported flag "${primitive}"`,
+        )
+      }
+
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        throw new Error(
+          `fp_text encountered invalid child expression: ${JSON.stringify(primitive)}`,
+        )
+      }
+
+      structuredPrimitives.push(primitive)
+    }
+
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(structuredPrimitives, this.token)
+
+    for (const token of Object.keys(propertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        throw new Error(
+          `fp_text encountered unsupported child token "${token}"`,
+        )
+      }
+    }
+
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        throw new Error(
+          `fp_text encountered unsupported child token "${token}"`,
+        )
+      }
+      if (!SUPPORTED_MULTI_TOKENS.has(token) && entries.length > 1) {
+        throw new Error(
+          `fp_text does not support repeated child token "${token}"`,
+        )
+      }
+    }
+
+    const atInstance = propertyMap.at as At | undefined
+    const xyInstance = propertyMap.xy as Xy | undefined
+    if (atInstance && xyInstance) {
+      throw new Error("fp_text cannot include both at and xy child tokens")
+    }
+
+    fpText._sxPosition = atInstance ?? xyInstance
+    fpText._sxLayer = propertyMap.layer as Layer | undefined
+    fpText._sxEffects = propertyMap.effects as TextEffects | undefined
+    fpText._sxUuid = propertyMap.uuid as Uuid | undefined
+
+    const unlockedEntry = propertyMap.unlocked as FpTextUnlocked | undefined
+    const hideEntry = propertyMap.hide as FpTextHide | undefined
+
+    if (unlockedEntry && sawBareUnlocked) {
+      throw new Error(
+        "fp_text encountered both bare and structured unlocked tokens",
+      )
+    }
+    if (hideEntry && sawBareHide) {
+      throw new Error(
+        "fp_text encountered both bare and structured hide tokens",
+      )
+    }
+
+    fpText._sxUnlocked = unlockedEntry
+    fpText._sxHide = hideEntry
+
+    if (sawBareUnlocked) {
+      fpText._sxUnlocked = new FpTextUnlocked({ value: true, bare: true })
+    }
+    if (sawBareHide) {
+      fpText._sxHide = new FpTextHide({ value: true, bare: true })
     }
 
     return fpText
-  }
-
-  private consumePrimitive(primitive: PrimitiveSExpr) {
-    if (typeof primitive === "string") {
-      if (primitive === "unlocked") {
-        this.unlocked = true
-        return
-      }
-      if (primitive === "hide") {
-        this.hidden = true
-        return
-      }
-      this.addUnknown(primitive)
-      return
-    }
-
-    if (!Array.isArray(primitive) || primitive.length === 0) {
-      this.addUnknown(primitive)
-      return
-    }
-
-    let parsed: unknown
-    try {
-      parsed = SxClass.parsePrimitiveSexpr(primitive, {
-        parentToken: this.token,
-      })
-    } catch (error) {
-      this.addUnknown(primitive)
-      return
-    }
-
-    if (!(parsed instanceof SxClass)) {
-      this.addUnknown(primitive)
-      return
-    }
-
-    this.attachChild(parsed)
-  }
-
-  private attachChild(child: SxClass) {
-    if (child instanceof At || child instanceof Xy) {
-      this._sxPosition = child
-      return
-    }
-    if (child instanceof FpTextUnlocked) {
-      this._sxUnlocked = child
-      return
-    }
-    if (child instanceof Layer) {
-      this._sxLayer = child
-      return
-    }
-    if (child instanceof FpTextHide) {
-      this._sxHide = child
-      return
-    }
-    if (child instanceof TextEffects) {
-      this._sxEffects = child
-      return
-    }
-    if (child instanceof Uuid) {
-      this._sxUuid = child
-      return
-    }
-
-    this._additionalChildren.push(child)
-  }
-
-  private addUnknown(primitive: PrimitiveSExpr) {
-    this._unknownChildren.push(new FpTextUnknown(primitive))
   }
 
   get type(): FpTextType | undefined {
@@ -199,22 +231,6 @@ export class FpText extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
-  get additionalChildren(): SxClass[] {
-    return [...this._additionalChildren]
-  }
-
-  set additionalChildren(children: SxClass[]) {
-    this._additionalChildren = [...children]
-  }
-
-  get unknownChildren(): FpTextUnknownKind[] {
-    return [...this._unknownChildren]
-  }
-
-  set unknownChildren(children: FpTextUnknownKind[]) {
-    this._unknownChildren = [...children]
-  }
-
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxPosition) children.push(this._sxPosition)
@@ -223,8 +239,6 @@ export class FpText extends SxClass {
     if (this._sxHide) children.push(this._sxHide)
     if (this._sxEffects) children.push(this._sxEffects)
     if (this._sxUuid) children.push(this._sxUuid)
-    children.push(...this._additionalChildren)
-    children.push(...this._unknownChildren)
     return children
   }
 
@@ -325,36 +339,3 @@ class FpTextHide extends SxClass {
   }
 }
 SxClass.register(FpTextHide)
-
-class FpTextUnknown extends SxClass {
-  static override token = "__fp_text_unknown__"
-  token: string
-  private readonly primitive: PrimitiveSExpr
-
-  constructor(primitive: PrimitiveSExpr) {
-    super()
-    this.primitive = primitive
-    this.token = this.resolveToken(primitive)
-  }
-
-  private resolveToken(primitive: PrimitiveSExpr): string {
-    if (typeof primitive === "string") return primitive
-    if (Array.isArray(primitive) && primitive.length > 0) {
-      const [token] = primitive
-      if (typeof token === "string") return token
-    }
-    return "__fp_text_unknown__"
-  }
-
-  get primitiveValue(): PrimitiveSExpr {
-    return this.primitive
-  }
-
-  override getChildren(): SxClass[] {
-    return []
-  }
-
-  override getString(): string {
-    return printSExpr(this.primitive)
-  }
-}

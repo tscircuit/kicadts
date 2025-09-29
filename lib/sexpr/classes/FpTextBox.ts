@@ -8,6 +8,7 @@ import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
 import { Pts } from "./Pts"
+import { RenderCache } from "./RenderCache"
 
 function primitiveToString(value: PrimitiveSExpr | undefined): string {
   if (value === undefined) return ""
@@ -16,7 +17,19 @@ function primitiveToString(value: PrimitiveSExpr | undefined): string {
   return printSExpr(value)
 }
 
-type FpTextBoxUnknownKind = FpTextBoxUnknown
+const SUPPORTED_SINGLE_TOKENS = new Set([
+  "start",
+  "end",
+  "pts",
+  "angle",
+  "layer",
+  "uuid",
+  "effects",
+  "stroke",
+  "render_cache",
+])
+
+const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
 export class FpTextBox extends SxClass {
   static override token = "fp_text_box"
@@ -32,20 +45,28 @@ export class FpTextBox extends SxClass {
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
   private _sxStroke?: Stroke
-  private _additionalChildren: SxClass[] = []
-  private _unknownChildren: FpTextBoxUnknownKind[] = []
+  private _sxRenderCache?: RenderCache
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): FpTextBox {
     const fpTextBox = new FpTextBox()
 
+    if (primitiveSexprs.length === 0) {
+      throw new Error("fp_text_box requires a text value")
+    }
+
     let capturedText = false
+    let locked = false
+    const structuredPrimitives: PrimitiveSExpr[] = []
 
     for (const primitive of primitiveSexprs) {
       if (typeof primitive === "string") {
         if (primitive === "locked") {
-          fpTextBox.locked = true
+          if (locked) {
+            throw new Error("fp_text_box encountered duplicate locked flags")
+          }
+          locked = true
           continue
         }
         if (!capturedText) {
@@ -53,8 +74,9 @@ export class FpTextBox extends SxClass {
           capturedText = true
           continue
         }
-        fpTextBox.addUnknown(primitive)
-        continue
+        throw new Error(
+          `fp_text_box encountered unsupported flag "${primitive}"`,
+        )
       }
 
       if (!capturedText) {
@@ -63,71 +85,58 @@ export class FpTextBox extends SxClass {
         continue
       }
 
-      fpTextBox.consumePrimitive(primitive)
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        throw new Error(
+          `fp_text_box encountered invalid child expression: ${JSON.stringify(primitive)}`,
+        )
+      }
+
+      structuredPrimitives.push(primitive)
     }
+
+    if (!capturedText) {
+      throw new Error("fp_text_box did not include a text value")
+    }
+
+    if (locked) {
+      fpTextBox._sxLocked = new FpTextBoxLocked()
+    }
+
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(structuredPrimitives, this.token)
+
+    for (const token of Object.keys(propertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        throw new Error(
+          `fp_text_box encountered unsupported child token "${token}"`,
+        )
+      }
+    }
+
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+        throw new Error(
+          `fp_text_box encountered unsupported child token "${token}"`,
+        )
+      }
+      if (!SUPPORTED_MULTI_TOKENS.has(token) && entries.length > 1) {
+        throw new Error(
+          `fp_text_box does not support repeated child token "${token}"`,
+        )
+      }
+    }
+
+    fpTextBox._sxStart = propertyMap.start as FpTextBoxStart | undefined
+    fpTextBox._sxEnd = propertyMap.end as FpTextBoxEnd | undefined
+    fpTextBox._sxPts = propertyMap.pts as Pts | undefined
+    fpTextBox._sxAngle = propertyMap.angle as FpTextBoxAngle | undefined
+    fpTextBox._sxLayer = propertyMap.layer as Layer | undefined
+    fpTextBox._sxUuid = propertyMap.uuid as Uuid | undefined
+    fpTextBox._sxEffects = propertyMap.effects as TextEffects | undefined
+    fpTextBox._sxStroke = propertyMap.stroke as Stroke | undefined
+    fpTextBox._sxRenderCache = propertyMap.render_cache as RenderCache | undefined
 
     return fpTextBox
-  }
-
-  private consumePrimitive(primitive: PrimitiveSExpr) {
-    if (!Array.isArray(primitive) || primitive.length === 0) {
-      this.addUnknown(primitive)
-      return
-    }
-
-    let parsed: unknown
-    try {
-      parsed = SxClass.parsePrimitiveSexpr(primitive, {
-        parentToken: this.token,
-      })
-    } catch (error) {
-      this.addUnknown(primitive)
-      return
-    }
-
-    if (parsed instanceof FpTextBoxStart) {
-      this._sxStart = parsed
-      return
-    }
-    if (parsed instanceof FpTextBoxEnd) {
-      this._sxEnd = parsed
-      return
-    }
-    if (parsed instanceof Pts) {
-      this._sxPts = parsed
-      return
-    }
-    if (parsed instanceof FpTextBoxAngle) {
-      this._sxAngle = parsed
-      return
-    }
-    if (parsed instanceof Layer) {
-      this._sxLayer = parsed
-      return
-    }
-    if (parsed instanceof TextEffects) {
-      this._sxEffects = parsed
-      return
-    }
-    if (parsed instanceof Stroke) {
-      this._sxStroke = parsed
-      return
-    }
-    if (parsed instanceof Uuid) {
-      this._sxUuid = parsed
-      return
-    }
-
-    if (parsed instanceof SxClass) {
-      this._additionalChildren.push(parsed)
-      return
-    }
-
-    this.addUnknown(primitive)
-  }
-
-  private addUnknown(primitive: PrimitiveSExpr) {
-    this._unknownChildren.push(new FpTextBoxUnknown(primitive))
   }
 
   get locked(): boolean {
@@ -235,20 +244,12 @@ export class FpTextBox extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
-  get additionalChildren(): SxClass[] {
-    return [...this._additionalChildren]
+  get renderCache(): RenderCache | undefined {
+    return this._sxRenderCache
   }
 
-  set additionalChildren(children: SxClass[]) {
-    this._additionalChildren = [...children]
-  }
-
-  get unknownChildren(): FpTextBoxUnknownKind[] {
-    return [...this._unknownChildren]
-  }
-
-  set unknownChildren(children: FpTextBoxUnknownKind[]) {
-    this._unknownChildren = [...children]
+  set renderCache(value: RenderCache | undefined) {
+    this._sxRenderCache = value
   }
 
   override getChildren(): SxClass[] {
@@ -262,8 +263,7 @@ export class FpTextBox extends SxClass {
     if (this._sxEffects) children.push(this._sxEffects)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxUuid) children.push(this._sxUuid)
-    children.push(...this._additionalChildren)
-    children.push(...this._unknownChildren)
+    if (this._sxRenderCache) children.push(this._sxRenderCache)
     return children
   }
 
@@ -410,36 +410,3 @@ class FpTextBoxLocked extends SxClass {
   }
 }
 SxClass.register(FpTextBoxLocked)
-
-class FpTextBoxUnknown extends SxClass {
-  static override token = "__fp_text_box_unknown__"
-  token: string
-  private readonly primitive: PrimitiveSExpr
-
-  constructor(primitive: PrimitiveSExpr) {
-    super()
-    this.primitive = primitive
-    this.token = this.resolveToken(primitive)
-  }
-
-  private resolveToken(primitive: PrimitiveSExpr): string {
-    if (typeof primitive === "string") return primitive
-    if (Array.isArray(primitive) && primitive.length > 0) {
-      const [token] = primitive
-      if (typeof token === "string") return token
-    }
-    return "__fp_text_box_unknown__"
-  }
-
-  get primitiveValue(): PrimitiveSExpr {
-    return this.primitive
-  }
-
-  override getChildren(): SxClass[] {
-    return []
-  }
-
-  override getString(): string {
-    return printSExpr(this.primitive)
-  }
-}

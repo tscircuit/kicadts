@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
@@ -27,6 +28,7 @@ import { Property } from "./Property"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { PadTeardrops } from "./PadTeardrops"
 
 const SINGLE_TOKENS = new Set([
   "at",
@@ -52,6 +54,9 @@ const SINGLE_TOKENS = new Set([
   "thermal_gap",
   "options",
   "primitives",
+  "remove_unused_layers",
+  "keep_end_layers",
+  "teardrops",
 ])
 
 const MULTI_TOKENS = new Set(["property"])
@@ -76,8 +81,8 @@ export class FootprintPad extends SxClass {
   private _padType = ""
   private _shape = ""
   private _locked = false
-  private _removeUnusedLayer = false
-  private _keepEndLayers = false
+  private _sxRemoveUnusedLayers?: PadRemoveUnusedLayers
+  private _sxKeepEndLayers?: PadKeepEndLayers
 
   private _sxAt?: At
   private _sxSize?: PadSize
@@ -103,6 +108,7 @@ export class FootprintPad extends SxClass {
   private _sxThermalGap?: PadThermalGap
   private _sxOptions?: PadOptions
   private _sxPrimitives?: PadPrimitives
+  private _sxTeardrops?: PadTeardrops
 
   constructor(number = "", padType = "", shape = "") {
     super()
@@ -149,10 +155,16 @@ export class FootprintPad extends SxClass {
           pad._locked = true
           break
         case "remove_unused_layer":
-          pad._removeUnusedLayer = true
+          pad._sxRemoveUnusedLayers = new PadRemoveUnusedLayers({
+            value: true,
+            bareToken: "remove_unused_layer",
+          })
           break
         case "keep_end_layers":
-          pad._keepEndLayers = true
+          pad._sxKeepEndLayers = new PadKeepEndLayers({
+            value: true,
+            bare: true,
+          })
           break
         default:
           throw new Error(`pad encountered unsupported flag "${flag}"`)
@@ -234,6 +246,16 @@ export class FootprintPad extends SxClass {
     pad._sxThermalGap = propertyMap.thermal_gap as PadThermalGap | undefined
     pad._sxOptions = propertyMap.options as PadOptions | undefined
     pad._sxPrimitives = propertyMap.primitives as PadPrimitives | undefined
+    pad._sxRemoveUnusedLayers =
+      (arrayPropertyMap.remove_unused_layers?.[0] as
+        | PadRemoveUnusedLayers
+        | undefined) ??
+      pad._sxRemoveUnusedLayers
+    pad._sxKeepEndLayers =
+      (arrayPropertyMap.keep_end_layers?.[0] as PadKeepEndLayers | undefined) ??
+      pad._sxKeepEndLayers
+    pad._sxTeardrops =
+      (arrayPropertyMap.teardrops?.[0] as PadTeardrops | undefined) ?? undefined
 
     return pad
   }
@@ -271,19 +293,23 @@ export class FootprintPad extends SxClass {
   }
 
   get removeUnusedLayer(): boolean {
-    return this._removeUnusedLayer
+    return this._sxRemoveUnusedLayers?.value ?? false
   }
 
   set removeUnusedLayer(value: boolean) {
-    this._removeUnusedLayer = value
+    this._sxRemoveUnusedLayers = value
+      ? new PadRemoveUnusedLayers({ value })
+      : undefined
   }
 
   get keepEndLayers(): boolean {
-    return this._keepEndLayers
+    return this._sxKeepEndLayers?.value ?? false
   }
 
   set keepEndLayers(value: boolean) {
-    this._keepEndLayers = value
+    this._sxKeepEndLayers = value
+      ? new PadKeepEndLayers({ value })
+      : undefined
   }
 
   get at(): At | undefined {
@@ -492,6 +518,14 @@ export class FootprintPad extends SxClass {
     this._sxPrimitives = value
   }
 
+  get teardrops(): PadTeardrops | undefined {
+    return this._sxTeardrops
+  }
+
+  set teardrops(value: PadTeardrops | undefined) {
+    this._sxTeardrops = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -517,6 +551,9 @@ export class FootprintPad extends SxClass {
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxRemoveUnusedLayers) children.push(this._sxRemoveUnusedLayers)
+    if (this._sxKeepEndLayers) children.push(this._sxKeepEndLayers)
+    if (this._sxTeardrops) children.push(this._sxTeardrops)
     if (this._sxOptions) children.push(this._sxOptions)
     if (this._sxPrimitives) children.push(this._sxPrimitives)
     return children
@@ -529,12 +566,6 @@ export class FootprintPad extends SxClass {
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())
     }
-    if (this._removeUnusedLayer) {
-      lines.push("  remove_unused_layer")
-    }
-    if (this._keepEndLayers) {
-      lines.push("  keep_end_layers")
-    }
     if (this._locked) {
       lines.push("  locked")
     }
@@ -543,3 +574,93 @@ export class FootprintPad extends SxClass {
   }
 }
 SxClass.register(FootprintPad)
+
+class PadRemoveUnusedLayers extends SxPrimitiveBoolean {
+  static override token = "remove_unused_layers"
+  static override parentToken = "pad"
+  override token = "remove_unused_layers"
+
+  private readonly bareToken?: string
+
+  constructor(options: { value?: boolean; bareToken?: string } = {}) {
+    super(options.value ?? false)
+    this.bareToken = options.bareToken
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): PadRemoveUnusedLayers {
+    const [raw] = primitiveSexprs
+    if (raw === undefined) {
+      return new PadRemoveUnusedLayers({ value: false })
+    }
+    if (typeof raw === "boolean") {
+      return new PadRemoveUnusedLayers({ value: raw })
+    }
+    if (typeof raw === "string") {
+      const normalized = raw.toLowerCase()
+      if (normalized === "yes" || normalized === "true") {
+        return new PadRemoveUnusedLayers({ value: true })
+      }
+      if (normalized === "no" || normalized === "false") {
+        return new PadRemoveUnusedLayers({ value: false })
+      }
+    }
+    throw new Error(
+      `remove_unused_layers expects yes/no or boolean, received ${JSON.stringify(raw)}`,
+    )
+  }
+
+  override getString(): string {
+    if (this.bareToken) {
+      return this.bareToken
+    }
+    return `(remove_unused_layers ${this.value ? "yes" : "no"})`
+  }
+}
+SxClass.register(PadRemoveUnusedLayers)
+
+class PadKeepEndLayers extends SxPrimitiveBoolean {
+  static override token = "keep_end_layers"
+  static override parentToken = "pad"
+  override token = "keep_end_layers"
+
+  private readonly renderBare: boolean
+
+  constructor(options: { value?: boolean; bare?: boolean } = {}) {
+    super(options.value ?? false)
+    this.renderBare = options.bare ?? false
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): PadKeepEndLayers {
+    const [raw] = primitiveSexprs
+    if (raw === undefined) {
+      return new PadKeepEndLayers({ value: false })
+    }
+    if (typeof raw === "boolean") {
+      return new PadKeepEndLayers({ value: raw })
+    }
+    if (typeof raw === "string") {
+      const normalized = raw.toLowerCase()
+      if (normalized === "yes" || normalized === "true") {
+        return new PadKeepEndLayers({ value: true })
+      }
+      if (normalized === "no" || normalized === "false") {
+        return new PadKeepEndLayers({ value: false })
+      }
+    }
+    throw new Error(
+      `keep_end_layers expects yes/no or boolean, received ${JSON.stringify(raw)}`,
+    )
+  }
+
+  override getString(): string {
+    if (this.renderBare) {
+      return "keep_end_layers"
+    }
+    return `(keep_end_layers ${this.value ? "yes" : "no"})`
+  }
+}
+SxClass.register(PadKeepEndLayers)

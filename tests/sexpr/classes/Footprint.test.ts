@@ -1,4 +1,5 @@
 import {
+  At,
   Footprint,
   FootprintAttr,
   FootprintPrivateLayers,
@@ -100,7 +101,10 @@ test("Footprint", () => {
   expect(position).toBeDefined()
   expect(position?.x).toBe(10.16)
   expect(position?.y).toBe(5.08)
-  expect(position?.angle).toBe(90)
+  expect(position).toBeInstanceOf(At)
+  if (position instanceof At) {
+    expect(position.angle).toBe(90)
+  }
   expect(footprint.descr?.value).toBe("0603 chip resistor")
   expect(footprint.tags?.value).toBe("resistor smd")
   expect(footprint.properties[0]?.key).toBe("Sheetfile")
@@ -146,7 +150,7 @@ test("Footprint", () => {
   expect(poly.points?.points.length).toBe(4)
   expect(poly.fill?.filled).toBe(true)
   expect(footprint.fpPads.length).toBe(1)
-  const pad = footprint.fpPads[0]
+  const pad = footprint.fpPads[0]!
   expect(pad.number).toBe("1")
   expect(pad.padType).toBe("smd")
   expect(pad.layers?.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
@@ -165,13 +169,14 @@ test("Footprint", () => {
       (at 10.16 5.08 90)
       (descr \"0603 chip resistor\")
       (tags \"resistor smd\")
-      (property \"Sheetfile\" \"example.kicad_sch\")
       (path \"/abcdef01\")
       (autoplace_cost90 4)
       (solder_mask_margin 0.09)
       (attr smd exclude_from_bom)
       (private_layers F.CrtYd B.CrtYd)
       (net_tie_pad_groups \"A,B\" \"C,D\")
+      (property \"Sheetfile\" \"example.kicad_sch\"
+      )
       (fp_text
         reference
         \"R1\"
@@ -258,11 +263,11 @@ test("Footprint", () => {
       (pad \"1\" smd roundrect
         (at 0 0 90)
         (size 1.2 0.6)
-        (layers \"F.Cu\" \"F.Paste\" \"F.Mask\")
+        (layers F.Cu F.Paste F.Mask)
         (roundrect_rratio 0.25)
         (net 1 \"GND\")
-        (pinfunction \"GND\")
-        (pintype \"passive\")
+        (pinfunction GND)
+        (pintype passive)
         (solder_mask_margin 0.05)
         (clearance 0.1)
         (uuid 12121212-3434-5656-7878-909090909090)

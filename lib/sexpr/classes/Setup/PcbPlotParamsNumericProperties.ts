@@ -1,4 +1,4 @@
-import { SxClass } from "lib/sexpr/base-classes/SxClass"
+import { SxClass } from "../../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
 import { toNumberValue } from "../../utils/toNumberValue"
 

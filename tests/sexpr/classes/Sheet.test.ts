@@ -50,7 +50,7 @@ test("Sheet", () => {
   expect(s.properties[0]).toBeInstanceOf(SheetProperty)
   expect(s.pins).toHaveLength(1)
   expect(s.pins[0]).toBeInstanceOf(SheetPin)
-  const pin = s.pins[0]
+  const pin = s.pins[0]!
   expect(pin.name).toBe("IN")
   expect(pin.electricalType).toBe("input")
   expect(pin.position).toBeInstanceOf(At)

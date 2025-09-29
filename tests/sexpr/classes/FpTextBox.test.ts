@@ -5,6 +5,7 @@ import {
   FpTextBoxStart,
   Layer,
   Pts,
+  RenderCache,
   Stroke,
   TextEffects,
   Uuid,
@@ -44,7 +45,11 @@ test("FpTextBox", () => {
   expect(fpTextBox.effects).toBeInstanceOf(TextEffects)
   expect(fpTextBox.stroke).toBeInstanceOf(Stroke)
   expect(fpTextBox.uuid).toBeInstanceOf(Uuid)
-  expect(fpTextBox.unknownChildren.length).toBe(1)
+  expect(fpTextBox.renderCache).toBeInstanceOf(RenderCache)
+  expect(fpTextBox.renderCache?.text).toBe("Notes text")
+  expect(fpTextBox.renderCache?.angle).toBe(0)
+  expect(fpTextBox.renderCache?.offsetX).toBe(0)
+  expect(fpTextBox.renderCache?.offsetY).toBeUndefined()
 
   fpTextBox.locked = false
 

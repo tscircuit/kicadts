@@ -1,4 +1,5 @@
 import { SxClass } from "../base-classes/SxClass"
+import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { SxPrimitiveString } from "../base-classes/SxPrimitiveString"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
@@ -55,6 +56,10 @@ export class TextEffects extends SxClass {
 
     effects._sxFont = propertyMap.font as TextEffectsFont | undefined
     effects._sxJustify = propertyMap.justify as TextEffectsJustify | undefined
+    const hideNode = propertyMap.hide as TextEffectsHide | undefined
+    if (hideNode) {
+      effects._hiddenText = hideNode.value
+    }
 
     for (const primitive of primitiveSexprs) {
       if (typeof primitive === "string") {
@@ -82,6 +87,7 @@ export class TextEffects extends SxClass {
     const children: SxClass[] = []
     if (this._sxFont) children.push(this._sxFont)
     if (this._sxJustify) children.push(this._sxJustify)
+    if (this._hiddenText) children.push(new TextEffectsHide(true))
     return children
   }
 
@@ -92,9 +98,6 @@ export class TextEffects extends SxClass {
     }
     if (this._sxJustify) {
       lines.push(this._sxJustify.getStringIndented())
-    }
-    if (this._hiddenText) {
-      lines.push("  hide")
     }
     lines.push(")")
     return lines.join("\n")
@@ -319,6 +322,21 @@ export class TextEffectsFontThickness extends SxPrimitiveNumber {
   token = "thickness"
 }
 SxClass.register(TextEffectsFontThickness)
+
+class TextEffectsHide extends SxPrimitiveBoolean {
+  static override token = "hide"
+  static override parentToken = "effects"
+  token = "hide"
+
+  constructor(value?: boolean) {
+    super(value ?? true)
+  }
+
+  override getString(): string {
+    return this.value ? "(hide yes)" : "(hide no)"
+  }
+}
+SxClass.register(TextEffectsHide)
 
 export class TextEffectsFontLineSpacing extends SxPrimitiveNumber {
   static override token = "line_spacing"

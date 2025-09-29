@@ -33,13 +33,6 @@ export class Label extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(rest, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `label does not support repeated child tokens: ${tokens}`,
-      )
-    }
-
     const unsupportedTokens = Object.keys(propertyMap).filter(
       (token) => !SUPPORTED_TOKENS.has(token),
     )
@@ -49,9 +42,26 @@ export class Label extends SxClass {
       )
     }
 
-    label._sxAt = propertyMap.at as At | undefined
-    label._sxEffects = propertyMap.effects as TextEffects | undefined
-    label._sxUuid = propertyMap.uuid as Uuid | undefined
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside label expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(`label does not support repeated child tokens: ${token}`)
+      }
+    }
+
+    label._sxAt =
+      (arrayPropertyMap.at?.[0] as At | undefined) ??
+      (propertyMap.at as At | undefined)
+    label._sxEffects =
+      (arrayPropertyMap.effects?.[0] as TextEffects | undefined) ??
+      (propertyMap.effects as TextEffects | undefined)
+    label._sxUuid =
+      (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
+      (propertyMap.uuid as Uuid | undefined)
 
     return label
   }

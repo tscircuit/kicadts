@@ -45,8 +45,6 @@ import {
 import type { SetupPropertyValues } from "./SetupPropertyTypes"
 import { Stackup } from "./Stackup"
 
-type SetupPropertyKey = keyof SetupPropertyValues
-
 const TOKEN_TO_KEY: Record<string, SetupPropertyKey> = {
   stackup: "stackup",
   pcbplotparams: "pcbPlotParams",
@@ -84,7 +82,9 @@ const TOKEN_TO_KEY: Record<string, SetupPropertyKey> = {
   visible_elements: "visibleElements",
   pad_to_paste_clearance_values: "padToPasteClearanceValues",
   trace_width: "traceWidth",
-} as const
+}
+
+type SetupPropertyKey = keyof SetupPropertyValues
 
 const SETUP_CHILD_ORDER: SetupPropertyKey[] = [
   "stackup",
@@ -131,7 +131,7 @@ export class Setup extends SxClass {
   static override token = "setup"
   token = "setup"
 
-  private _properties: Partial<SetupPropertyValues> = {}
+  private _properties: Partial<Record<SetupPropertyKey, SxClass>> = {}
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -147,7 +147,7 @@ export class Setup extends SxClass {
       if (!key) {
         throw new Error(`Unsupported setup property token: ${token}`)
       }
-      setup._properties[key] = instance as SetupPropertyValues[typeof key]
+      setup._properties[key] = instance
     }
 
     return setup
@@ -164,15 +164,15 @@ export class Setup extends SxClass {
     return children
   }
 
-  private setProperty<K extends SetupPropertyKey>(
-    key: K,
-    instance: SetupPropertyValues[K] | undefined,
+  private setProperty(
+    key: SetupPropertyKey,
+    instance: SxClass | undefined,
   ) {
     if (instance) {
       this._properties[key] = instance
-    } else {
-      delete this._properties[key]
+      return
     }
+    delete this._properties[key]
   }
 
   private setNumberProperty<T extends SxClass>(
@@ -184,11 +184,19 @@ export class Setup extends SxClass {
       delete this._properties[key]
       return
     }
-    this._properties[key] = new ClassRef(value) as SetupPropertyValues[typeof key]
+    this._properties[key] = new ClassRef(value)
+  }
+
+  private getPropertyInstance<T extends SxClass>(
+    key: SetupPropertyKey,
+    ClassRef: new (...args: any[]) => T,
+  ): T | undefined {
+    const value = this._properties[key]
+    return value instanceof ClassRef ? value : undefined
   }
 
   get stackup(): Stackup | undefined {
-    return this._properties.stackup
+    return this.getPropertyInstance("stackup", Stackup)
   }
 
   set stackup(value: Stackup | undefined) {
@@ -199,7 +207,7 @@ export class Setup extends SxClass {
   }
 
   get pcbPlotParams(): PcbPlotParams | undefined {
-    return this._properties.pcbPlotParams
+    return this.getPropertyInstance("pcbPlotParams", PcbPlotParams)
   }
 
   set pcbPlotParams(value: PcbPlotParams | undefined) {
@@ -210,7 +218,10 @@ export class Setup extends SxClass {
   }
 
   get padToMaskClearance(): number | undefined {
-    return this._properties.padToMaskClearance?.value
+    return this.getPropertyInstance(
+      "padToMaskClearance",
+      SetupPadToMaskClearance,
+    )?.value
   }
 
   set padToMaskClearance(value: number | undefined) {
@@ -218,7 +229,10 @@ export class Setup extends SxClass {
   }
 
   get solderMaskMinWidth(): number | undefined {
-    return this._properties.solderMaskMinWidth?.value
+    return this.getPropertyInstance(
+      "solderMaskMinWidth",
+      SetupSolderMaskMinWidth,
+    )?.value
   }
 
   set solderMaskMinWidth(value: number | undefined) {
@@ -226,7 +240,10 @@ export class Setup extends SxClass {
   }
 
   get padToPasteClearance(): number | undefined {
-    return this._properties.padToPasteClearance?.value
+    return this.getPropertyInstance(
+      "padToPasteClearance",
+      SetupPadToPasteClearance,
+    )?.value
   }
 
   set padToPasteClearance(value: number | undefined) {
@@ -234,7 +251,10 @@ export class Setup extends SxClass {
   }
 
   get padToPasteClearanceRatio(): number | undefined {
-    return this._properties.padToPasteClearanceRatio?.value
+    return this.getPropertyInstance(
+      "padToPasteClearanceRatio",
+      SetupPadToPasteClearanceRatio,
+    )?.value
   }
 
   set padToPasteClearanceRatio(value: number | undefined) {
@@ -246,7 +266,10 @@ export class Setup extends SxClass {
   }
 
   get lastTraceWidth(): number | undefined {
-    return this._properties.lastTraceWidth?.value
+    return this.getPropertyInstance(
+      "lastTraceWidth",
+      SetupLastTraceWidth,
+    )?.value
   }
 
   set lastTraceWidth(value: number | undefined) {
@@ -254,7 +277,7 @@ export class Setup extends SxClass {
   }
 
   get traceClearance(): number | undefined {
-    return this._properties.traceClearance?.value
+    return this.getPropertyInstance("traceClearance", SetupTraceClearance)?.value
   }
 
   set traceClearance(value: number | undefined) {
@@ -262,7 +285,7 @@ export class Setup extends SxClass {
   }
 
   get zoneClearance(): number | undefined {
-    return this._properties.zoneClearance?.value
+    return this.getPropertyInstance("zoneClearance", SetupZoneClearance)?.value
   }
 
   set zoneClearance(value: number | undefined) {
@@ -270,7 +293,7 @@ export class Setup extends SxClass {
   }
 
   get zone45Only(): string | undefined {
-    return this._properties.zone45Only?.value
+    return this.getPropertyInstance("zone45Only", SetupZone45Only)?.value
   }
 
   set zone45Only(value: string | undefined) {
@@ -281,7 +304,7 @@ export class Setup extends SxClass {
   }
 
   get traceMin(): number | undefined {
-    return this._properties.traceMin?.value
+    return this.getPropertyInstance("traceMin", SetupTraceMin)?.value
   }
 
   set traceMin(value: number | undefined) {
@@ -289,7 +312,7 @@ export class Setup extends SxClass {
   }
 
   get segmentWidth(): number | undefined {
-    return this._properties.segmentWidth?.value
+    return this.getPropertyInstance("segmentWidth", SetupSegmentWidth)?.value
   }
 
   set segmentWidth(value: number | undefined) {
@@ -297,7 +320,7 @@ export class Setup extends SxClass {
   }
 
   get edgeWidth(): number | undefined {
-    return this._properties.edgeWidth?.value
+    return this.getPropertyInstance("edgeWidth", SetupEdgeWidth)?.value
   }
 
   set edgeWidth(value: number | undefined) {
@@ -305,7 +328,7 @@ export class Setup extends SxClass {
   }
 
   get viaSize(): number | undefined {
-    return this._properties.viaSize?.value
+    return this.getPropertyInstance("viaSize", SetupViaSize)?.value
   }
 
   set viaSize(value: number | undefined) {
@@ -313,7 +336,7 @@ export class Setup extends SxClass {
   }
 
   get viaDrill(): number | undefined {
-    return this._properties.viaDrill?.value
+    return this.getPropertyInstance("viaDrill", SetupViaDrill)?.value
   }
 
   set viaDrill(value: number | undefined) {
@@ -321,7 +344,7 @@ export class Setup extends SxClass {
   }
 
   get viaMinSize(): number | undefined {
-    return this._properties.viaMinSize?.value
+    return this.getPropertyInstance("viaMinSize", SetupViaMinSize)?.value
   }
 
   set viaMinSize(value: number | undefined) {
@@ -329,7 +352,7 @@ export class Setup extends SxClass {
   }
 
   get viaMinDrill(): number | undefined {
-    return this._properties.viaMinDrill?.value
+    return this.getPropertyInstance("viaMinDrill", SetupViaMinDrill)?.value
   }
 
   set viaMinDrill(value: number | undefined) {
@@ -337,7 +360,7 @@ export class Setup extends SxClass {
   }
 
   get uviasAllowed(): string | undefined {
-    return this._properties.uviasAllowed?.value
+    return this.getPropertyInstance("uviasAllowed", SetupUviasAllowed)?.value
   }
 
   set uviasAllowed(value: string | undefined) {
@@ -348,7 +371,7 @@ export class Setup extends SxClass {
   }
 
   get uviaSize(): number | undefined {
-    return this._properties.uviaSize?.value
+    return this.getPropertyInstance("uviaSize", SetupUviaSize)?.value
   }
 
   set uviaSize(value: number | undefined) {
@@ -356,7 +379,7 @@ export class Setup extends SxClass {
   }
 
   get uviaDrill(): number | undefined {
-    return this._properties.uviaDrill?.value
+    return this.getPropertyInstance("uviaDrill", SetupUviaDrill)?.value
   }
 
   set uviaDrill(value: number | undefined) {
@@ -364,7 +387,7 @@ export class Setup extends SxClass {
   }
 
   get uviaMinSize(): number | undefined {
-    return this._properties.uviaMinSize?.value
+    return this.getPropertyInstance("uviaMinSize", SetupUviaMinSize)?.value
   }
 
   set uviaMinSize(value: number | undefined) {
@@ -372,7 +395,7 @@ export class Setup extends SxClass {
   }
 
   get uviaMinDrill(): number | undefined {
-    return this._properties.uviaMinDrill?.value
+    return this.getPropertyInstance("uviaMinDrill", SetupUviaMinDrill)?.value
   }
 
   set uviaMinDrill(value: number | undefined) {
@@ -380,7 +403,7 @@ export class Setup extends SxClass {
   }
 
   get pcbTextWidth(): number | undefined {
-    return this._properties.pcbTextWidth?.value
+    return this.getPropertyInstance("pcbTextWidth", SetupPcbTextWidth)?.value
   }
 
   set pcbTextWidth(value: number | undefined) {
@@ -388,7 +411,7 @@ export class Setup extends SxClass {
   }
 
   get pcbTextSize(): number[] | undefined {
-    return this._properties.pcbTextSize?.values
+    return this.getPropertyInstance("pcbTextSize", SetupPcbTextSize)?.values
   }
 
   set pcbTextSize(values: number[] | undefined) {
@@ -396,11 +419,11 @@ export class Setup extends SxClass {
       delete this._properties.pcbTextSize
       return
     }
-    this._properties.pcbTextSize = new SetupPcbTextSize(values)
+    this.setProperty("pcbTextSize", new SetupPcbTextSize(values))
   }
 
   get modEdgeWidth(): number | undefined {
-    return this._properties.modEdgeWidth?.value
+    return this.getPropertyInstance("modEdgeWidth", SetupModEdgeWidth)?.value
   }
 
   set modEdgeWidth(value: number | undefined) {
@@ -408,7 +431,7 @@ export class Setup extends SxClass {
   }
 
   get modTextSize(): number[] | undefined {
-    return this._properties.modTextSize?.values
+    return this.getPropertyInstance("modTextSize", SetupModTextSize)?.values
   }
 
   set modTextSize(values: number[] | undefined) {
@@ -416,11 +439,11 @@ export class Setup extends SxClass {
       delete this._properties.modTextSize
       return
     }
-    this._properties.modTextSize = new SetupModTextSize(values)
+    this.setProperty("modTextSize", new SetupModTextSize(values))
   }
 
   get modTextWidth(): number | undefined {
-    return this._properties.modTextWidth?.value
+    return this.getPropertyInstance("modTextWidth", SetupModTextWidth)?.value
   }
 
   set modTextWidth(value: number | undefined) {
@@ -428,7 +451,7 @@ export class Setup extends SxClass {
   }
 
   get padSize(): number[] | undefined {
-    return this._properties.padSize?.values
+    return this.getPropertyInstance("padSize", SetupPadSize)?.values
   }
 
   set padSize(values: number[] | undefined) {
@@ -436,11 +459,11 @@ export class Setup extends SxClass {
       delete this._properties.padSize
       return
     }
-    this._properties.padSize = new SetupPadSize(values)
+    this.setProperty("padSize", new SetupPadSize(values))
   }
 
   get padDrill(): number | undefined {
-    return this._properties.padDrill?.value
+    return this.getPropertyInstance("padDrill", SetupPadDrill)?.value
   }
 
   set padDrill(value: number | undefined) {
@@ -448,7 +471,10 @@ export class Setup extends SxClass {
   }
 
   get allowSoldermaskBridgesInFootprints(): string | undefined {
-    return this._properties.allowSoldermaskBridgesInFootprints?.value
+    return this.getPropertyInstance(
+      "allowSoldermaskBridgesInFootprints",
+      SetupAllowSoldermaskBridgesInFootprints,
+    )?.value
   }
 
   set allowSoldermaskBridgesInFootprints(value: string | undefined) {
@@ -461,7 +487,7 @@ export class Setup extends SxClass {
   }
 
   get tenting(): string[] | undefined {
-    return this._properties.tenting?.sides
+    return this.getPropertyInstance("tenting", SetupTenting)?.sides
   }
 
   set tenting(sides: string[] | undefined) {
@@ -469,11 +495,11 @@ export class Setup extends SxClass {
       delete this._properties.tenting
       return
     }
-    this._properties.tenting = new SetupTenting(sides)
+    this.setProperty("tenting", new SetupTenting(sides))
   }
 
   get auxAxisOrigin(): Coordinate | undefined {
-    const origin = this._properties.auxAxisOrigin
+    const origin = this.getPropertyInstance("auxAxisOrigin", SetupAuxAxisOrigin)
     if (!origin) return undefined
     return { x: origin.x, y: origin.y }
   }
@@ -483,14 +509,14 @@ export class Setup extends SxClass {
       delete this._properties.auxAxisOrigin
       return
     }
-    this._properties.auxAxisOrigin = new SetupAuxAxisOrigin(
-      origin.x,
-      origin.y,
+    this.setProperty(
+      "auxAxisOrigin",
+      new SetupAuxAxisOrigin(origin.x, origin.y),
     )
   }
 
   get gridOrigin(): Coordinate | undefined {
-    const origin = this._properties.gridOrigin
+    const origin = this.getPropertyInstance("gridOrigin", SetupGridOrigin)
     if (!origin) return undefined
     return { x: origin.x, y: origin.y }
   }
@@ -500,11 +526,11 @@ export class Setup extends SxClass {
       delete this._properties.gridOrigin
       return
     }
-    this._properties.gridOrigin = new SetupGridOrigin(origin.x, origin.y)
+    this.setProperty("gridOrigin", new SetupGridOrigin(origin.x, origin.y))
   }
 
   get visibleElements(): string | undefined {
-    return this._properties.visibleElements?.value
+    return this.getPropertyInstance("visibleElements", SetupVisibleElements)?.value
   }
 
   set visibleElements(value: string | undefined) {
@@ -515,7 +541,10 @@ export class Setup extends SxClass {
   }
 
   get padToPasteClearanceValues(): number[] | undefined {
-    return this._properties.padToPasteClearanceValues?.values
+    return this.getPropertyInstance(
+      "padToPasteClearanceValues",
+      SetupPadToPasteClearanceValues,
+    )?.values
   }
 
   set padToPasteClearanceValues(values: number[] | undefined) {
@@ -523,12 +552,14 @@ export class Setup extends SxClass {
       delete this._properties.padToPasteClearanceValues
       return
     }
-    this._properties.padToPasteClearanceValues =
-      new SetupPadToPasteClearanceValues(values)
+    this.setProperty(
+      "padToPasteClearanceValues",
+      new SetupPadToPasteClearanceValues(values),
+    )
   }
 
   get traceWidth(): number[] | undefined {
-    return this._properties.traceWidth?.values
+    return this.getPropertyInstance("traceWidth", SetupTraceWidth)?.values
   }
 
   set traceWidth(values: number[] | undefined) {
@@ -536,7 +567,7 @@ export class Setup extends SxClass {
       delete this._properties.traceWidth
       return
     }
-    this._properties.traceWidth = new SetupTraceWidth(values)
+    this.setProperty("traceWidth", new SetupTraceWidth(values))
   }
 }
 SxClass.register(Setup)

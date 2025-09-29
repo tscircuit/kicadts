@@ -22,29 +22,59 @@ export class Junction extends SxClass {
   ): Junction {
     const junction = new Junction()
 
-    const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+    for (const primitive of primitiveSexprs) {
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        throw new Error(
+          `junction encountered invalid child expression: ${JSON.stringify(primitive)}`,
+        )
+      }
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
+      const parsed = SxClass.parsePrimitiveSexpr(primitive, {
+        parentToken: this.token,
+      })
+
+      if (!(parsed instanceof SxClass)) {
+        throw new Error(
+          `junction child did not resolve to an SxClass: ${JSON.stringify(primitive)}`,
+        )
+      }
+
+      if (parsed instanceof At) {
+        if (junction._sxAt) {
+          throw new Error("junction encountered duplicate at tokens")
+        }
+        junction._sxAt = parsed
+        continue
+      }
+
+      if (parsed instanceof JunctionDiameter) {
+        if (junction._sxDiameter) {
+          throw new Error("junction encountered duplicate diameter tokens")
+        }
+        junction._sxDiameter = parsed
+        continue
+      }
+
+      if (parsed instanceof Color) {
+        if (junction._sxColor) {
+          throw new Error("junction encountered duplicate color tokens")
+        }
+        junction._sxColor = parsed
+        continue
+      }
+
+      if (parsed instanceof Uuid) {
+        if (junction._sxUuid) {
+          throw new Error("junction encountered duplicate uuid tokens")
+        }
+        junction._sxUuid = parsed
+        continue
+      }
+
       throw new Error(
-        `junction does not support repeated child tokens: ${tokens}`,
+        `Unsupported child tokens inside junction expression: ${parsed.token}`,
       )
     }
-
-    const unsupportedTokens = Object.keys(propertyMap).filter(
-      (token) => !SUPPORTED_TOKENS.has(token),
-    )
-    if (unsupportedTokens.length > 0) {
-      throw new Error(
-        `Unsupported child tokens inside junction expression: ${unsupportedTokens.join(", ")}`,
-      )
-    }
-
-    junction._sxAt = propertyMap.at as At | undefined
-    junction._sxDiameter = propertyMap.diameter as JunctionDiameter | undefined
-    junction._sxColor = propertyMap.color as Color | undefined
-    junction._sxUuid = propertyMap.uuid as Uuid | undefined
 
     return junction
   }

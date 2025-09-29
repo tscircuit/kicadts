@@ -3,20 +3,34 @@ import { printSExpr, type PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
 export class Zone extends SxClass {
   static override token = "zone"
-  static override rawArgs = true
   token = "zone"
 
-  args: PrimitiveSExpr[]
+  private _rawChildren: PrimitiveSExpr[] = []
 
-  constructor(args: PrimitiveSExpr[]) {
-    super()
-    this.args = args
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Zone {
+    const zone = new Zone()
+    zone._rawChildren = [...primitiveSexprs]
+    return zone
+  }
+
+  get rawChildren(): PrimitiveSExpr[] {
+    return [...this._rawChildren]
+  }
+
+  set rawChildren(children: PrimitiveSExpr[]) {
+    this._rawChildren = [...children]
+  }
+
+  override getChildren(): SxClass[] {
+    return []
   }
 
   override getString(): string {
     const lines = ["(zone"]
 
-    for (const arg of this.args) {
+    for (const arg of this._rawChildren) {
       lines.push(`  ${printSExpr(arg)}`)
     }
 

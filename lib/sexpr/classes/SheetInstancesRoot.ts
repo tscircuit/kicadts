@@ -20,10 +20,12 @@ export class SheetInstancesRoot extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(propertyMap).length > 0) {
-      const tokens = Object.keys(propertyMap).join(", ")
+    const unsupportedSingularTokens = Object.keys(propertyMap).filter(
+      (token) => token !== "path",
+    )
+    if (unsupportedSingularTokens.length > 0) {
       throw new Error(
-        `Unsupported singular child tokens inside sheet_instances expression: ${tokens}`,
+        `Unsupported singular child tokens inside sheet_instances expression: ${unsupportedSingularTokens.join(", ")}`,
       )
     }
 
@@ -36,7 +38,11 @@ export class SheetInstancesRoot extends SxClass {
       )
     }
 
-    sheetInstances._paths = (arrayPropertyMap.path as SheetInstancesRootPath[]) ?? []
+    const paths = (arrayPropertyMap.path as SheetInstancesRootPath[]) ?? []
+    if (!paths.length && propertyMap.path) {
+      paths.push(propertyMap.path as SheetInstancesRootPath)
+    }
+    sheetInstances._paths = paths
 
     return sheetInstances
   }
@@ -78,10 +84,12 @@ export class SheetInstancesRootPath extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(rest, "sheet_instances_path")
 
-    if (Object.keys(propertyMap).length > 0) {
-      const tokens = Object.keys(propertyMap).join(", ")
+    const unsupportedSingularTokens = Object.keys(propertyMap).filter(
+      (token) => !SUPPORTED_ARRAY_TOKENS.has(token),
+    )
+    if (unsupportedSingularTokens.length > 0) {
       throw new Error(
-        `Unsupported singular child tokens inside sheet_instances path expression: ${tokens}`,
+        `Unsupported singular child tokens inside sheet_instances path expression: ${unsupportedSingularTokens.join(", ")}`,
       )
     }
 
@@ -94,7 +102,11 @@ export class SheetInstancesRootPath extends SxClass {
       )
     }
 
-    path._pages = (arrayPropertyMap.page as SheetInstancesRootPage[]) ?? []
+    const pages = (arrayPropertyMap.page as SheetInstancesRootPage[]) ?? []
+    if (!pages.length && propertyMap.page) {
+      pages.push(propertyMap.page as SheetInstancesRootPage)
+    }
+    path._pages = pages
 
     return path
   }

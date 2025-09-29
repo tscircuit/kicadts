@@ -26,14 +26,21 @@ export class PcbGeneral extends SxClass {
       }
     }
 
-    for (const token of Object.keys(arrayPropertyMap)) {
-      throw new Error(`general encountered repeated child token "${token}"`)
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SINGLE_TOKENS.has(token)) {
+        throw new Error(`general encountered unsupported child token "${token}"`)
+      }
+      if (entries.length > 1) {
+        throw new Error(`general encountered repeated child token "${token}"`)
+      }
     }
 
-    general._sxThickness = propertyMap.thickness as PcbGeneralThickness | undefined
-    general._sxLegacyTeardrops = propertyMap.legacy_teardrops as
-      | PcbGeneralLegacyTeardrops
-      | undefined
+    general._sxThickness = (arrayPropertyMap.thickness?.[0] as
+      | PcbGeneralThickness
+      | undefined) ?? (propertyMap.thickness as PcbGeneralThickness | undefined)
+    general._sxLegacyTeardrops =
+      (arrayPropertyMap.legacy_teardrops?.[0] as PcbGeneralLegacyTeardrops | undefined) ??
+      (propertyMap.legacy_teardrops as PcbGeneralLegacyTeardrops | undefined)
 
     return general
   }

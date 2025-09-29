@@ -23,9 +23,15 @@ export class Wire extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(`wire does not support repeated child tokens: ${tokens}`)
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside wire expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(`wire does not support repeated child tokens: ${token}`)
+      }
     }
 
     const unsupportedTokens = Object.keys(propertyMap).filter(
@@ -37,7 +43,9 @@ export class Wire extends SxClass {
       )
     }
 
-    wire._sxPts = propertyMap.pts as Pts | undefined
+    wire._sxPts =
+      (arrayPropertyMap.pts?.[0] as Pts | undefined) ??
+      (propertyMap.pts as Pts | undefined)
     wire._sxStroke = propertyMap.stroke as Stroke | undefined
     wire._sxUuid = propertyMap.uuid as Uuid | undefined
 
