@@ -14,6 +14,16 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "uuid",
 ])
 
+export interface FpLineConstructorParams {
+  start?: FpLineStart | { x: number; y: number }
+  end?: FpLineEnd | { x: number; y: number }
+  layer?: Layer | string | string[]
+  width?: number
+  stroke?: Stroke
+  uuid?: Uuid | string
+  locked?: boolean
+}
+
 export class FpLine extends SxClass {
   static override token = "fp_line"
   static override parentToken = "footprint"
@@ -26,6 +36,17 @@ export class FpLine extends SxClass {
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
   private _locked = false
+
+  constructor(params: FpLineConstructorParams = {}) {
+    super()
+    if (params.start !== undefined) this.start = params.start
+    if (params.end !== undefined) this.end = params.end
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.width !== undefined) this.width = params.width
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

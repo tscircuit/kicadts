@@ -7,6 +7,13 @@ import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 
 const SUPPORTED_TOKENS = new Set(["at", "diameter", "color", "uuid"])
 
+export interface JunctionConstructorParams {
+  at?: At
+  diameter?: number | JunctionDiameter
+  color?: Color
+  uuid?: string | Uuid
+}
+
 export class Junction extends SxClass {
   static override token = "junction"
   static override parentToken = "kicad_sch"
@@ -16,6 +23,30 @@ export class Junction extends SxClass {
   private _sxDiameter?: JunctionDiameter
   private _sxColor?: Color
   private _sxUuid?: Uuid
+
+  constructor(params: JunctionConstructorParams = {}) {
+    super()
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.diameter !== undefined) {
+      if (params.diameter instanceof JunctionDiameter) {
+        this._sxDiameter = params.diameter
+      } else {
+        this.diameter = params.diameter
+      }
+    }
+
+    if (params.color !== undefined) {
+      this.color = params.color
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

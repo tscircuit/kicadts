@@ -5,6 +5,11 @@ import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["at", "uuid"])
 
+export interface NoConnectConstructorParams {
+  at?: At
+  uuid?: string | Uuid
+}
+
 export class NoConnect extends SxClass {
   static override token = "no_connect"
   static override parentToken = "kicad_sch"
@@ -12,6 +17,18 @@ export class NoConnect extends SxClass {
 
   private _sxAt?: At
   private _sxUuid?: Uuid
+
+  constructor(params: NoConnectConstructorParams = {}) {
+    super()
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

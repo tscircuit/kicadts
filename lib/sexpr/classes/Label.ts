@@ -9,6 +9,14 @@ import { FieldsAutoplaced } from "./FieldsAutoplaced"
 
 const SUPPORTED_TOKENS = new Set(["at", "effects", "uuid", "fields_autoplaced"])
 
+export interface LabelConstructorParams {
+  value?: string
+  at?: At
+  effects?: TextEffects
+  uuid?: string | Uuid
+  fieldsAutoplaced?: boolean | FieldsAutoplaced
+}
+
 export class Label extends SxClass {
   static override token = "label"
   static override parentToken = "kicad_sch"
@@ -19,6 +27,34 @@ export class Label extends SxClass {
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
   private _sxFieldsAutoplaced?: FieldsAutoplaced
+
+  constructor(params: LabelConstructorParams = {}) {
+    super()
+
+    if (params.value !== undefined) {
+      this.value = params.value
+    }
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.effects !== undefined) {
+      this.effects = params.effects
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+
+    if (params.fieldsAutoplaced !== undefined) {
+      if (params.fieldsAutoplaced instanceof FieldsAutoplaced) {
+        this._sxFieldsAutoplaced = params.fieldsAutoplaced
+      } else {
+        this.fieldsAutoplaced = params.fieldsAutoplaced
+      }
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

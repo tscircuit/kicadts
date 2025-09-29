@@ -44,6 +44,17 @@ const primitiveToString = (
   return printSExpr(value)
 }
 
+export interface PropertyConstructorParams {
+  key?: string
+  value?: string
+  position?: At | Xy
+  layer?: Layer | Array<string | number> | string
+  uuid?: string | Uuid
+  effects?: TextEffects
+  unlocked?: boolean | PropertyUnlocked
+  hidden?: boolean | PropertyHide
+}
+
 export class Property extends SxClass {
   static override token = "property"
   token = "property"
@@ -58,10 +69,48 @@ export class Property extends SxClass {
   private _sxUnlocked?: PropertyUnlocked
   private _sxHide?: PropertyHide
 
-  constructor(key = "", value = "") {
+  constructor(keyOrParams: string | PropertyConstructorParams = {}, value = "") {
     super()
-    this._key = key
-    this._value = value
+
+    // Support both old constructor signature and new params interface
+    if (typeof keyOrParams === "string") {
+      this._key = keyOrParams
+      this._value = value
+    } else {
+      const params = keyOrParams
+      if (params.key !== undefined) {
+        this._key = params.key
+      }
+      if (params.value !== undefined) {
+        this._value = params.value
+      }
+      if (params.position !== undefined) {
+        this.position = params.position
+      }
+      if (params.layer !== undefined) {
+        this.layer = params.layer
+      }
+      if (params.uuid !== undefined) {
+        this.uuid = params.uuid
+      }
+      if (params.effects !== undefined) {
+        this.effects = params.effects
+      }
+      if (params.unlocked !== undefined) {
+        if (params.unlocked instanceof PropertyUnlocked) {
+          this._sxUnlocked = params.unlocked
+        } else {
+          this.unlocked = params.unlocked
+        }
+      }
+      if (params.hidden !== undefined) {
+        if (params.hidden instanceof PropertyHide) {
+          this._sxHide = params.hidden
+        } else {
+          this.hidden = params.hidden
+        }
+      }
+    }
   }
 
   static override fromSexprPrimitives(

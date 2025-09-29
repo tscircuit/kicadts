@@ -22,6 +22,17 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
 
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
+export interface FpTextConstructorParams {
+  type?: FpTextType
+  text?: string
+  position?: At | Xy
+  unlocked?: boolean
+  hidden?: boolean
+  layer?: Layer | string | string[]
+  effects?: TextEffects
+  uuid?: Uuid | string
+}
+
 export class FpText extends SxClass {
   static override token = "fp_text"
   token = "fp_text"
@@ -34,6 +45,18 @@ export class FpText extends SxClass {
   private _sxLayer?: Layer
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
+
+  constructor(params: FpTextConstructorParams = {}) {
+    super()
+    if (params.type !== undefined) this.type = params.type
+    if (params.text !== undefined) this.text = params.text
+    if (params.position !== undefined) this.position = params.position
+    if (params.unlocked !== undefined) this.unlocked = params.unlocked
+    if (params.hidden !== undefined) this.hidden = params.hidden
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.effects !== undefined) this.effects = params.effects
+    if (params.uuid !== undefined) this.uuid = params.uuid
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

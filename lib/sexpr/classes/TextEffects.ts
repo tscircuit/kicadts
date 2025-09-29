@@ -9,6 +9,12 @@ import { toStringValue } from "../utils/toStringValue"
 
 export type TextEffectsProperty = TextEffectsFont | TextEffectsJustify
 
+export interface TextEffectsConstructorParams {
+  font?: TextEffectsFont
+  justify?: TextEffectsJustify
+  hiddenText?: boolean
+}
+
 export class TextEffects extends SxClass {
   static override token = "effects"
   token = "effects"
@@ -16,6 +22,14 @@ export class TextEffects extends SxClass {
   _sxFont?: TextEffectsFont
   _sxJustify?: TextEffectsJustify
   private _hiddenText = false
+
+  constructor(params: TextEffectsConstructorParams = {}) {
+    super()
+
+    if (params.font !== undefined) this.font = params.font
+    if (params.justify !== undefined) this.justify = params.justify
+    if (params.hiddenText !== undefined) this.hiddenText = params.hiddenText
+  }
 
   get font(): TextEffectsFont {
     if (!this._sxFont) {

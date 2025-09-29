@@ -22,6 +22,14 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "effects",
 ])
 
+export interface GrTextConstructorParams {
+  text?: string
+  position?: At | Xy | GrTextPosition
+  layer?: Layer | string | Array<string | number>
+  uuid?: Uuid | string
+  effects?: TextEffects
+}
+
 export class GrText extends SxClass {
   static override token = "gr_text"
   override token = "gr_text"
@@ -32,9 +40,17 @@ export class GrText extends SxClass {
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
 
-  constructor(text = "") {
+  constructor(params: GrTextConstructorParams | string = {}) {
     super()
-    this.text = text
+    if (typeof params === 'string') {
+      this.text = params
+    } else {
+      if (params.text !== undefined) this.text = params.text
+      if (params.position !== undefined) this.position = params.position
+      if (params.layer !== undefined) this.layer = params.layer
+      if (params.uuid !== undefined) this.uuid = params.uuid
+      if (params.effects !== undefined) this.effects = params.effects
+    }
   }
 
   static override fromSexprPrimitives(

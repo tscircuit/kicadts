@@ -18,6 +18,16 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "locked",
 ])
 
+export interface SegmentConstructorParams {
+  start?: SegmentStart | { x: number; y: number }
+  end?: SegmentEnd | { x: number; y: number }
+  width?: Width | number
+  layer?: Layer | string | Array<string | number>
+  net?: SegmentNet | { id: number; name?: string }
+  uuid?: Uuid | string
+  locked?: boolean
+}
+
 export class Segment extends SxClass {
   static override token = "segment"
   override token = "segment"
@@ -29,6 +39,17 @@ export class Segment extends SxClass {
   private _sxNet?: SegmentNet
   private _sxUuid?: Uuid
   private _sxLocked?: SegmentLocked
+
+  constructor(params: SegmentConstructorParams = {}) {
+    super()
+    if (params.start !== undefined) this.start = params.start
+    if (params.end !== undefined) this.end = params.end
+    if (params.width !== undefined) this.width = params.width
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.net !== undefined) this.net = params.net
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

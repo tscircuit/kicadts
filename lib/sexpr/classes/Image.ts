@@ -19,6 +19,14 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
 
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
+export interface ImageConstructorParams {
+  position?: At | Xy
+  scale?: ImageScale | number
+  layer?: Layer | string | string[]
+  uuid?: Uuid | string
+  data?: ImageData | string | string[]
+}
+
 export class Image extends SxClass {
   static override token = "image"
   token = "image"
@@ -28,6 +36,16 @@ export class Image extends SxClass {
   private _sxLayer?: Layer
   private _sxUuid?: Uuid
   private _sxData?: ImageData
+
+  constructor(params: ImageConstructorParams = {}) {
+    super()
+
+    if (params.position !== undefined) this.position = params.position
+    if (params.scale !== undefined) this.scale = params.scale
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.data !== undefined) this.data = params.data
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

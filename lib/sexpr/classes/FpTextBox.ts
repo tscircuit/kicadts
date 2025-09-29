@@ -31,6 +31,20 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
 
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
+export interface FpTextBoxConstructorParams {
+  locked?: boolean
+  text?: string
+  start?: FpTextBoxStart | { x: number; y: number }
+  end?: FpTextBoxEnd | { x: number; y: number }
+  pts?: Pts
+  angle?: FpTextBoxAngle | number
+  layer?: Layer | string | string[]
+  uuid?: Uuid | string
+  effects?: TextEffects
+  stroke?: Stroke
+  renderCache?: RenderCache
+}
+
 export class FpTextBox extends SxClass {
   static override token = "fp_text_box"
   token = "fp_text_box"
@@ -46,6 +60,21 @@ export class FpTextBox extends SxClass {
   private _sxEffects?: TextEffects
   private _sxStroke?: Stroke
   private _sxRenderCache?: RenderCache
+
+  constructor(params: FpTextBoxConstructorParams = {}) {
+    super()
+    if (params.locked !== undefined) this.locked = params.locked
+    if (params.text !== undefined) this.text = params.text
+    if (params.start !== undefined) this.start = params.start
+    if (params.end !== undefined) this.end = params.end
+    if (params.pts !== undefined) this.pts = params.pts
+    if (params.angle !== undefined) this.angle = params.angle
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.effects !== undefined) this.effects = params.effects
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.renderCache !== undefined) this.renderCache = params.renderCache
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

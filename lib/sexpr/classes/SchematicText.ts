@@ -9,6 +9,14 @@ import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["exclude_from_sim", "at", "effects", "uuid"])
 
+export interface SchematicTextConstructorParams {
+  value?: string
+  excludeFromSim?: boolean | ExcludeFromSim
+  at?: At
+  effects?: TextEffects
+  uuid?: string | Uuid
+}
+
 export class SchematicText extends SxClass {
   static override token = "text"
   static override parentToken = "kicad_sch"
@@ -19,6 +27,32 @@ export class SchematicText extends SxClass {
   private _sxAt?: At
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
+
+  constructor(params: SchematicTextConstructorParams = {}) {
+    super()
+
+    if (params.value !== undefined) {
+      this.value = params.value
+    }
+
+    if (params.excludeFromSim !== undefined) {
+      this.excludeFromSim = typeof params.excludeFromSim === 'boolean'
+        ? params.excludeFromSim
+        : params.excludeFromSim.value
+    }
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.effects !== undefined) {
+      this.effects = params.effects
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
