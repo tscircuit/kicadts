@@ -7,6 +7,7 @@ import { Uuid } from "./Uuid"
 import { ViaNet } from "./ViaNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
+import { PadTeardrops } from "./PadTeardrops"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -33,9 +34,7 @@ export class Via extends SxClass {
   private _tstamp?: string
   private _sxTeardrops?: PadTeardrops
 
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): Via {
+  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
     const via = new Via()
 
     for (const primitive of primitiveSexprs) {
