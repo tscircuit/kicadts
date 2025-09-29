@@ -72,18 +72,17 @@ test("KicadSch parse", () => {
         A4
       )
       (title_block
-        (title \"Demo\")
-        (company \"Example Co\")
+        (title "Demo")
+        (company "Example Co")
       )
-      (property \"Sheetfile\" \"demo.kicad_sch\"
+      (property "Sheetfile" "demo.kicad_sch"
       )
       (sheet
         (at 0 0 0)
         (size 100 80)
         (uuid abcdefab-1234-5678-90ab-abcdefabcdef)
       )
-      (symbol
-        (lib_id \"Device:R\")
+      (symbol "Device:R"
         (at 25.4 12.7)
         (uuid fedcba98-7654-3210-fedc-ba9876543210)
       )
