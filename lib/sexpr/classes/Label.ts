@@ -2,12 +2,20 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { FieldsAutoplaced } from "./FieldsAutoplaced"
 
 const SUPPORTED_TOKENS = new Set(["at", "effects", "uuid", "fields_autoplaced"])
+
+export interface LabelConstructorParams {
+  value?: string
+  at?: AtInput
+  effects?: TextEffects
+  uuid?: string | Uuid
+  fieldsAutoplaced?: boolean | FieldsAutoplaced
+}
 
 export class Label extends SxClass {
   static override token = "label"
@@ -19,6 +27,34 @@ export class Label extends SxClass {
   private _sxEffects?: TextEffects
   private _sxUuid?: Uuid
   private _sxFieldsAutoplaced?: FieldsAutoplaced
+
+  constructor(params: LabelConstructorParams = {}) {
+    super()
+
+    if (params.value !== undefined) {
+      this.value = params.value
+    }
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.effects !== undefined) {
+      this.effects = params.effects
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+
+    if (params.fieldsAutoplaced !== undefined) {
+      if (params.fieldsAutoplaced instanceof FieldsAutoplaced) {
+        this._sxFieldsAutoplaced = params.fieldsAutoplaced
+      } else {
+        this.fieldsAutoplaced = params.fieldsAutoplaced
+      }
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -87,8 +123,8 @@ export class Label extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {

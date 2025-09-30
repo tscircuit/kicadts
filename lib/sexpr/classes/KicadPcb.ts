@@ -18,6 +18,27 @@ import { TitleBlock } from "./TitleBlock"
 import { Via } from "./Via"
 import { Zone } from "./Zone"
 
+export interface KicadPcbConstructorParams {
+  version?: number
+  generator?: string
+  generatorVersion?: string
+  general?: PcbGeneral
+  paper?: Paper
+  titleBlock?: TitleBlock
+  layers?: PcbLayers
+  setup?: Setup
+  properties?: Property[]
+  nets?: PcbNet[]
+  footprints?: Footprint[]
+  images?: Image[]
+  segments?: Segment[]
+  graphicLines?: GrLine[]
+  graphicTexts?: GrText[]
+  vias?: Via[]
+  zones?: Zone[]
+  otherChildren?: SxClass[]
+}
+
 export class KicadPcb extends SxClass {
   static override token = "kicad_pcb"
   token = "kicad_pcb"
@@ -40,6 +61,28 @@ export class KicadPcb extends SxClass {
   private _vias: Via[] = []
   private _zones: Zone[] = []
   private _otherChildren: SxClass[] = []
+
+  constructor(params: KicadPcbConstructorParams = {}) {
+    super()
+    if (params.version !== undefined) this.version = params.version
+    if (params.generator !== undefined) this.generator = params.generator
+    if (params.generatorVersion !== undefined) this.generatorVersion = params.generatorVersion
+    if (params.general !== undefined) this.general = params.general
+    if (params.paper !== undefined) this.paper = params.paper
+    if (params.titleBlock !== undefined) this.titleBlock = params.titleBlock
+    if (params.layers !== undefined) this.layers = params.layers
+    if (params.setup !== undefined) this.setup = params.setup
+    if (params.properties !== undefined) this.properties = params.properties
+    if (params.nets !== undefined) this.nets = params.nets
+    if (params.footprints !== undefined) this.footprints = params.footprints
+    if (params.images !== undefined) this.images = params.images
+    if (params.segments !== undefined) this.segments = params.segments
+    if (params.graphicLines !== undefined) this.graphicLines = params.graphicLines
+    if (params.graphicTexts !== undefined) this.graphicTexts = params.graphicTexts
+    if (params.vias !== undefined) this.vias = params.vias
+    if (params.zones !== undefined) this.zones = params.zones
+    if (params.otherChildren !== undefined) this.otherChildren = params.otherChildren
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

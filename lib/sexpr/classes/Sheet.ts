@@ -4,7 +4,7 @@ import { indentLines } from "../utils/indentLines"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Color } from "./Color"
 import { Dnp } from "./Dnp"
 import { ExcludeFromSim } from "./ExcludeFromSim"
@@ -20,6 +20,22 @@ import { SymbolPropertyId as PropertyId } from "./Symbol"
 import { SheetFill } from "./SheetFill"
 import { SheetSize } from "./SheetSize"
 import { SheetProperty } from "./SheetProperty"
+
+export interface SheetConstructorParams {
+  position?: AtInput
+  size?: SheetSize | { width: number; height: number }
+  excludeFromSim?: boolean | ExcludeFromSim
+  inBom?: boolean | InBom
+  onBoard?: boolean | OnBoard
+  dnp?: boolean | Dnp
+  fieldsAutoplaced?: boolean | FieldsAutoplaced
+  stroke?: Stroke
+  fill?: SheetFill
+  uuid?: string | Uuid
+  properties?: SheetProperty[]
+  pins?: SheetPin[]
+  instances?: SheetInstances
+}
 
 export class Sheet extends SxClass {
   static override token = "sheet"
@@ -38,6 +54,72 @@ export class Sheet extends SxClass {
   private _properties: SheetProperty[] = []
   private _pins: SheetPin[] = []
   private _sxInstances?: SheetInstances
+
+  constructor(params: SheetConstructorParams = {}) {
+    super()
+
+    if (params.position !== undefined) {
+      this.position = params.position
+    }
+
+    if (params.size !== undefined) {
+      this.size = params.size
+    }
+
+    if (params.excludeFromSim !== undefined) {
+      this.excludeFromSim = typeof params.excludeFromSim === 'boolean'
+        ? params.excludeFromSim
+        : params.excludeFromSim.value
+    }
+
+    if (params.inBom !== undefined) {
+      this.inBom = typeof params.inBom === 'boolean'
+        ? params.inBom
+        : params.inBom.value
+    }
+
+    if (params.onBoard !== undefined) {
+      this.onBoard = typeof params.onBoard === 'boolean'
+        ? params.onBoard
+        : params.onBoard.value
+    }
+
+    if (params.dnp !== undefined) {
+      this.dnp = typeof params.dnp === 'boolean'
+        ? params.dnp
+        : params.dnp.value
+    }
+
+    if (params.fieldsAutoplaced !== undefined) {
+      this.fieldsAutoplaced = typeof params.fieldsAutoplaced === 'boolean'
+        ? params.fieldsAutoplaced
+        : params.fieldsAutoplaced.value
+    }
+
+    if (params.stroke !== undefined) {
+      this.stroke = params.stroke
+    }
+
+    if (params.fill !== undefined) {
+      this.fill = params.fill
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+
+    if (params.properties !== undefined) {
+      this.properties = params.properties
+    }
+
+    if (params.pins !== undefined) {
+      this.pins = params.pins
+    }
+
+    if (params.instances !== undefined) {
+      this.instances = params.instances
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -72,8 +154,8 @@ export class Sheet extends SxClass {
     return this._sxAt
   }
 
-  set position(value: At | undefined) {
-    this._sxAt = value
+  set position(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): { width: number; height: number } | undefined {

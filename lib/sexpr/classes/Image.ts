@@ -5,7 +5,7 @@ import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import { Layer } from "./Layer"
 import { Uuid } from "./Uuid"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Xy } from "./Xy"
 
 const SUPPORTED_SINGLE_TOKENS = new Set([
@@ -19,6 +19,14 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
 
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
+export interface ImageConstructorParams {
+  position?: AtInput | Xy
+  scale?: ImageScale | number
+  layer?: Layer | string | string[]
+  uuid?: Uuid | string
+  data?: ImageData | string | string[]
+}
+
 export class Image extends SxClass {
   static override token = "image"
   token = "image"
@@ -28,6 +36,16 @@ export class Image extends SxClass {
   private _sxLayer?: Layer
   private _sxUuid?: Uuid
   private _sxData?: ImageData
+
+  constructor(params: ImageConstructorParams = {}) {
+    super()
+
+    if (params.position !== undefined) this.position = params.position
+    if (params.scale !== undefined) this.scale = params.scale
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.data !== undefined) this.data = params.data
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -85,8 +103,17 @@ export class Image extends SxClass {
     return this._sxPosition
   }
 
-  set position(value: At | Xy | undefined) {
-    this._sxPosition = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxPosition = undefined
+      return
+    }
+    if (value instanceof Xy) {
+      this._sxPosition = value
+      return
+    }
+    // Handle AtInput (At, array, or object)
+    this._sxPosition = At.from(value as AtInput)
   }
 
   get scale(): ImageScale | undefined {

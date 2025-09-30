@@ -1,9 +1,14 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["at", "uuid"])
+
+export interface NoConnectConstructorParams {
+  at?: AtInput
+  uuid?: string | Uuid
+}
 
 export class NoConnect extends SxClass {
   static override token = "no_connect"
@@ -12,6 +17,18 @@ export class NoConnect extends SxClass {
 
   private _sxAt?: At
   private _sxUuid?: Uuid
+
+  constructor(params: NoConnectConstructorParams = {}) {
+    super()
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -47,8 +64,8 @@ export class NoConnect extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get uuid(): Uuid | undefined {

@@ -14,6 +14,14 @@ function primitiveToString(value: PrimitiveSExpr | undefined): string {
   return printSExpr(value)
 }
 
+export interface TitleBlockConstructorParams {
+  title?: string
+  date?: string
+  rev?: string
+  company?: string
+  comments?: TitleBlockComment[]
+}
+
 export class TitleBlock extends SxClass {
   static override token = "title_block"
   token = "title_block"
@@ -23,6 +31,16 @@ export class TitleBlock extends SxClass {
   private _sxRev?: TitleBlockRevision
   private _sxCompany?: TitleBlockCompany
   comments: TitleBlockComment[] = []
+
+  constructor(params: TitleBlockConstructorParams = {}) {
+    super()
+
+    if (params.title !== undefined) this.title = params.title
+    if (params.date !== undefined) this.date = params.date
+    if (params.rev !== undefined) this.rev = params.rev
+    if (params.company !== undefined) this.company = params.company
+    if (params.comments !== undefined) this.comments = params.comments
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

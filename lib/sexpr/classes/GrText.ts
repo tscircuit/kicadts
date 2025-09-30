@@ -2,7 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Xy } from "./Xy"
 import { Layer } from "./Layer"
 import { TextEffects } from "./TextEffects"
@@ -22,6 +22,14 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "effects",
 ])
 
+export interface GrTextConstructorParams {
+  text?: string
+  position?: AtInput | Xy | GrTextPosition
+  layer?: Layer | string | Array<string | number>
+  uuid?: Uuid | string
+  effects?: TextEffects
+}
+
 export class GrText extends SxClass {
   static override token = "gr_text"
   override token = "gr_text"
@@ -32,9 +40,17 @@ export class GrText extends SxClass {
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
 
-  constructor(text = "") {
+  constructor(params: GrTextConstructorParams | string = {}) {
     super()
-    this.text = text
+    if (typeof params === 'string') {
+      this.text = params
+    } else {
+      if (params.text !== undefined) this.text = params.text
+      if (params.position !== undefined) this.position = params.position
+      if (params.layer !== undefined) this.layer = params.layer
+      if (params.uuid !== undefined) this.uuid = params.uuid
+      if (params.effects !== undefined) this.effects = params.effects
+    }
   }
 
   static override fromSexprPrimitives(
@@ -125,21 +141,27 @@ export class GrText extends SxClass {
     return this._sxPosition
   }
 
-  set position(value: At | Xy | GrTextPosition | undefined,) {
+  set position(value: AtInput | Xy | GrTextPosition | undefined,) {
     if (value === undefined) {
       this._sxPosition = undefined
       return
     }
-    if (value instanceof At || value instanceof Xy) {
+    if (value instanceof Xy) {
       this._sxPosition = value
       return
     }
-    const { x, y, angle } = value
-    if (angle !== undefined) {
-      this._sxPosition = new At([x, y, angle])
-    } else {
-      this._sxPosition = new Xy(x, y)
+    // Check if it's GrTextPosition (plain object with x, y)
+    if (typeof value === 'object' && 'x' in value && 'y' in value && !Array.isArray(value) && !(value instanceof At)) {
+      const { x, y, angle } = value as GrTextPosition
+      if (angle !== undefined) {
+        this._sxPosition = new At([x, y, angle])
+      } else {
+        this._sxPosition = new Xy(x, y)
+      }
+      return
     }
+    // Handle AtInput (At, array, or object with angle)
+    this._sxPosition = At.from(value as AtInput)
   }
 
   get layer(): Layer | undefined {

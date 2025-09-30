@@ -4,20 +4,20 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { PadChamfer } from "./PadChamfer"
 import { PadChamferRatio } from "./PadChamferRatio"
 import { PadClearance } from "./PadClearance"
 import { PadDieLength } from "./PadDieLength"
 import { PadDrill } from "./PadDrill"
-import { PadLayers } from "./PadLayers"
+import { PadLayers, type PadLayersInput } from "./PadLayers"
 import { PadNet } from "./PadNet"
 import { PadOptions } from "./PadOptions"
 import { PadPinFunction } from "./PadPinFunction"
 import { PadPinType } from "./PadPinType"
 import { PadPrimitives } from "./PadPrimitives"
 import { PadRoundrectRratio } from "./PadRoundrectRratio"
-import { PadSize } from "./PadSize"
+import { PadSize, type PadSizeInput } from "./PadSize"
 import { PadSolderMaskMargin } from "./PadSolderMaskMargin"
 import { PadSolderPasteMargin } from "./PadSolderPasteMargin"
 import { PadSolderPasteMarginRatio } from "./PadSolderPasteMarginRatio"
@@ -77,6 +77,42 @@ const ensureSingle = (
   }
 }
 
+export interface FootprintPadConstructorParams {
+  number?: string
+  padType?: string
+  shape?: string
+  locked?: boolean
+  removeUnusedLayers?: boolean
+  keepEndLayers?: boolean
+  at?: AtInput
+  size?: PadSizeInput
+  drill?: PadDrill
+  layers?: PadLayersInput
+  width?: Width | number
+  stroke?: Stroke
+  properties?: Property[]
+  roundrectRatio?: number | PadRoundrectRratio
+  chamferRatio?: number | PadChamferRatio
+  chamfer?: PadChamfer
+  rectDelta?: PadRectDelta
+  net?: PadNet
+  uuid?: Uuid | string
+  pinFunction?: string | PadPinFunction
+  pinType?: string | PadPinType
+  dieLength?: number | PadDieLength
+  solderMaskMargin?: number | PadSolderMaskMargin
+  solderPasteMargin?: number | PadSolderPasteMargin
+  solderPasteMarginRatio?: number | PadSolderPasteMarginRatio
+  clearance?: number | PadClearance
+  zoneConnect?: number | PadZoneConnect
+  thermalWidth?: number | PadThermalWidth
+  thermalGap?: number | PadThermalGap
+  thermalBridgeAngle?: number | PadThermalBridgeAngle
+  options?: PadOptions
+  primitives?: PadPrimitives
+  teardrops?: PadTeardrops
+}
+
 export class FootprintPad extends SxClass {
   static override token = "pad"
   token = "pad"
@@ -116,11 +152,52 @@ export class FootprintPad extends SxClass {
   private _sxPrimitives?: PadPrimitives
   private _sxTeardrops?: PadTeardrops
 
-  constructor(number = "", padType = "", shape = "") {
+  constructor(params?: FootprintPadConstructorParams | string, padType?: string, shape?: string) {
     super()
-    this._number = number
-    this._padType = padType
-    this._shape = shape
+
+    // Support legacy string-based constructor
+    if (typeof params === 'string') {
+      this._number = params
+      this._padType = padType || ""
+      this._shape = shape || ""
+      return
+    }
+
+    // Modern params-based constructor
+    const p = params || {}
+    if (p.number !== undefined) this.number = p.number
+    if (p.padType !== undefined) this.padType = p.padType
+    if (p.shape !== undefined) this.shape = p.shape
+    if (p.locked !== undefined) this.locked = p.locked
+    if (p.removeUnusedLayers !== undefined) this.removeUnusedLayers = p.removeUnusedLayers
+    if (p.keepEndLayers !== undefined) this.keepEndLayers = p.keepEndLayers
+    if (p.at !== undefined) this.at = p.at
+    if (p.size !== undefined) this.size = p.size
+    if (p.drill !== undefined) this.drill = p.drill
+    if (p.layers !== undefined) this.layers = p.layers
+    if (p.width !== undefined) this.width = p.width
+    if (p.stroke !== undefined) this.stroke = p.stroke
+    if (p.properties !== undefined) this.properties = p.properties
+    if (p.roundrectRatio !== undefined) this.roundrectRatio = p.roundrectRatio
+    if (p.chamferRatio !== undefined) this.chamferRatio = p.chamferRatio
+    if (p.chamfer !== undefined) this.chamfer = p.chamfer
+    if (p.rectDelta !== undefined) this.rectDelta = p.rectDelta
+    if (p.net !== undefined) this.net = p.net
+    if (p.uuid !== undefined) this.uuid = p.uuid
+    if (p.pinFunction !== undefined) this.pinFunction = p.pinFunction
+    if (p.pinType !== undefined) this.pinType = p.pinType
+    if (p.dieLength !== undefined) this.dieLength = p.dieLength
+    if (p.solderMaskMargin !== undefined) this.solderMaskMargin = p.solderMaskMargin
+    if (p.solderPasteMargin !== undefined) this.solderPasteMargin = p.solderPasteMargin
+    if (p.solderPasteMarginRatio !== undefined) this.solderPasteMarginRatio = p.solderPasteMarginRatio
+    if (p.clearance !== undefined) this.clearance = p.clearance
+    if (p.zoneConnect !== undefined) this.zoneConnect = p.zoneConnect
+    if (p.thermalWidth !== undefined) this.thermalWidth = p.thermalWidth
+    if (p.thermalGap !== undefined) this.thermalGap = p.thermalGap
+    if (p.thermalBridgeAngle !== undefined) this.thermalBridgeAngle = p.thermalBridgeAngle
+    if (p.options !== undefined) this.options = p.options
+    if (p.primitives !== undefined) this.primitives = p.primitives
+    if (p.teardrops !== undefined) this.teardrops = p.teardrops
   }
 
   static override fromSexprPrimitives(
@@ -330,16 +407,16 @@ export class FootprintPad extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): PadSize | undefined {
     return this._sxSize
   }
 
-  set size(value: PadSize | undefined) {
-    this._sxSize = value
+  set size(value: PadSizeInput | undefined) {
+    this._sxSize = value !== undefined ? PadSize.from(value) : undefined
   }
 
   get drill(): PadDrill | undefined {
@@ -354,8 +431,8 @@ export class FootprintPad extends SxClass {
     return this._sxLayers
   }
 
-  set layers(value: PadLayers | undefined) {
-    this._sxLayers = value
+  set layers(value: PadLayersInput | undefined) {
+    this._sxLayers = value !== undefined ? PadLayers.from(value) : undefined
   }
 
   get width(): Width | undefined {

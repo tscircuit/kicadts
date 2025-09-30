@@ -1,11 +1,18 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Color } from "./Color"
 import { Uuid } from "./Uuid"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 
 const SUPPORTED_TOKENS = new Set(["at", "diameter", "color", "uuid"])
+
+export interface JunctionConstructorParams {
+  at?: AtInput
+  diameter?: number | JunctionDiameter
+  color?: Color
+  uuid?: string | Uuid
+}
 
 export class Junction extends SxClass {
   static override token = "junction"
@@ -16,6 +23,30 @@ export class Junction extends SxClass {
   private _sxDiameter?: JunctionDiameter
   private _sxColor?: Color
   private _sxUuid?: Uuid
+
+  constructor(params: JunctionConstructorParams = {}) {
+    super()
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.diameter !== undefined) {
+      if (params.diameter instanceof JunctionDiameter) {
+        this._sxDiameter = params.diameter
+      } else {
+        this.diameter = params.diameter
+      }
+    }
+
+    if (params.color !== undefined) {
+      this.color = params.color
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -83,8 +114,8 @@ export class Junction extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get diameter(): number | undefined {

@@ -3,7 +3,7 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Layer } from "./Layer"
 import { PropertyHide } from "./PropertyHide"
 import { PropertyUnlocked } from "./PropertyUnlocked"
@@ -44,6 +44,17 @@ const primitiveToString = (
   return printSExpr(value)
 }
 
+export interface PropertyConstructorParams {
+  key?: string
+  value?: string
+  position?: AtInput | Xy
+  layer?: Layer | Array<string | number> | string
+  uuid?: string | Uuid
+  effects?: TextEffects
+  unlocked?: boolean | PropertyUnlocked
+  hidden?: boolean | PropertyHide
+}
+
 export class Property extends SxClass {
   static override token = "property"
   token = "property"
@@ -58,10 +69,48 @@ export class Property extends SxClass {
   private _sxUnlocked?: PropertyUnlocked
   private _sxHide?: PropertyHide
 
-  constructor(key = "", value = "") {
+  constructor(keyOrParams: string | PropertyConstructorParams = {}, value = "") {
     super()
-    this._key = key
-    this._value = value
+
+    // Support both old constructor signature and new params interface
+    if (typeof keyOrParams === "string") {
+      this._key = keyOrParams
+      this._value = value
+    } else {
+      const params = keyOrParams
+      if (params.key !== undefined) {
+        this._key = params.key
+      }
+      if (params.value !== undefined) {
+        this._value = params.value
+      }
+      if (params.position !== undefined) {
+        this.position = params.position
+      }
+      if (params.layer !== undefined) {
+        this.layer = params.layer
+      }
+      if (params.uuid !== undefined) {
+        this.uuid = params.uuid
+      }
+      if (params.effects !== undefined) {
+        this.effects = params.effects
+      }
+      if (params.unlocked !== undefined) {
+        if (params.unlocked instanceof PropertyUnlocked) {
+          this._sxUnlocked = params.unlocked
+        } else {
+          this.unlocked = params.unlocked
+        }
+      }
+      if (params.hidden !== undefined) {
+        if (params.hidden instanceof PropertyHide) {
+          this._sxHide = params.hidden
+        } else {
+          this.hidden = params.hidden
+        }
+      }
+    }
   }
 
   static override fromSexprPrimitives(
@@ -154,9 +203,9 @@ export class Property extends SxClass {
     return this._sxAt ?? this._sxXy
   }
 
-  set position(value: At | Xy | undefined) {
-    if (value instanceof At) {
-      this._sxAt = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxAt = undefined
       this._sxXy = undefined
       return
     }
@@ -165,7 +214,8 @@ export class Property extends SxClass {
       this._sxAt = undefined
       return
     }
-    this._sxAt = undefined
+    // Handle AtInput (At, array, or object)
+    this._sxAt = At.from(value as AtInput)
     this._sxXy = undefined
   }
 

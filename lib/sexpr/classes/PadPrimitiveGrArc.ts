@@ -5,6 +5,13 @@ import { toNumberValue } from "../utils/toNumberValue"
 
 const SUPPORTED_TOKENS = new Set(["start", "mid", "end", "width"])
 
+export interface PadPrimitiveGrArcConstructorParams {
+  start?: PadPrimitiveGrArcStart | { x: number; y: number }
+  mid?: PadPrimitiveGrArcMid | { x: number; y: number }
+  end?: PadPrimitiveGrArcEnd | { x: number; y: number }
+  width?: Width | number
+}
+
 export class PadPrimitiveGrArc extends SxClass {
   static override token = "gr_arc"
   static override parentToken = "primitives"
@@ -14,6 +21,14 @@ export class PadPrimitiveGrArc extends SxClass {
   private _sxMid?: PadPrimitiveGrArcMid
   private _sxEnd?: PadPrimitiveGrArcEnd
   private _sxWidth?: Width
+
+  constructor(params: PadPrimitiveGrArcConstructorParams = {}) {
+    super()
+    if (params.start !== undefined) this.start = params.start
+    if (params.mid !== undefined) this.mid = params.mid
+    if (params.end !== undefined) this.end = params.end
+    if (params.width !== undefined) this.width = params.width
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

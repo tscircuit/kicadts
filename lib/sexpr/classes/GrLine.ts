@@ -25,6 +25,17 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "locked",
 ])
 
+export interface GrLineConstructorParams {
+  start?: GrLineStart | GrLinePoint
+  end?: GrLineEnd | GrLinePoint
+  angle?: number
+  layer?: Layer | string | Array<string | number>
+  width?: Width | number
+  stroke?: Stroke
+  uuid?: Uuid | string
+  locked?: boolean
+}
+
 export class GrLine extends SxClass {
   static override token = "gr_line"
   override token = "gr_line"
@@ -38,8 +49,16 @@ export class GrLine extends SxClass {
   private _sxUuid?: Uuid
   private _sxLocked?: GrLineLocked
 
-  constructor() {
+  constructor(params: GrLineConstructorParams = {}) {
     super()
+    if (params.start !== undefined) this.start = params.start
+    if (params.end !== undefined) this.end = params.end
+    if (params.angle !== undefined) this.angle = params.angle
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.width !== undefined) this.width = params.width
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
   }
 
   static override fromSexprPrimitives(

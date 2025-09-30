@@ -6,7 +6,7 @@ import { indentLines } from "../utils/indentLines"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Dnp } from "./Dnp"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { ExcludeFromSim } from "./ExcludeFromSim"
@@ -657,8 +657,8 @@ export class SymbolText extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {
@@ -706,6 +706,31 @@ export class SymbolPower extends SxClass {
 }
 SxClass.register(SymbolPower)
 
+export interface SchematicSymbolConstructorParams {
+  libraryId?: string
+  at?: AtInput
+  unit?: number | SymbolUnit
+  pinNumbers?: SymbolPinNumbers
+  pinNames?: SymbolPinNames
+  excludeFromSim?: boolean
+  inBom?: boolean
+  onBoard?: boolean
+  dnp?: boolean
+  uuid?: string
+  duplicatePinNumbersAreJumpers?: boolean
+  fieldsAutoplaced?: boolean
+  properties?: SymbolProperty[]
+  pins?: SymbolPin[]
+  subSymbols?: SchematicSymbol[]
+  polylines?: SymbolPolyline[]
+  rectangles?: SymbolRectangle[]
+  circles?: SymbolCircle[]
+  arcs?: SymbolArc[]
+  texts?: SymbolText[]
+  embeddedFonts?: EmbeddedFonts
+  instances?: SymbolInstances
+}
+
 export class SchematicSymbol extends SxClass {
   static override token = "symbol"
   token = "symbol"
@@ -735,6 +760,33 @@ export class SchematicSymbol extends SxClass {
   _sxInstances?: SymbolInstances
   private _inlineLibId?: string
 
+  constructor(params: SchematicSymbolConstructorParams = {}) {
+    super()
+
+    if (params.libraryId !== undefined) this.libraryId = params.libraryId
+    if (params.at !== undefined) this.at = params.at
+    if (params.unit !== undefined) this.unit = typeof params.unit === 'number' ? params.unit : params.unit.value
+    if (params.pinNumbers !== undefined) this.pinNumbers = params.pinNumbers
+    if (params.pinNames !== undefined) this.pinNames = params.pinNames
+    if (params.excludeFromSim !== undefined) this.excludeFromSim = params.excludeFromSim
+    if (params.inBom !== undefined) this.inBom = params.inBom
+    if (params.onBoard !== undefined) this.onBoard = params.onBoard
+    if (params.dnp !== undefined) this.dnp = params.dnp
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.duplicatePinNumbersAreJumpers !== undefined) this.duplicatePinNumbersAreJumpers = params.duplicatePinNumbersAreJumpers
+    if (params.fieldsAutoplaced !== undefined) this.fieldsAutoplaced = params.fieldsAutoplaced
+    if (params.properties !== undefined) this.properties = params.properties
+    if (params.pins !== undefined) this.pins = params.pins
+    if (params.subSymbols !== undefined) this.subSymbols = params.subSymbols
+    if (params.polylines !== undefined) this.polylines = params.polylines
+    if (params.rectangles !== undefined) this.rectangles = params.rectangles
+    if (params.circles !== undefined) this.circles = params.circles
+    if (params.arcs !== undefined) this.arcs = params.arcs
+    if (params.texts !== undefined) this.texts = params.texts
+    if (params.embeddedFonts !== undefined) this._sxEmbeddedFonts = params.embeddedFonts
+    if (params.instances !== undefined) this.instances = params.instances
+  }
+
   get libraryId(): string | undefined {
     return this._sxLibId?.value ?? this._inlineLibId
   }
@@ -755,8 +807,8 @@ export class SchematicSymbol extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get unit(): number | undefined {
@@ -981,7 +1033,7 @@ export class SymbolProperty extends SxClass {
     key: string
     value: string
     id?: number | SymbolPropertyId
-    at?: At
+    at?: AtInput
     effects?: TextEffects
   }) {
     super()
@@ -989,7 +1041,7 @@ export class SymbolProperty extends SxClass {
     this.value = params.value
     this._sxId =
       params.id !== undefined ? SymbolPropertyId.from(params.id) : undefined
-    this._sxAt = params.at
+    this._sxAt = params.at !== undefined ? At.from(params.at) : undefined
     this._sxEffects = params.effects
   }
 
@@ -1027,8 +1079,8 @@ export class SymbolProperty extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {
@@ -1313,8 +1365,8 @@ export class SymbolPin extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get length(): number | undefined {

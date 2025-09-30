@@ -20,6 +20,16 @@ const SUPPORTED_TOKENS = new Set([
   "uuid",
 ])
 
+export interface FpPolyConstructorParams {
+  points?: Pts | Xy[] | Array<{ x: number; y: number }>
+  layer?: Layer | string | Array<string | number>
+  width?: Width | number
+  stroke?: Stroke
+  fill?: FpPolyFill | boolean
+  locked?: boolean
+  uuid?: Uuid | string
+}
+
 export class FpPoly extends SxClass {
   static override token = "fp_poly"
   override token = "fp_poly"
@@ -31,6 +41,17 @@ export class FpPoly extends SxClass {
   private _sxFill?: FpPolyFill
   private _sxLocked?: FpPolyLocked
   private _sxUuid?: Uuid
+
+  constructor(params: FpPolyConstructorParams = {}) {
+    super()
+    if (params.points !== undefined) this.points = params.points
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.width !== undefined) this.width = params.width
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.fill !== undefined) this.fill = params.fill
+    if (params.locked !== undefined) this.locked = params.locked
+    if (params.uuid !== undefined) this.uuid = params.uuid
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

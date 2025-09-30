@@ -6,6 +6,12 @@ import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["pts", "stroke", "uuid"])
 
+export interface BusConstructorParams {
+  points?: Pts
+  stroke?: Stroke
+  uuid?: string | Uuid
+}
+
 export class Bus extends SxClass {
   static override token = "bus"
   static override parentToken = "kicad_sch"
@@ -14,6 +20,22 @@ export class Bus extends SxClass {
   private _sxPts?: Pts
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
+
+  constructor(params: BusConstructorParams = {}) {
+    super()
+
+    if (params.points !== undefined) {
+      this.points = params.points
+    }
+
+    if (params.stroke !== undefined) {
+      this.stroke = params.stroke
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Bus {
     const bus = new Bus()

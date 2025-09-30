@@ -6,6 +6,12 @@ import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["pts", "stroke", "uuid"])
 
+export interface WireConstructorParams {
+  points?: Pts
+  stroke?: Stroke
+  uuid?: string | Uuid
+}
+
 export class Wire extends SxClass {
   static override token = "wire"
   static override parentToken = "kicad_sch"
@@ -14,6 +20,22 @@ export class Wire extends SxClass {
   private _sxPts?: Pts
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
+
+  constructor(params: WireConstructorParams = {}) {
+    super()
+
+    if (params.points !== undefined) {
+      this.points = params.points
+    }
+
+    if (params.stroke !== undefined) {
+      this.stroke = params.stroke
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Wire {
     const wire = new Wire()

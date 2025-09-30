@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Layers } from "./Layers"
 import { Uuid } from "./Uuid"
 import { ViaNet } from "./ViaNet"
@@ -15,6 +15,22 @@ const BARE_FLAGS = new Set([
   "remove_unused_layers",
   "keep_end_layers",
 ])
+
+export interface ViaConstructorParams {
+  type?: string
+  locked?: boolean
+  free?: boolean
+  removeUnusedLayers?: boolean
+  keepEndLayers?: boolean
+  at?: AtInput
+  size?: number
+  drill?: number
+  layers?: Layers | string[]
+  net?: ViaNet
+  uuid?: Uuid | string
+  tstamp?: string
+  teardrops?: PadTeardrops
+}
 
 export class Via extends SxClass {
   static override token = "via"
@@ -33,6 +49,23 @@ export class Via extends SxClass {
   private _sxUuid?: Uuid
   private _tstamp?: string
   private _sxTeardrops?: PadTeardrops
+
+  constructor(params: ViaConstructorParams = {}) {
+    super()
+    if (params.type !== undefined) this.type = params.type
+    if (params.locked !== undefined) this.locked = params.locked
+    if (params.free !== undefined) this.free = params.free
+    if (params.removeUnusedLayers !== undefined) this.removeUnusedLayers = params.removeUnusedLayers
+    if (params.keepEndLayers !== undefined) this.keepEndLayers = params.keepEndLayers
+    if (params.at !== undefined) this.at = params.at
+    if (params.size !== undefined) this.size = params.size
+    if (params.drill !== undefined) this.drill = params.drill
+    if (params.layers !== undefined) this.layers = params.layers
+    if (params.net !== undefined) this.net = params.net
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
+    if (params.teardrops !== undefined) this.teardrops = params.teardrops
+  }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
     const via = new Via()
@@ -220,8 +253,8 @@ export class Via extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): number | undefined {

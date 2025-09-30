@@ -31,31 +31,30 @@ import {
 const schematic = new KicadSch({
   version: 20240101,
   generator: "kicadts-demo",
+  titleBlock: new TitleBlock({
+    title: "Demo Schematic",
+    company: "Example Labs",
+  }),
+  paper: new Paper({ size: "A4" }),
+  properties: [new Property({ key: "Sheetfile", value: "demo.kicad_sch" })],
+  sheets: [
+    new Sheet({
+      position: [0, 0, 0], // Can use array instead of new At([0, 0, 0])
+      size: { width: 100, height: 80 },
+    }),
+  ],
+  symbols: [
+    new SchematicSymbol({
+      libraryId: "Device:R",
+      at: { x: 25.4, y: 12.7 }, // Can use object instead of new At([25.4, 12.7])
+    }),
+  ],
+  wires: [
+    new Wire({
+      points: new Pts([new Xy(0, 0), new Xy(25.4, 12.7)]),
+    }),
+  ],
 })
-
-const title = new TitleBlock()
-title.title = "Demo Schematic"
-title.company = "Example Labs"
-schematic.titleBlock = title
-
-const paper = new Paper()
-paper.size = "A4"
-schematic.paper = paper
-schematic.properties = [new Property("Sheetfile", "demo.kicad_sch")]
-
-const sheet = new Sheet()
-sheet.position = new At([0, 0, 0])
-sheet.size = { width: 100, height: 80 }
-schematic.sheets = [sheet]
-
-const symbol = new SchematicSymbol()
-symbol.libraryId = "Device:R"
-symbol.at = new At([25.4, 12.7])
-schematic.symbols = [symbol]
-
-const wire = new Wire()
-wire.points = new Pts([new Xy(0, 0), new Xy(25.4, 12.7)])
-schematic.wires = [wire]
 
 await fs.writeFile("demo.kicad_sch", schematic.getString())
 ```
@@ -79,51 +78,57 @@ import {
   TextEffects,
 } from "kicadts"
 
-const pcb = new KicadPcb()
-pcb.version = 20240101
-pcb.generator = "kicadts-demo"
-
 const netGnd = new PcbNet(1, "GND")
 const netSignal = new PcbNet(2, "Net-(R1-Pad2)")
-pcb.nets = [netGnd, netSignal]
 
-const footprint = new Footprint()
-footprint.libraryLink = "Resistor_SMD:R_0603"
-footprint.layer = "F.Cu"
-footprint.position = new At([10, 5, 90])
+const makeText = (
+  type: string,
+  text: string,
+  x: number,
+  y: number,
+  layer: string
+) =>
+  new FpText({
+    type,
+    text,
+    position: { x, y },
+    layer,
+    effects: new TextEffects({
+      font: { size: { height: 1, width: 1 }, thickness: 0.15 },
+    }),
+  })
 
-const makeText = (type: string, text: string, x: number, y: number, layer: string) => {
-  const fpText = new FpText()
-  fpText.type = type
-  fpText.text = text
-  fpText.position = new At([x, y])
-  fpText.layer = layer
-  const effects = new TextEffects()
-  effects.font.size = { height: 1, width: 1 }
-  effects.font.thickness = 0.15
-  fpText.effects = effects
-  return fpText
-}
+const pad = (number: string, x: number, net: PcbNet) =>
+  new FootprintPad({
+    number,
+    padType: "smd",
+    shape: "roundrect",
+    at: { x, y: 0 },
+    size: { width: 1.05, height: 0.95 },
+    layers: ["F.Cu", "F.Paste", "F.Mask"],
+    roundrectRatio: 0.25,
+    net: new PadNet(net.id, net.name),
+    pinfunction: number,
+    pintype: "passive",
+  })
 
-footprint.fpTexts = [
-  makeText("reference", "R1", 0, -1.5, "F.SilkS"),
-  makeText("value", "10k", 0, 1.5, "F.Fab"),
-]
-
-const pad = (number: string, x: number, net: PcbNet) => {
-  const fpPad = new FootprintPad(number, "smd", "roundrect")
-  fpPad.at = new At([x, 0])
-  fpPad.size = new PadSize(1.05, 0.95)
-  fpPad.layers = new PadLayers(["F.Cu", "F.Paste", "F.Mask"])
-  fpPad.roundrectRatio = 0.25
-  fpPad.net = new PadNet(net.id, net.name)
-  fpPad.pinfunction = number
-  fpPad.pintype = "passive"
-  return fpPad
-}
-
-footprint.fpPads = [pad("1", -0.8, netGnd), pad("2", 0.8, netSignal)]
-pcb.footprints = [footprint]
+const pcb = new KicadPcb({
+  version: 20240101,
+  generator: "kicadts-demo",
+  nets: [netGnd, netSignal],
+  footprints: [
+    new Footprint({
+      libraryLink: "Resistor_SMD:R_0603",
+      layer: "F.Cu",
+      position: { x: 10, y: 5, angle: 90 },
+      fpTexts: [
+        makeText("reference", "R1", 0, -1.5, "F.SilkS"),
+        makeText("value", "10k", 0, 1.5, "F.Fab"),
+      ],
+      fpPads: [pad("1", -0.8, netGnd), pad("2", 0.8, netSignal)],
+    }),
+  ],
+})
 
 await fs.writeFile("demo.kicad_pcb", pcb.getString())
 ```
@@ -144,28 +149,32 @@ import {
   TextEffects,
 } from "kicadts"
 
-const footprint = new Footprint()
-footprint.libraryLink = "Demo:TestPad"
-footprint.layer = "F.Cu"
-footprint.position = new At([0, 0])
-
-const label = new FpText()
-label.type = "reference"
-label.text = "REF**"
-label.position = new At([0, -1.5])
-label.layer = "F.SilkS"
-const effects = new TextEffects()
-effects.font.size = { height: 1, width: 1 }
-effects.font.thickness = 0.15
-label.effects = effects
-
-footprint.fpTexts = [label]
-
-const pad = new FootprintPad("1", "smd", "rect")
-pad.at = new At([0, 0])
-pad.size = new PadSize(1.5, 1.5)
-pad.layers = new PadLayers(["F.Cu", "F.Paste", "F.Mask"])
-footprint.fpPads = [pad]
+const footprint = new Footprint({
+  libraryLink: "Demo:TestPad",
+  layer: "F.Cu",
+  position: [0, 0], // Array format
+  fpTexts: [
+    new FpText({
+      type: "reference",
+      text: "REF**",
+      position: { x: 0, y: -1.5 },
+      layer: "F.SilkS",
+      effects: new TextEffects({
+        font: { size: { height: 1, width: 1 }, thickness: 0.15 },
+      }),
+    }),
+  ],
+  fpPads: [
+    new FootprintPad({
+      number: "1",
+      padType: "smd",
+      shape: "rect",
+      at: [0, 0], // You can also use { x, y } form
+      size: { width: 1.5, height: 1.5 },
+      layers: ["F.Cu", "F.Paste", "F.Mask"],
+    }),
+  ],
+})
 
 await fs.writeFile("Demo_TestPad.kicad_mod", footprint.getString())
 ```

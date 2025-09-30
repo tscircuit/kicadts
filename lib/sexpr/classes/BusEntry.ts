@@ -1,10 +1,17 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["at", "size", "stroke", "uuid"])
+
+export interface BusEntryConstructorParams {
+  at?: AtInput
+  size?: BusEntrySize | { x: number; y: number }
+  stroke?: Stroke
+  uuid?: string | Uuid
+}
 
 export class BusEntry extends SxClass {
   static override token = "bus_entry"
@@ -15,6 +22,26 @@ export class BusEntry extends SxClass {
   private _sxSize?: BusEntrySize
   private _sxStroke?: Stroke
   private _sxUuid?: Uuid
+
+  constructor(params: BusEntryConstructorParams = {}) {
+    super()
+
+    if (params.at !== undefined) {
+      this.at = params.at
+    }
+
+    if (params.size !== undefined) {
+      this.size = params.size
+    }
+
+    if (params.stroke !== undefined) {
+      this.stroke = params.stroke
+    }
+
+    if (params.uuid !== undefined) {
+      this.uuid = params.uuid
+    }
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -52,8 +79,8 @@ export class BusEntry extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): { x: number; y: number } | undefined {

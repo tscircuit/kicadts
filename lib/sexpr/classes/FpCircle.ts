@@ -7,6 +7,17 @@ import { Width } from "./Width"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
+export interface FpCircleConstructorParams {
+  center?: FpCircleCenter | { x: number; y: number }
+  end?: FpCircleEnd | { x: number; y: number }
+  layer?: Layer | string | string[]
+  width?: number | Width
+  stroke?: Stroke
+  fill?: boolean | FpCircleFill
+  uuid?: string | Uuid
+  locked?: boolean
+}
+
 export class FpCircle extends SxClass {
   static override token = "fp_circle"
   token = "fp_circle"
@@ -19,6 +30,18 @@ export class FpCircle extends SxClass {
   private _sxFill?: FpCircleFill
   private _sxUuid?: Uuid
   private _locked = false
+
+  constructor(params: FpCircleConstructorParams = {}) {
+    super()
+    if (params.center !== undefined) this.center = params.center
+    if (params.end !== undefined) this.end = params.end
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.width !== undefined) this.width = params.width
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.fill !== undefined) this.fill = params.fill
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

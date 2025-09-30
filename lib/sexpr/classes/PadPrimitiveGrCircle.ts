@@ -6,6 +6,13 @@ import { toNumberValue } from "../utils/toNumberValue"
 
 const SUPPORTED_TOKENS = new Set(["center", "end", "width", "fill"])
 
+export interface PadPrimitiveGrCircleConstructorParams {
+  center?: PadPrimitiveGrCircleCenter | { x: number; y: number }
+  end?: PadPrimitiveGrCircleEnd | { x: number; y: number }
+  width?: Width | number
+  fill?: PadPrimitiveGrCircleFill | boolean
+}
+
 export class PadPrimitiveGrCircle extends SxClass {
   static override token = "gr_circle"
   static override parentToken = "primitives"
@@ -15,6 +22,14 @@ export class PadPrimitiveGrCircle extends SxClass {
   private _sxEnd?: PadPrimitiveGrCircleEnd
   private _sxWidth?: Width
   private _sxFill?: PadPrimitiveGrCircleFill
+
+  constructor(params: PadPrimitiveGrCircleConstructorParams = {}) {
+    super()
+    if (params.center !== undefined) this.center = params.center
+    if (params.end !== undefined) this.end = params.end
+    if (params.width !== undefined) this.width = params.width
+    if (params.fill !== undefined) this.fill = params.fill
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],

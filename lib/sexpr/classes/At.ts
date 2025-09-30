@@ -1,6 +1,11 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 
+export type AtInput =
+  | At
+  | [x: number, y: number, angle?: number]
+  | { x: number; y: number; angle?: number }
+
 export class At extends SxClass {
   static override token = "at"
   token = "at"
@@ -21,6 +26,19 @@ export class At extends SxClass {
   x: number
   y: number
   angle?: number
+
+  static from(
+    input: AtInput,
+    opts: { isTextSymbol?: boolean } = {},
+  ): At {
+    if (input instanceof At) {
+      return input
+    }
+    if (Array.isArray(input)) {
+      return new At(input, opts)
+    }
+    return new At([input.x, input.y, input.angle], opts)
+  }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): At {
     const [x, y, angle] = primitiveSexprs

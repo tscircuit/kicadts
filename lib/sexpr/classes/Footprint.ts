@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { FootprintAttr } from "./FootprintAttr"
 import { FootprintAutoplaceCost180 } from "./FootprintAutoplaceCost180"
 import { FootprintAutoplaceCost90 } from "./FootprintAutoplaceCost90"
@@ -80,6 +80,43 @@ const MULTI_TOKENS = new Set([
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
 
+export interface FootprintConstructorParams {
+  libraryLink?: string
+  locked?: boolean
+  placed?: boolean
+  layer?: Layer | string | string[]
+  uuid?: Uuid | string
+  at?: AtInput | Xy
+  descr?: string | FootprintDescr
+  tags?: string | string[] | FootprintTags
+  path?: string | FootprintPath
+  autoplaceCost90?: number | FootprintAutoplaceCost90
+  autoplaceCost180?: number | FootprintAutoplaceCost180
+  solderMaskMargin?: number | FootprintSolderMaskMargin
+  solderPasteMargin?: number | FootprintSolderPasteMargin
+  solderPasteRatio?: number | FootprintSolderPasteRatio
+  clearance?: number | FootprintClearance
+  zoneConnect?: number | FootprintZoneConnect
+  thermalWidth?: number | FootprintThermalWidth
+  thermalGap?: number | FootprintThermalGap
+  attr?: FootprintAttr
+  privateLayers?: FootprintPrivateLayers
+  netTiePadGroups?: FootprintNetTiePadGroups
+  sheetname?: string | FootprintSheetname
+  sheetfile?: string | FootprintSheetfile
+  embeddedFonts?: EmbeddedFonts
+  properties?: Property[]
+  fpTexts?: FpText[]
+  fpTextBoxes?: FpTextBox[]
+  fpLines?: FpLine[]
+  fpRects?: FpRect[]
+  fpCircles?: FpCircle[]
+  fpArcs?: FpArc[]
+  fpPolys?: FpPoly[]
+  pads?: FootprintPad[]
+  models?: FootprintModel[]
+}
+
 export class Footprint extends SxClass {
   static override token = "footprint"
   token = "footprint"
@@ -122,6 +159,44 @@ export class Footprint extends SxClass {
   private _fpPolys: FpPoly[] = []
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
+
+  constructor(params: FootprintConstructorParams = {}) {
+    super()
+    if (params.libraryLink !== undefined) this.libraryLink = params.libraryLink
+    if (params.locked !== undefined) this.locked = params.locked
+    if (params.placed !== undefined) this.placed = params.placed
+    if (params.layer !== undefined) this.layer = params.layer
+    if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.at !== undefined) this.position = params.at
+    if (params.descr !== undefined) this.descr = params.descr
+    if (params.tags !== undefined) this.tags = params.tags
+    if (params.path !== undefined) this.path = params.path
+    if (params.autoplaceCost90 !== undefined) this.autoplaceCost90 = params.autoplaceCost90
+    if (params.autoplaceCost180 !== undefined) this.autoplaceCost180 = params.autoplaceCost180
+    if (params.solderMaskMargin !== undefined) this.solderMaskMargin = params.solderMaskMargin
+    if (params.solderPasteMargin !== undefined) this.solderPasteMargin = params.solderPasteMargin
+    if (params.solderPasteRatio !== undefined) this.solderPasteRatio = params.solderPasteRatio
+    if (params.clearance !== undefined) this.clearance = params.clearance
+    if (params.zoneConnect !== undefined) this.zoneConnect = params.zoneConnect
+    if (params.thermalWidth !== undefined) this.thermalWidth = params.thermalWidth
+    if (params.thermalGap !== undefined) this.thermalGap = params.thermalGap
+    if (params.attr !== undefined) this.attr = params.attr
+    if (params.privateLayers !== undefined) this.privateLayers = params.privateLayers
+    if (params.netTiePadGroups !== undefined) this.netTiePadGroups = params.netTiePadGroups
+    if (params.sheetname !== undefined) this.sheetname = params.sheetname
+    if (params.sheetfile !== undefined) this.sheetfile = params.sheetfile
+    if (params.embeddedFonts !== undefined) this.embeddedFonts = params.embeddedFonts
+    if (params.properties !== undefined) this.properties = params.properties
+    if (params.fpTexts !== undefined) this.fpTexts = params.fpTexts
+    if (params.fpTextBoxes !== undefined) this.fpTextBoxes = params.fpTextBoxes
+    if (params.fpLines !== undefined) this.fpLines = params.fpLines
+    if (params.fpRects !== undefined) this.fpRects = params.fpRects
+    if (params.fpCircles !== undefined) this.fpCircles = params.fpCircles
+    if (params.fpArcs !== undefined) this.fpArcs = params.fpArcs
+    if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
+    if (params.pads !== undefined) this.pads = params.pads
+    if (params.models !== undefined) this.models = params.models
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -357,9 +432,9 @@ export class Footprint extends SxClass {
     return this._sxAt ?? this._sxXy
   }
 
-  set position(value: At | Xy | undefined) {
-    if (value instanceof At) {
-      this._sxAt = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxAt = undefined
       this._sxXy = undefined
       return
     }
@@ -368,7 +443,8 @@ export class Footprint extends SxClass {
       this._sxAt = undefined
       return
     }
-    this._sxAt = undefined
+    // Handle AtInput (At, array, or object)
+    this._sxAt = At.from(value as AtInput)
     this._sxXy = undefined
   }
 
