@@ -2,7 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { FieldsAutoplaced } from "./FieldsAutoplaced"
@@ -11,7 +11,7 @@ const SUPPORTED_TOKENS = new Set(["at", "effects", "uuid", "fields_autoplaced"])
 
 export interface LabelConstructorParams {
   value?: string
-  at?: At
+  at?: AtInput
   effects?: TextEffects
   uuid?: string | Uuid
   fieldsAutoplaced?: boolean | FieldsAutoplaced
@@ -123,8 +123,8 @@ export class Label extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {

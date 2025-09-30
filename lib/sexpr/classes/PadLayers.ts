@@ -4,6 +4,8 @@ import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 
+export type PadLayersInput = PadLayers | string[]
+
 export class PadLayers extends SxClass {
   static override token = "layers"
   static override parentToken = "pad"
@@ -14,6 +16,13 @@ export class PadLayers extends SxClass {
   constructor(layers: string[]) {
     super()
     this.layers = layers
+  }
+
+  static from(input: PadLayersInput): PadLayers {
+    if (input instanceof PadLayers) {
+      return input
+    }
+    return new PadLayers(input)
   }
 
   static override fromSexprPrimitives(

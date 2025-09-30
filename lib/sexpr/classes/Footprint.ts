@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { FootprintAttr } from "./FootprintAttr"
 import { FootprintAutoplaceCost180 } from "./FootprintAutoplaceCost180"
 import { FootprintAutoplaceCost90 } from "./FootprintAutoplaceCost90"
@@ -86,7 +86,7 @@ export interface FootprintConstructorParams {
   placed?: boolean
   layer?: Layer | string | string[]
   uuid?: Uuid | string
-  at?: At | Xy
+  at?: AtInput | Xy
   descr?: string | FootprintDescr
   tags?: string | string[] | FootprintTags
   path?: string | FootprintPath
@@ -167,7 +167,7 @@ export class Footprint extends SxClass {
     if (params.placed !== undefined) this.placed = params.placed
     if (params.layer !== undefined) this.layer = params.layer
     if (params.uuid !== undefined) this.uuid = params.uuid
-    if (params.at !== undefined) this.at = params.at
+    if (params.at !== undefined) this.position = params.at
     if (params.descr !== undefined) this.descr = params.descr
     if (params.tags !== undefined) this.tags = params.tags
     if (params.path !== undefined) this.path = params.path
@@ -432,9 +432,9 @@ export class Footprint extends SxClass {
     return this._sxAt ?? this._sxXy
   }
 
-  set position(value: At | Xy | undefined) {
-    if (value instanceof At) {
-      this._sxAt = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxAt = undefined
       this._sxXy = undefined
       return
     }
@@ -443,7 +443,8 @@ export class Footprint extends SxClass {
       this._sxAt = undefined
       return
     }
-    this._sxAt = undefined
+    // Handle AtInput (At, array, or object)
+    this._sxAt = At.from(value as AtInput)
     this._sxXy = undefined
   }
 

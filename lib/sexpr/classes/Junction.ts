@@ -1,6 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Color } from "./Color"
 import { Uuid } from "./Uuid"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
@@ -8,7 +8,7 @@ import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 const SUPPORTED_TOKENS = new Set(["at", "diameter", "color", "uuid"])
 
 export interface JunctionConstructorParams {
-  at?: At
+  at?: AtInput
   diameter?: number | JunctionDiameter
   color?: Color
   uuid?: string | Uuid
@@ -114,8 +114,8 @@ export class Junction extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get diameter(): number | undefined {

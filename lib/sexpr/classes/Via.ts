@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Layers } from "./Layers"
 import { Uuid } from "./Uuid"
 import { ViaNet } from "./ViaNet"
@@ -22,7 +22,7 @@ export interface ViaConstructorParams {
   free?: boolean
   removeUnusedLayers?: boolean
   keepEndLayers?: boolean
-  at?: At
+  at?: AtInput
   size?: number
   drill?: number
   layers?: Layers | string[]
@@ -253,8 +253,8 @@ export class Via extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): number | undefined {

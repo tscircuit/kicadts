@@ -5,7 +5,7 @@ import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import { Layer } from "./Layer"
 import { Uuid } from "./Uuid"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Xy } from "./Xy"
 
 const SUPPORTED_SINGLE_TOKENS = new Set([
@@ -20,7 +20,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
 
 export interface ImageConstructorParams {
-  position?: At | Xy
+  position?: AtInput | Xy
   scale?: ImageScale | number
   layer?: Layer | string | string[]
   uuid?: Uuid | string
@@ -103,8 +103,17 @@ export class Image extends SxClass {
     return this._sxPosition
   }
 
-  set position(value: At | Xy | undefined) {
-    this._sxPosition = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxPosition = undefined
+      return
+    }
+    if (value instanceof Xy) {
+      this._sxPosition = value
+      return
+    }
+    // Handle AtInput (At, array, or object)
+    this._sxPosition = At.from(value as AtInput)
   }
 
   get scale(): ImageScale | undefined {

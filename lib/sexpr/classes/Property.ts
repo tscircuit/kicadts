@@ -3,7 +3,7 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Layer } from "./Layer"
 import { PropertyHide } from "./PropertyHide"
 import { PropertyUnlocked } from "./PropertyUnlocked"
@@ -47,7 +47,7 @@ const primitiveToString = (
 export interface PropertyConstructorParams {
   key?: string
   value?: string
-  position?: At | Xy
+  position?: AtInput | Xy
   layer?: Layer | Array<string | number> | string
   uuid?: string | Uuid
   effects?: TextEffects
@@ -203,9 +203,9 @@ export class Property extends SxClass {
     return this._sxAt ?? this._sxXy
   }
 
-  set position(value: At | Xy | undefined) {
-    if (value instanceof At) {
-      this._sxAt = value
+  set position(value: AtInput | Xy | undefined) {
+    if (value === undefined) {
+      this._sxAt = undefined
       this._sxXy = undefined
       return
     }
@@ -214,7 +214,8 @@ export class Property extends SxClass {
       this._sxAt = undefined
       return
     }
-    this._sxAt = undefined
+    // Handle AtInput (At, array, or object)
+    this._sxAt = At.from(value as AtInput)
     this._sxXy = undefined
   }
 

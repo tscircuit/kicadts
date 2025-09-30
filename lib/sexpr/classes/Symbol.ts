@@ -6,7 +6,7 @@ import { indentLines } from "../utils/indentLines"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Dnp } from "./Dnp"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { ExcludeFromSim } from "./ExcludeFromSim"
@@ -657,8 +657,8 @@ export class SymbolText extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {
@@ -708,7 +708,7 @@ SxClass.register(SymbolPower)
 
 export interface SchematicSymbolConstructorParams {
   libraryId?: string
-  at?: At
+  at?: AtInput
   unit?: number | SymbolUnit
   pinNumbers?: SymbolPinNumbers
   pinNames?: SymbolPinNames
@@ -807,8 +807,8 @@ export class SchematicSymbol extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get unit(): number | undefined {
@@ -1033,7 +1033,7 @@ export class SymbolProperty extends SxClass {
     key: string
     value: string
     id?: number | SymbolPropertyId
-    at?: At
+    at?: AtInput
     effects?: TextEffects
   }) {
     super()
@@ -1041,7 +1041,7 @@ export class SymbolProperty extends SxClass {
     this.value = params.value
     this._sxId =
       params.id !== undefined ? SymbolPropertyId.from(params.id) : undefined
-    this._sxAt = params.at
+    this._sxAt = params.at !== undefined ? At.from(params.at) : undefined
     this._sxEffects = params.effects
   }
 
@@ -1079,8 +1079,8 @@ export class SymbolProperty extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {
@@ -1365,8 +1365,8 @@ export class SymbolPin extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get length(): number | undefined {

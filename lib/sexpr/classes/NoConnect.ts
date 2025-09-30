@@ -1,12 +1,12 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["at", "uuid"])
 
 export interface NoConnectConstructorParams {
-  at?: At
+  at?: AtInput
   uuid?: string | Uuid
 }
 
@@ -64,8 +64,8 @@ export class NoConnect extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get uuid(): Uuid | undefined {

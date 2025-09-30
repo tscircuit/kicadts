@@ -2,7 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { ExcludeFromSim } from "./ExcludeFromSim"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
@@ -12,7 +12,7 @@ const SUPPORTED_TOKENS = new Set(["exclude_from_sim", "at", "effects", "uuid"])
 export interface SchematicTextConstructorParams {
   value?: string
   excludeFromSim?: boolean | ExcludeFromSim
-  at?: At
+  at?: AtInput
   effects?: TextEffects
   uuid?: string | Uuid
 }
@@ -125,8 +125,8 @@ export class SchematicText extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get effects(): TextEffects | undefined {

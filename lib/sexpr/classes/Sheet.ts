@@ -4,7 +4,7 @@ import { indentLines } from "../utils/indentLines"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { Color } from "./Color"
 import { Dnp } from "./Dnp"
 import { ExcludeFromSim } from "./ExcludeFromSim"
@@ -22,7 +22,7 @@ import { SheetSize } from "./SheetSize"
 import { SheetProperty } from "./SheetProperty"
 
 export interface SheetConstructorParams {
-  position?: At
+  position?: AtInput
   size?: SheetSize | { width: number; height: number }
   excludeFromSim?: boolean | ExcludeFromSim
   inBom?: boolean | InBom
@@ -154,8 +154,8 @@ export class Sheet extends SxClass {
     return this._sxAt
   }
 
-  set position(value: At | undefined) {
-    this._sxAt = value
+  set position(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): { width: number; height: number } | undefined {

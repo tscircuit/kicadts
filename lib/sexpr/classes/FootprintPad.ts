@@ -4,20 +4,20 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { printSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-import { At } from "./At"
+import { At, type AtInput } from "./At"
 import { PadChamfer } from "./PadChamfer"
 import { PadChamferRatio } from "./PadChamferRatio"
 import { PadClearance } from "./PadClearance"
 import { PadDieLength } from "./PadDieLength"
 import { PadDrill } from "./PadDrill"
-import { PadLayers } from "./PadLayers"
+import { PadLayers, type PadLayersInput } from "./PadLayers"
 import { PadNet } from "./PadNet"
 import { PadOptions } from "./PadOptions"
 import { PadPinFunction } from "./PadPinFunction"
 import { PadPinType } from "./PadPinType"
 import { PadPrimitives } from "./PadPrimitives"
 import { PadRoundrectRratio } from "./PadRoundrectRratio"
-import { PadSize } from "./PadSize"
+import { PadSize, type PadSizeInput } from "./PadSize"
 import { PadSolderMaskMargin } from "./PadSolderMaskMargin"
 import { PadSolderPasteMargin } from "./PadSolderPasteMargin"
 import { PadSolderPasteMarginRatio } from "./PadSolderPasteMarginRatio"
@@ -84,10 +84,10 @@ export interface FootprintPadConstructorParams {
   locked?: boolean
   removeUnusedLayers?: boolean
   keepEndLayers?: boolean
-  at?: At
-  size?: PadSize
+  at?: AtInput
+  size?: PadSizeInput
   drill?: PadDrill
-  layers?: PadLayers
+  layers?: PadLayersInput
   width?: Width | number
   stroke?: Stroke
   properties?: Property[]
@@ -407,16 +407,16 @@ export class FootprintPad extends SxClass {
     return this._sxAt
   }
 
-  set at(value: At | undefined) {
-    this._sxAt = value
+  set at(value: AtInput | undefined) {
+    this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
   get size(): PadSize | undefined {
     return this._sxSize
   }
 
-  set size(value: PadSize | undefined) {
-    this._sxSize = value
+  set size(value: PadSizeInput | undefined) {
+    this._sxSize = value !== undefined ? PadSize.from(value) : undefined
   }
 
   get drill(): PadDrill | undefined {
@@ -431,8 +431,8 @@ export class FootprintPad extends SxClass {
     return this._sxLayers
   }
 
-  set layers(value: PadLayers | undefined) {
-    this._sxLayers = value
+  set layers(value: PadLayersInput | undefined) {
+    this._sxLayers = value !== undefined ? PadLayers.from(value) : undefined
   }
 
   get width(): Width | undefined {

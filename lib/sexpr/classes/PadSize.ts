@@ -2,6 +2,11 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { toNumberValue } from "../utils/toNumberValue"
 
+export type PadSizeInput =
+  | PadSize
+  | [width: number, height: number]
+  | { width: number; height: number }
+
 export class PadSize extends SxClass {
   static override token = "size"
   static override parentToken = "pad"
@@ -14,6 +19,16 @@ export class PadSize extends SxClass {
     super()
     this._width = width
     this._height = height
+  }
+
+  static from(input: PadSizeInput): PadSize {
+    if (input instanceof PadSize) {
+      return input
+    }
+    if (Array.isArray(input)) {
+      return new PadSize(input[0], input[1])
+    }
+    return new PadSize(input.width, input.height)
   }
 
   static override fromSexprPrimitives(

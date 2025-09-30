@@ -39,14 +39,14 @@ const schematic = new KicadSch({
   properties: [new Property({ key: "Sheetfile", value: "demo.kicad_sch" })],
   sheets: [
     new Sheet({
-      position: new At([0, 0, 0]),
+      position: [0, 0, 0], // Can use array instead of new At([0, 0, 0])
       size: { width: 100, height: 80 },
     }),
   ],
   symbols: [
     new SchematicSymbol({
       libraryId: "Device:R",
-      at: new At([25.4, 12.7]),
+      at: { x: 25.4, y: 12.7 }, // Can use object instead of new At([25.4, 12.7])
     }),
   ],
   wires: [
@@ -81,11 +81,17 @@ import {
 const netGnd = new PcbNet(1, "GND")
 const netSignal = new PcbNet(2, "Net-(R1-Pad2)")
 
-const makeText = (type: string, text: string, x: number, y: number, layer: string) =>
+const makeText = (
+  type: string,
+  text: string,
+  x: number,
+  y: number,
+  layer: string
+) =>
   new FpText({
     type,
     text,
-    position: new At([x, y]),
+    position: { x, y },
     layer,
     effects: new TextEffects({
       font: { size: { height: 1, width: 1 }, thickness: 0.15 },
@@ -97,9 +103,9 @@ const pad = (number: string, x: number, net: PcbNet) =>
     number,
     padType: "smd",
     shape: "roundrect",
-    at: new At([x, 0]),
-    size: new PadSize(1.05, 0.95),
-    layers: new PadLayers(["F.Cu", "F.Paste", "F.Mask"]),
+    at: { x, y: 0 },
+    size: { width: 1.05, height: 0.95 },
+    layers: ["F.Cu", "F.Paste", "F.Mask"],
     roundrectRatio: 0.25,
     net: new PadNet(net.id, net.name),
     pinfunction: number,
@@ -114,7 +120,7 @@ const pcb = new KicadPcb({
     new Footprint({
       libraryLink: "Resistor_SMD:R_0603",
       layer: "F.Cu",
-      position: new At([10, 5, 90]),
+      position: { x: 10, y: 5, angle: 90 },
       fpTexts: [
         makeText("reference", "R1", 0, -1.5, "F.SilkS"),
         makeText("value", "10k", 0, 1.5, "F.Fab"),
@@ -146,12 +152,12 @@ import {
 const footprint = new Footprint({
   libraryLink: "Demo:TestPad",
   layer: "F.Cu",
-  position: new At([0, 0]),
+  position: [0, 0], // Array format
   fpTexts: [
     new FpText({
       type: "reference",
       text: "REF**",
-      position: new At([0, -1.5]),
+      position: { x: 0, y: -1.5 },
       layer: "F.SilkS",
       effects: new TextEffects({
         font: { size: { height: 1, width: 1 }, thickness: 0.15 },
@@ -163,9 +169,9 @@ const footprint = new Footprint({
       number: "1",
       padType: "smd",
       shape: "rect",
-      at: new At([0, 0]),
-      size: new PadSize(1.5, 1.5),
-      layers: new PadLayers(["F.Cu", "F.Paste", "F.Mask"]),
+      at: [0, 0], // You can also use { x, y } form
+      size: { width: 1.5, height: 1.5 },
+      layers: ["F.Cu", "F.Paste", "F.Mask"],
     }),
   ],
 })
