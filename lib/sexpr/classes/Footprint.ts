@@ -194,7 +194,7 @@ export class Footprint extends SxClass {
     if (params.fpCircles !== undefined) this.fpCircles = params.fpCircles
     if (params.fpArcs !== undefined) this.fpArcs = params.fpArcs
     if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
-    if (params.pads !== undefined) this.pads = params.pads
+    if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
   }
 
@@ -465,13 +465,17 @@ export class Footprint extends SxClass {
     return this._sxTags
   }
 
-  set tags(value: FootprintTags | string | undefined) {
+  set tags(value: string | string[] | FootprintTags | undefined) {
     if (value === undefined) {
       this._sxTags = undefined
       return
     }
-    this._sxTags =
-      value instanceof FootprintTags ? value : new FootprintTags(value)
+    if (value instanceof FootprintTags) {
+      this._sxTags = value
+      return
+    }
+    const tagString = Array.isArray(value) ? value.join(' ') : value
+    this._sxTags = new FootprintTags(tagString)
   }
 
   get path(): FootprintPath | undefined {
@@ -667,18 +671,24 @@ export class Footprint extends SxClass {
     return this._sxSheetname?.value
   }
 
-  set sheetname(value: string | undefined) {
-    this._sxSheetname =
-      value === undefined ? undefined : new FootprintSheetname(value)
+  set sheetname(value: string | FootprintSheetname | undefined) {
+    if (value === undefined) {
+      this._sxSheetname = undefined
+      return
+    }
+    this._sxSheetname = value instanceof FootprintSheetname ? value : new FootprintSheetname(value)
   }
 
   get sheetfile(): string | undefined {
     return this._sxSheetfile?.value
   }
 
-  set sheetfile(value: string | undefined) {
-    this._sxSheetfile =
-      value === undefined ? undefined : new FootprintSheetfile(value)
+  set sheetfile(value: string | FootprintSheetfile | undefined) {
+    if (value === undefined) {
+      this._sxSheetfile = undefined
+      return
+    }
+    this._sxSheetfile = value instanceof FootprintSheetfile ? value : new FootprintSheetfile(value)
   }
 
   get embeddedFonts(): EmbeddedFonts | undefined {

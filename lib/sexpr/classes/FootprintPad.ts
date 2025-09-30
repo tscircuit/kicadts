@@ -169,7 +169,7 @@ export class FootprintPad extends SxClass {
     if (p.padType !== undefined) this.padType = p.padType
     if (p.shape !== undefined) this.shape = p.shape
     if (p.locked !== undefined) this.locked = p.locked
-    if (p.removeUnusedLayers !== undefined) this.removeUnusedLayers = p.removeUnusedLayers
+    if (p.removeUnusedLayers !== undefined) this.removeUnusedLayer = p.removeUnusedLayers
     if (p.keepEndLayers !== undefined) this.keepEndLayers = p.keepEndLayers
     if (p.at !== undefined) this.at = p.at
     if (p.size !== undefined) this.size = p.size
@@ -184,8 +184,8 @@ export class FootprintPad extends SxClass {
     if (p.rectDelta !== undefined) this.rectDelta = p.rectDelta
     if (p.net !== undefined) this.net = p.net
     if (p.uuid !== undefined) this.uuid = p.uuid
-    if (p.pinFunction !== undefined) this.pinFunction = p.pinFunction
-    if (p.pinType !== undefined) this.pinType = p.pinType
+    if (p.pinFunction !== undefined) this.pinfunction = p.pinFunction
+    if (p.pinType !== undefined) this.pintype = p.pinType
     if (p.dieLength !== undefined) this.dieLength = p.dieLength
     if (p.solderMaskMargin !== undefined) this.solderMaskMargin = p.solderMaskMargin
     if (p.solderPasteMargin !== undefined) this.solderPasteMargin = p.solderPasteMargin
@@ -439,8 +439,12 @@ export class FootprintPad extends SxClass {
     return this._sxWidth
   }
 
-  set width(value: Width | undefined) {
-    this._sxWidth = value
+  set width(value: number | Width | undefined) {
+    if (value === undefined) {
+      this._sxWidth = undefined
+      return
+    }
+    this._sxWidth = typeof value === 'number' ? new Width(value) : value
   }
 
   get stroke(): Stroke | undefined {
@@ -463,18 +467,24 @@ export class FootprintPad extends SxClass {
     return this._sxRoundrectRatio?.value
   }
 
-  set roundrectRatio(value: number | undefined) {
-    this._sxRoundrectRatio =
-      value === undefined ? undefined : new PadRoundrectRratio(value)
+  set roundrectRatio(value: number | PadRoundrectRratio | undefined) {
+    if (value === undefined) {
+      this._sxRoundrectRatio = undefined
+      return
+    }
+    this._sxRoundrectRatio = typeof value === 'number' ? new PadRoundrectRratio(value) : value
   }
 
   get chamferRatio(): number | undefined {
     return this._sxChamferRatio?.value
   }
 
-  set chamferRatio(value: number | undefined) {
-    this._sxChamferRatio =
-      value === undefined ? undefined : new PadChamferRatio(value)
+  set chamferRatio(value: number | PadChamferRatio | undefined) {
+    if (value === undefined) {
+      this._sxChamferRatio = undefined
+      return
+    }
+    this._sxChamferRatio = typeof value === 'number' ? new PadChamferRatio(value) : value
   }
 
   get chamfer(): PadChamfer | undefined {
@@ -529,98 +539,132 @@ export class FootprintPad extends SxClass {
     return this._sxPinFunction?.value
   }
 
-  set pinfunction(value: string | undefined) {
-    this._sxPinFunction =
-      value === undefined ? undefined : new PadPinFunction(value)
+  set pinfunction(value: string | PadPinFunction | undefined) {
+    if (value === undefined) {
+      this._sxPinFunction = undefined
+      return
+    }
+    this._sxPinFunction = typeof value === 'string' ? new PadPinFunction(value) : value
   }
 
   get pintype(): string | undefined {
     return this._sxPinType?.value
   }
 
-  set pintype(value: string | undefined) {
-    this._sxPinType = value === undefined ? undefined : new PadPinType(value)
+  set pintype(value: string | PadPinType | undefined) {
+    if (value === undefined) {
+      this._sxPinType = undefined
+      return
+    }
+    this._sxPinType = typeof value === 'string' ? new PadPinType(value) : value
   }
 
   get dieLength(): number | undefined {
     return this._sxDieLength?.value
   }
 
-  set dieLength(value: number | undefined) {
-    this._sxDieLength =
-      value === undefined ? undefined : new PadDieLength(value)
+  set dieLength(value: number | PadDieLength | undefined) {
+    if (value === undefined) {
+      this._sxDieLength = undefined
+      return
+    }
+    this._sxDieLength = typeof value === 'number' ? new PadDieLength(value) : value
   }
 
   get solderMaskMargin(): number | undefined {
     return this._sxSolderMaskMargin?.value
   }
 
-  set solderMaskMargin(value: number | undefined) {
-    this._sxSolderMaskMargin =
-      value === undefined ? undefined : new PadSolderMaskMargin(value)
+  set solderMaskMargin(value: number | PadSolderMaskMargin | undefined) {
+    if (value === undefined) {
+      this._sxSolderMaskMargin = undefined
+      return
+    }
+    this._sxSolderMaskMargin = typeof value === 'number' ? new PadSolderMaskMargin(value) : value
   }
 
   get solderPasteMargin(): number | undefined {
     return this._sxSolderPasteMargin?.value
   }
 
-  set solderPasteMargin(value: number | undefined) {
-    this._sxSolderPasteMargin =
-      value === undefined ? undefined : new PadSolderPasteMargin(value)
+  set solderPasteMargin(value: number | PadSolderPasteMargin | undefined) {
+    if (value === undefined) {
+      this._sxSolderPasteMargin = undefined
+      return
+    }
+    this._sxSolderPasteMargin = typeof value === 'number' ? new PadSolderPasteMargin(value) : value
   }
 
   get solderPasteMarginRatio(): number | undefined {
     return this._sxSolderPasteMarginRatio?.value
   }
 
-  set solderPasteMarginRatio(value: number | undefined) {
-    this._sxSolderPasteMarginRatio =
-      value === undefined ? undefined : new PadSolderPasteMarginRatio(value)
+  set solderPasteMarginRatio(value: number | PadSolderPasteMarginRatio | undefined) {
+    if (value === undefined) {
+      this._sxSolderPasteMarginRatio = undefined
+      return
+    }
+    this._sxSolderPasteMarginRatio = typeof value === 'number' ? new PadSolderPasteMarginRatio(value) : value
   }
 
   get clearance(): number | undefined {
     return this._sxClearance?.value
   }
 
-  set clearance(value: number | undefined) {
-    this._sxClearance =
-      value === undefined ? undefined : new PadClearance(value)
+  set clearance(value: number | PadClearance | undefined) {
+    if (value === undefined) {
+      this._sxClearance = undefined
+      return
+    }
+    this._sxClearance = typeof value === 'number' ? new PadClearance(value) : value
   }
 
   get zoneConnect(): number | undefined {
     return this._sxZoneConnect?.value
   }
 
-  set zoneConnect(value: number | undefined) {
-    this._sxZoneConnect =
-      value === undefined ? undefined : new PadZoneConnect(value)
+  set zoneConnect(value: number | PadZoneConnect | undefined) {
+    if (value === undefined) {
+      this._sxZoneConnect = undefined
+      return
+    }
+    this._sxZoneConnect = typeof value === 'number' ? new PadZoneConnect(value) : value
   }
 
   get thermalWidth(): number | undefined {
     return this._sxThermalWidth?.value
   }
 
-  set thermalWidth(value: number | undefined) {
-    this._sxThermalWidth =
-      value === undefined ? undefined : new PadThermalWidth(value)
+  set thermalWidth(value: number | PadThermalWidth | undefined) {
+    if (value === undefined) {
+      this._sxThermalWidth = undefined
+      return
+    }
+    this._sxThermalWidth = typeof value === 'number' ? new PadThermalWidth(value) : value
   }
 
   get thermalGap(): number | undefined {
     return this._sxThermalGap?.value
   }
 
-  set thermalGap(value: number | undefined) {
-    this._sxThermalGap =
-      value === undefined ? undefined : new PadThermalGap(value)
+  set thermalGap(value: number | PadThermalGap | undefined) {
+    if (value === undefined) {
+      this._sxThermalGap = undefined
+      return
+    }
+    this._sxThermalGap = typeof value === 'number' ? new PadThermalGap(value) : value
   }
 
   get thermalBridgeAngle(): number | undefined {
     return this._sxThermalBridgeAngle?.value
   }
 
-  set thermalBridgeAngle(value: number | undefined) {
-    this._sxThermalBridgeAngle =
-      value === undefined ? undefined : new PadThermalBridgeAngle(value)
+  set thermalBridgeAngle(value: number | PadThermalBridgeAngle | undefined) {
+    if (value === undefined) {
+      this._sxThermalBridgeAngle = undefined
+      return
+    }
+    this._sxThermalBridgeAngle = typeof value === 'number' ? new PadThermalBridgeAngle(value) : value
   }
 
   get options(): PadOptions | undefined {
