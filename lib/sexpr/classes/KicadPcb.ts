@@ -66,7 +66,8 @@ export class KicadPcb extends SxClass {
     super()
     if (params.version !== undefined) this.version = params.version
     if (params.generator !== undefined) this.generator = params.generator
-    if (params.generatorVersion !== undefined) this.generatorVersion = params.generatorVersion
+    if (params.generatorVersion !== undefined)
+      this.generatorVersion = params.generatorVersion
     if (params.general !== undefined) this.general = params.general
     if (params.paper !== undefined) this.paper = params.paper
     if (params.titleBlock !== undefined) this.titleBlock = params.titleBlock
@@ -77,11 +78,14 @@ export class KicadPcb extends SxClass {
     if (params.footprints !== undefined) this.footprints = params.footprints
     if (params.images !== undefined) this.images = params.images
     if (params.segments !== undefined) this.segments = params.segments
-    if (params.graphicLines !== undefined) this.graphicLines = params.graphicLines
-    if (params.graphicTexts !== undefined) this.graphicTexts = params.graphicTexts
+    if (params.graphicLines !== undefined)
+      this.graphicLines = params.graphicLines
+    if (params.graphicTexts !== undefined)
+      this.graphicTexts = params.graphicTexts
     if (params.vias !== undefined) this.vias = params.vias
     if (params.zones !== undefined) this.zones = params.zones
-    if (params.otherChildren !== undefined) this.otherChildren = params.otherChildren
+    if (params.otherChildren !== undefined)
+      this.otherChildren = params.otherChildren
   }
 
   static override fromSexprPrimitives(

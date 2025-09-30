@@ -765,16 +765,21 @@ export class SchematicSymbol extends SxClass {
 
     if (params.libraryId !== undefined) this.libraryId = params.libraryId
     if (params.at !== undefined) this.at = params.at
-    if (params.unit !== undefined) this.unit = typeof params.unit === 'number' ? params.unit : params.unit.value
+    if (params.unit !== undefined)
+      this.unit =
+        typeof params.unit === "number" ? params.unit : params.unit.value
     if (params.pinNumbers !== undefined) this.pinNumbers = params.pinNumbers
     if (params.pinNames !== undefined) this.pinNames = params.pinNames
-    if (params.excludeFromSim !== undefined) this.excludeFromSim = params.excludeFromSim
+    if (params.excludeFromSim !== undefined)
+      this.excludeFromSim = params.excludeFromSim
     if (params.inBom !== undefined) this.inBom = params.inBom
     if (params.onBoard !== undefined) this.onBoard = params.onBoard
     if (params.dnp !== undefined) this.dnp = params.dnp
     if (params.uuid !== undefined) this.uuid = params.uuid
-    if (params.duplicatePinNumbersAreJumpers !== undefined) this.duplicatePinNumbersAreJumpers = params.duplicatePinNumbersAreJumpers
-    if (params.fieldsAutoplaced !== undefined) this.fieldsAutoplaced = params.fieldsAutoplaced
+    if (params.duplicatePinNumbersAreJumpers !== undefined)
+      this.duplicatePinNumbersAreJumpers = params.duplicatePinNumbersAreJumpers
+    if (params.fieldsAutoplaced !== undefined)
+      this.fieldsAutoplaced = params.fieldsAutoplaced
     if (params.properties !== undefined) this.properties = params.properties
     if (params.pins !== undefined) this.pins = params.pins
     if (params.subSymbols !== undefined) this.subSymbols = params.subSymbols
@@ -783,7 +788,8 @@ export class SchematicSymbol extends SxClass {
     if (params.circles !== undefined) this.circles = params.circles
     if (params.arcs !== undefined) this.arcs = params.arcs
     if (params.texts !== undefined) this.texts = params.texts
-    if (params.embeddedFonts !== undefined) this._sxEmbeddedFonts = params.embeddedFonts
+    if (params.embeddedFonts !== undefined)
+      this._sxEmbeddedFonts = params.embeddedFonts
     if (params.instances !== undefined) this.instances = params.instances
   }
 

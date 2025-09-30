@@ -69,7 +69,10 @@ export class Property extends SxClass {
   private _sxUnlocked?: PropertyUnlocked
   private _sxHide?: PropertyHide
 
-  constructor(keyOrParams: string | PropertyConstructorParams = {}, value = "") {
+  constructor(
+    keyOrParams: string | PropertyConstructorParams = {},
+    value = "",
+  ) {
     super()
 
     // Support both old constructor signature and new params interface

@@ -171,21 +171,30 @@ export class Footprint extends SxClass {
     if (params.descr !== undefined) this.descr = params.descr
     if (params.tags !== undefined) this.tags = params.tags
     if (params.path !== undefined) this.path = params.path
-    if (params.autoplaceCost90 !== undefined) this.autoplaceCost90 = params.autoplaceCost90
-    if (params.autoplaceCost180 !== undefined) this.autoplaceCost180 = params.autoplaceCost180
-    if (params.solderMaskMargin !== undefined) this.solderMaskMargin = params.solderMaskMargin
-    if (params.solderPasteMargin !== undefined) this.solderPasteMargin = params.solderPasteMargin
-    if (params.solderPasteRatio !== undefined) this.solderPasteRatio = params.solderPasteRatio
+    if (params.autoplaceCost90 !== undefined)
+      this.autoplaceCost90 = params.autoplaceCost90
+    if (params.autoplaceCost180 !== undefined)
+      this.autoplaceCost180 = params.autoplaceCost180
+    if (params.solderMaskMargin !== undefined)
+      this.solderMaskMargin = params.solderMaskMargin
+    if (params.solderPasteMargin !== undefined)
+      this.solderPasteMargin = params.solderPasteMargin
+    if (params.solderPasteRatio !== undefined)
+      this.solderPasteRatio = params.solderPasteRatio
     if (params.clearance !== undefined) this.clearance = params.clearance
     if (params.zoneConnect !== undefined) this.zoneConnect = params.zoneConnect
-    if (params.thermalWidth !== undefined) this.thermalWidth = params.thermalWidth
+    if (params.thermalWidth !== undefined)
+      this.thermalWidth = params.thermalWidth
     if (params.thermalGap !== undefined) this.thermalGap = params.thermalGap
     if (params.attr !== undefined) this.attr = params.attr
-    if (params.privateLayers !== undefined) this.privateLayers = params.privateLayers
-    if (params.netTiePadGroups !== undefined) this.netTiePadGroups = params.netTiePadGroups
+    if (params.privateLayers !== undefined)
+      this.privateLayers = params.privateLayers
+    if (params.netTiePadGroups !== undefined)
+      this.netTiePadGroups = params.netTiePadGroups
     if (params.sheetname !== undefined) this.sheetname = params.sheetname
     if (params.sheetfile !== undefined) this.sheetfile = params.sheetfile
-    if (params.embeddedFonts !== undefined) this.embeddedFonts = params.embeddedFonts
+    if (params.embeddedFonts !== undefined)
+      this.embeddedFonts = params.embeddedFonts
     if (params.properties !== undefined) this.properties = params.properties
     if (params.fpTexts !== undefined) this.fpTexts = params.fpTexts
     if (params.fpTextBoxes !== undefined) this.fpTextBoxes = params.fpTextBoxes
@@ -474,7 +483,7 @@ export class Footprint extends SxClass {
       this._sxTags = value
       return
     }
-    const tagString = Array.isArray(value) ? value.join(' ') : value
+    const tagString = Array.isArray(value) ? value.join(" ") : value
     this._sxTags = new FootprintTags(tagString)
   }
 
@@ -676,7 +685,10 @@ export class Footprint extends SxClass {
       this._sxSheetname = undefined
       return
     }
-    this._sxSheetname = value instanceof FootprintSheetname ? value : new FootprintSheetname(value)
+    this._sxSheetname =
+      value instanceof FootprintSheetname
+        ? value
+        : new FootprintSheetname(value)
   }
 
   get sheetfile(): string | undefined {
@@ -688,7 +700,10 @@ export class Footprint extends SxClass {
       this._sxSheetfile = undefined
       return
     }
-    this._sxSheetfile = value instanceof FootprintSheetfile ? value : new FootprintSheetfile(value)
+    this._sxSheetfile =
+      value instanceof FootprintSheetfile
+        ? value
+        : new FootprintSheetfile(value)
   }
 
   get embeddedFonts(): EmbeddedFonts | undefined {

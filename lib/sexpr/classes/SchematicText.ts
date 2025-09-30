@@ -36,9 +36,10 @@ export class SchematicText extends SxClass {
     }
 
     if (params.excludeFromSim !== undefined) {
-      this.excludeFromSim = typeof params.excludeFromSim === 'boolean'
-        ? params.excludeFromSim
-        : params.excludeFromSim.value
+      this.excludeFromSim =
+        typeof params.excludeFromSim === "boolean"
+          ? params.excludeFromSim
+          : params.excludeFromSim.value
     }
 
     if (params.at !== undefined) {

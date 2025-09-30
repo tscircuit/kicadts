@@ -27,10 +27,7 @@ export class At extends SxClass {
   y: number
   angle?: number
 
-  static from(
-    input: AtInput,
-    opts: { isTextSymbol?: boolean } = {},
-  ): At {
+  static from(input: AtInput, opts: { isTextSymbol?: boolean } = {}): At {
     if (input instanceof At) {
       return input
     }

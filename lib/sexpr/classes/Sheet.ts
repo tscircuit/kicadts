@@ -67,33 +67,33 @@ export class Sheet extends SxClass {
     }
 
     if (params.excludeFromSim !== undefined) {
-      this.excludeFromSim = typeof params.excludeFromSim === 'boolean'
-        ? params.excludeFromSim
-        : params.excludeFromSim.value
+      this.excludeFromSim =
+        typeof params.excludeFromSim === "boolean"
+          ? params.excludeFromSim
+          : params.excludeFromSim.value
     }
 
     if (params.inBom !== undefined) {
-      this.inBom = typeof params.inBom === 'boolean'
-        ? params.inBom
-        : params.inBom.value
+      this.inBom =
+        typeof params.inBom === "boolean" ? params.inBom : params.inBom.value
     }
 
     if (params.onBoard !== undefined) {
-      this.onBoard = typeof params.onBoard === 'boolean'
-        ? params.onBoard
-        : params.onBoard.value
+      this.onBoard =
+        typeof params.onBoard === "boolean"
+          ? params.onBoard
+          : params.onBoard.value
     }
 
     if (params.dnp !== undefined) {
-      this.dnp = typeof params.dnp === 'boolean'
-        ? params.dnp
-        : params.dnp.value
+      this.dnp = typeof params.dnp === "boolean" ? params.dnp : params.dnp.value
     }
 
     if (params.fieldsAutoplaced !== undefined) {
-      this.fieldsAutoplaced = typeof params.fieldsAutoplaced === 'boolean'
-        ? params.fieldsAutoplaced
-        : params.fieldsAutoplaced.value
+      this.fieldsAutoplaced =
+        typeof params.fieldsAutoplaced === "boolean"
+          ? params.fieldsAutoplaced
+          : params.fieldsAutoplaced.value
     }
 
     if (params.stroke !== undefined) {

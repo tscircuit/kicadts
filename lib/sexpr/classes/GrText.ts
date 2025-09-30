@@ -42,7 +42,7 @@ export class GrText extends SxClass {
 
   constructor(params: GrTextConstructorParams | string = {}) {
     super()
-    if (typeof params === 'string') {
+    if (typeof params === "string") {
       this.text = params
     } else {
       if (params.text !== undefined) this.text = params.text
@@ -151,7 +151,13 @@ export class GrText extends SxClass {
       return
     }
     // Check if it's GrTextPosition (plain object with x, y)
-    if (typeof value === 'object' && 'x' in value && 'y' in value && !Array.isArray(value) && !(value instanceof At)) {
+    if (
+      typeof value === "object" &&
+      "x" in value &&
+      "y" in value &&
+      !Array.isArray(value) &&
+      !(value instanceof At)
+    ) {
       const { x, y, angle } = value as GrTextPosition
       if (angle !== undefined) {
         this._sxPosition = new At([x, y, angle])
