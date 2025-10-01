@@ -2,6 +2,8 @@
 
 `kicadts` is a TypeScript-first toolkit for reading, editing, and generating KiCad S-expression documents. Every KiCad token is modeled as a class, so you can compose schematics, boards, and footprints entirely in TypeScript and emit KiCad-compatible files with deterministic formatting.
 
+[![npm version](https://img.shields.io/npm/v/kicadts.svg)](https://www.npmjs.com/package/kicadts)
+
 ## Local Setup
 
 This repository uses [Bun](https://bun.sh) for scripts and testing.
