@@ -26,7 +26,6 @@ const SINGLE_CHILD_TOKENS = new Set([
   "paper",
   "title_block",
   "lib_symbols",
-  "sheet_instances",
   "embedded_fonts",
 ])
 
@@ -39,6 +38,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "label",
   "junction",
   "wire",
+  "sheet_instances",
 ])
 
 const SUPPORTED_CHILD_TOKENS = new Set([
@@ -54,7 +54,7 @@ export interface KicadSchConstructorParams {
   paper?: Paper
   titleBlock?: TitleBlock
   libSymbols?: LibSymbols
-  sheetInstances?: SheetInstances
+  sheetInstances?: SheetInstances | SheetInstances[]
   embeddedFonts?: EmbeddedFonts
   properties?: Property[]
   images?: Image[]
@@ -77,7 +77,7 @@ export class KicadSch extends SxClass {
   private _sxPaper?: Paper
   private _sxTitleBlock?: TitleBlock
   private _sxLibSymbols?: LibSymbols
-  private _sxSheetInstances?: SheetInstances
+  private _sheetInstances: SheetInstances[] = []
   private _sxEmbeddedFonts?: EmbeddedFonts
   private _properties: Property[] = []
   private _images: Image[] = []
@@ -216,7 +216,9 @@ export class KicadSch extends SxClass {
       paper: propertyMap.paper as Paper | undefined,
       titleBlock: propertyMap.title_block as TitleBlock | undefined,
       libSymbols: propertyMap.lib_symbols as LibSymbols | undefined,
-      sheetInstances: propertyMap.sheet_instances as SheetInstances | undefined,
+      sheetInstances: arrayPropertyMap.sheet_instances as
+        | SheetInstances[]
+        | undefined,
       embeddedFonts: propertyMap.embedded_fonts as EmbeddedFonts | undefined,
       properties: (arrayPropertyMap.property as Property[]) ?? [],
       images: (arrayPropertyMap.image as Image[]) ?? [],
@@ -292,12 +294,16 @@ export class KicadSch extends SxClass {
     this._sxLibSymbols = value
   }
 
-  get sheetInstances(): SheetInstances | undefined {
-    return this._sxSheetInstances
+  get sheetInstances(): SheetInstances[] {
+    return [...this._sheetInstances]
   }
 
-  set sheetInstances(value: SheetInstances | undefined) {
-    this._sxSheetInstances = value
+  set sheetInstances(value: SheetInstances | SheetInstances[] | undefined) {
+    if (value === undefined) {
+      this._sheetInstances = []
+      return
+    }
+    this._sheetInstances = Array.isArray(value) ? [...value] : [value]
   }
 
   get embeddedFonts(): EmbeddedFonts | undefined {
@@ -381,7 +387,7 @@ export class KicadSch extends SxClass {
     if (this._sxPaper) children.push(this._sxPaper)
     if (this._sxTitleBlock) children.push(this._sxTitleBlock)
     if (this._sxLibSymbols) children.push(this._sxLibSymbols)
-    if (this._sxSheetInstances) children.push(this._sxSheetInstances)
+    children.push(...this._sheetInstances)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     children.push(...this._properties)
     children.push(...this._images)
