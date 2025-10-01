@@ -2,37 +2,92 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
+import { SheetInstancesRootPath } from "./SheetInstancesRoot"
+
+const SUPPORTED_CHILD_TOKENS = new Set(["project", "path"])
 
 export class SheetInstances extends SxClass {
   static override token = "sheet_instances"
   static override parentToken = "kicad_sch"
   token = "sheet_instances"
 
-  projects: SheetInstancesProject[] = []
+  private _projects: SheetInstancesProject[] = []
+  private _paths: SheetInstancesRootPath[] = []
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SheetInstances {
     const instances = new SheetInstances()
-    const { arrayPropertyMap } = SxClass.parsePrimitivesToClassProperties(
-      primitiveSexprs,
-      "sheet_instances",
-    )
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    instances.projects =
-      (arrayPropertyMap.project as SheetInstancesProject[]) ?? []
+    const unsupportedSingularTokens = Object.keys(propertyMap).filter(
+      (token) => !SUPPORTED_CHILD_TOKENS.has(token),
+    )
+    if (unsupportedSingularTokens.length > 0) {
+      throw new Error(
+        `sheet_instances encountered unsupported child token${unsupportedSingularTokens.length > 1 ? "s" : ""} ${unsupportedSingularTokens
+          .map((token) => `"${token}"`)
+          .join(", ")}`,
+      )
+    }
+
+    const unsupportedArrayTokens = Object.keys(arrayPropertyMap).filter(
+      (token) => !SUPPORTED_CHILD_TOKENS.has(token),
+    )
+    if (unsupportedArrayTokens.length > 0) {
+      throw new Error(
+        `sheet_instances encountered unsupported repeated child token${unsupportedArrayTokens.length > 1 ? "s" : ""} ${unsupportedArrayTokens
+          .map((token) => `"${token}"`)
+          .join(", ")}`,
+      )
+    }
+
+    const projects = (arrayPropertyMap.project as SheetInstancesProject[]) ?? []
+    if (!projects.length && propertyMap.project) {
+      projects.push(propertyMap.project as SheetInstancesProject)
+    }
+
+    const paths = (arrayPropertyMap.path as SheetInstancesRootPath[]) ?? []
+    if (!paths.length && propertyMap.path) {
+      paths.push(propertyMap.path as SheetInstancesRootPath)
+    }
+
+    instances._projects = projects
+    instances._paths = paths
 
     return instances
   }
 
+  get projects(): SheetInstancesProject[] {
+    return [...this._projects]
+  }
+
+  set projects(value: SheetInstancesProject[]) {
+    this._projects = [...value]
+  }
+
+  get paths(): SheetInstancesRootPath[] {
+    return [...this._paths]
+  }
+
+  set paths(value: SheetInstancesRootPath[]) {
+    this._paths = [...value]
+  }
+
   override getChildren(): SxClass[] {
-    return [...this.projects]
+    return [...this._projects, ...this._paths]
   }
 
   override getString(): string {
+    const children = this.getChildren()
+    if (children.length === 0) {
+      return "(sheet_instances)"
+    }
+
     const lines = ["(sheet_instances"]
-    for (const project of this.projects) {
-      lines.push(project.getStringIndented())
+    for (const child of children) {
+      lines.push(child.getStringIndented())
     }
     lines.push(")")
     return lines.join("\n")
