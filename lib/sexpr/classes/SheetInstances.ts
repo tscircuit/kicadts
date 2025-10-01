@@ -4,9 +4,9 @@ import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 
 export class SheetInstances extends SxClass {
-  static override token = "instances"
-  static override parentToken = "sheet"
-  token = "instances"
+  static override token = "sheet_instances"
+  static override parentToken = "kicad_sch"
+  token = "sheet_instances"
 
   projects: SheetInstancesProject[] = []
 
@@ -30,7 +30,7 @@ export class SheetInstances extends SxClass {
   }
 
   override getString(): string {
-    const lines = ["(instances"]
+    const lines = ["(sheet_instances"]
     for (const project of this.projects) {
       lines.push(project.getStringIndented())
     }
