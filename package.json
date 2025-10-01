@@ -1,6 +1,6 @@
 {
   "name": "kicadts",
-  "module": "dist/index.js",
+  "main": "dist/index.js",
   "version": "0.0.4",
   "type": "module",
   "repository": {
