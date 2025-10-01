@@ -797,7 +797,12 @@ export class SchematicSymbol extends SxClass {
     return this._sxLibId?.value ?? this._inlineLibId
   }
 
-  set libraryId(value: string | undefined) {
+  set libraryId(value: string | SymbolLibId | undefined) {
+    if (value && typeof value === "object") {
+      this._sxLibId = value
+      this._inlineLibId = undefined
+      return
+    }
     if (value === undefined || value === "") {
       this._inlineLibId = undefined
       if (this._sxLibId) {
