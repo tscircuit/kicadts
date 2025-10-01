@@ -6,6 +6,50 @@ import { SheetInstancesRootPath } from "./SheetInstancesRoot"
 
 const SUPPORTED_CHILD_TOKENS = new Set(["project", "path"])
 
+const parseSheetInstancesChildren = (
+  primitiveSexprs: PrimitiveSExpr[],
+): {
+  projects: SheetInstancesProject[]
+  paths: SheetInstancesRootPath[]
+} => {
+  const { propertyMap, arrayPropertyMap } =
+    SxClass.parsePrimitivesToClassProperties(primitiveSexprs, "sheet_instances")
+
+  const unsupportedSingularTokens = Object.keys(propertyMap).filter(
+    (token) => !SUPPORTED_CHILD_TOKENS.has(token),
+  )
+  if (unsupportedSingularTokens.length > 0) {
+    throw new Error(
+      `sheet_instances encountered unsupported child token${unsupportedSingularTokens.length > 1 ? "s" : ""} ${unsupportedSingularTokens
+        .map((token) => `"${token}"`)
+        .join(", ")}`,
+    )
+  }
+
+  const unsupportedArrayTokens = Object.keys(arrayPropertyMap).filter(
+    (token) => !SUPPORTED_CHILD_TOKENS.has(token),
+  )
+  if (unsupportedArrayTokens.length > 0) {
+    throw new Error(
+      `sheet_instances encountered unsupported repeated child token${unsupportedArrayTokens.length > 1 ? "s" : ""} ${unsupportedArrayTokens
+        .map((token) => `"${token}"`)
+        .join(", ")}`,
+    )
+  }
+
+  const projects = (arrayPropertyMap.project as SheetInstancesProject[]) ?? []
+  if (!projects.length && propertyMap.project) {
+    projects.push(propertyMap.project as SheetInstancesProject)
+  }
+
+  const paths = (arrayPropertyMap.path as SheetInstancesRootPath[]) ?? []
+  if (!paths.length && propertyMap.path) {
+    paths.push(propertyMap.path as SheetInstancesRootPath)
+  }
+
+  return { projects, paths }
+}
+
 export class SheetInstances extends SxClass {
   static override token = "sheet_instances"
   static override parentToken = "kicad_sch"
@@ -18,44 +62,9 @@ export class SheetInstances extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SheetInstances {
     const instances = new SheetInstances()
-    const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
-
-    const unsupportedSingularTokens = Object.keys(propertyMap).filter(
-      (token) => !SUPPORTED_CHILD_TOKENS.has(token),
-    )
-    if (unsupportedSingularTokens.length > 0) {
-      throw new Error(
-        `sheet_instances encountered unsupported child token${unsupportedSingularTokens.length > 1 ? "s" : ""} ${unsupportedSingularTokens
-          .map((token) => `"${token}"`)
-          .join(", ")}`,
-      )
-    }
-
-    const unsupportedArrayTokens = Object.keys(arrayPropertyMap).filter(
-      (token) => !SUPPORTED_CHILD_TOKENS.has(token),
-    )
-    if (unsupportedArrayTokens.length > 0) {
-      throw new Error(
-        `sheet_instances encountered unsupported repeated child token${unsupportedArrayTokens.length > 1 ? "s" : ""} ${unsupportedArrayTokens
-          .map((token) => `"${token}"`)
-          .join(", ")}`,
-      )
-    }
-
-    const projects = (arrayPropertyMap.project as SheetInstancesProject[]) ?? []
-    if (!projects.length && propertyMap.project) {
-      projects.push(propertyMap.project as SheetInstancesProject)
-    }
-
-    const paths = (arrayPropertyMap.path as SheetInstancesRootPath[]) ?? []
-    if (!paths.length && propertyMap.path) {
-      paths.push(propertyMap.path as SheetInstancesRootPath)
-    }
-
-    instances._projects = projects
-    instances._paths = paths
-
+    const { projects, paths } = parseSheetInstancesChildren(primitiveSexprs)
+    instances.projects = projects
+    instances.paths = paths
     return instances
   }
 
@@ -82,10 +91,10 @@ export class SheetInstances extends SxClass {
   override getString(): string {
     const children = this.getChildren()
     if (children.length === 0) {
-      return "(sheet_instances)"
+      return `(${this.token})`
     }
 
-    const lines = ["(sheet_instances"]
+    const lines = [`(${this.token}`]
     for (const child of children) {
       lines.push(child.getStringIndented())
     }
@@ -94,6 +103,23 @@ export class SheetInstances extends SxClass {
   }
 }
 SxClass.register(SheetInstances)
+
+export class SheetInstancesForSheet extends SheetInstances {
+  static override token = "instances"
+  static override parentToken = "sheet"
+  override token = "instances"
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SheetInstancesForSheet {
+    const instances = new SheetInstancesForSheet()
+    const { projects, paths } = parseSheetInstancesChildren(primitiveSexprs)
+    instances.projects = projects
+    instances.paths = paths
+    return instances
+  }
+}
+SxClass.register(SheetInstancesForSheet)
 
 export class SheetInstancesProject extends SxClass {
   static override token = "project"
