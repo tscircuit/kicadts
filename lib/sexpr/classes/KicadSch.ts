@@ -8,6 +8,7 @@ import { LibSymbols } from "./LibSymbols"
 import { Paper } from "./Paper"
 import { Property } from "./Property"
 import { Label } from "./Label"
+import { GlobalLabel } from "./GlobalLabel"
 import { SchematicSymbol } from "./Symbol"
 import { SchematicText } from "./SchematicText"
 import { Sheet } from "./Sheet"
@@ -36,6 +37,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "symbol",
   "text",
   "label",
+  "global_label",
   "junction",
   "wire",
   "sheet_instances",
@@ -62,6 +64,7 @@ export interface KicadSchConstructorParams {
   symbols?: SchematicSymbol[]
   texts?: SchematicText[]
   labels?: Label[]
+  globalLabels?: GlobalLabel[]
   wires?: Wire[]
   junctions?: Junction[]
 }
@@ -85,6 +88,7 @@ export class KicadSch extends SxClass {
   private _symbols: SchematicSymbol[] = []
   private _texts: SchematicText[] = []
   private _labels: Label[] = []
+  private _globalLabels: GlobalLabel[] = []
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
 
@@ -157,6 +161,10 @@ export class KicadSch extends SxClass {
       this.labels = params.labels
     }
 
+    if (params.globalLabels !== undefined) {
+      this.globalLabels = params.globalLabels
+    }
+
     if (params.wires !== undefined) {
       this.wires = params.wires
     }
@@ -226,6 +234,7 @@ export class KicadSch extends SxClass {
       symbols: (arrayPropertyMap.symbol as SchematicSymbol[]) ?? [],
       texts: (arrayPropertyMap.text as SchematicText[]) ?? [],
       labels: (arrayPropertyMap.label as Label[]) ?? [],
+      globalLabels: (arrayPropertyMap.global_label as GlobalLabel[]) ?? [],
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
     })
@@ -362,6 +371,14 @@ export class KicadSch extends SxClass {
     this._labels = [...value]
   }
 
+  get globalLabels(): GlobalLabel[] {
+    return [...this._globalLabels]
+  }
+
+  set globalLabels(value: GlobalLabel[]) {
+    this._globalLabels = [...value]
+  }
+
   get junctions(): Junction[] {
     return [...this._junctions]
   }
@@ -395,6 +412,7 @@ export class KicadSch extends SxClass {
     children.push(...this._symbols)
     children.push(...this._texts)
     children.push(...this._labels)
+    children.push(...this._globalLabels)
     children.push(...this._junctions)
     children.push(...this._wires)
     return children
