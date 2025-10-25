@@ -183,36 +183,26 @@ await fs.writeFile("Demo_TestPad.kicad_mod", footprint.getString())
 
 ## Load Existing KiCad Files
 
-Parsing works for schematics, boards, footprints, or any KiCad S-expression. `parseKicadSexpr` returns an array of `SxClass` instances; narrow to the concrete class with `instanceof` and mutate as needed.
+Use the specialized parse functions to load and validate schematics, boards, or footprints. Each function ensures the root element is the expected type.
 
 ```ts
 import { promises as fs } from "node:fs"
-import { KicadPcb, KicadSch, Footprint, parseKicadSexpr } from "kicadts"
+import { parseKicadSch, parseKicadPcb, parseKicadMod } from "kicadts"
 
-const load = async (path: string) => {
-  const raw = await fs.readFile(path, "utf8")
-  const [root] = parseKicadSexpr(raw)
+// Load and modify a schematic
+const schematic = parseKicadSch(await fs.readFile("existing.kicad_sch", "utf8"))
+schematic.generator = "kicadts"
+await fs.writeFile("existing.kicad_sch", schematic.getString())
 
-  if (root instanceof KicadSch) {
-    root.generator = "kicadts"
-    return root
-  }
+// Load and modify a PCB
+const pcb = parseKicadPcb(await fs.readFile("existing.kicad_pcb", "utf8"))
+pcb.generatorVersion = "(generated programmatically)"
+await fs.writeFile("existing.kicad_pcb", pcb.getString())
 
-  if (root instanceof KicadPcb) {
-    root.generatorVersion = "(generated programmatically)"
-    return root
-  }
-
-  if (root instanceof Footprint) {
-    root.descr = "Imported with kicadts"
-    return root
-  }
-
-  throw new Error(`Unsupported root token: ${root.token}`)
-}
-
-const updated = await load("existing.kicad_sch")
-await fs.writeFile("existing.kicad_sch", updated.getString())
+// Load and modify a footprint
+const footprint = parseKicadMod(await fs.readFile("Demo_TestPad.kicad_mod", "utf8"))
+footprint.descr = "Imported with kicadts"
+await fs.writeFile("Demo_TestPad.kicad_mod", footprint.getString())
 ```
 
-Any class exposes `getChildren()` if you need to walk the tree manually, and snapshot tests (`bun test`) ensure the emitted S-expression stays identical to KiCad’s own formatting.
+For generic S-expression parsing, use `parseKicadSexpr` which returns an array of `SxClass` instances. Any class exposes `getChildren()` if you need to walk the tree manually, and snapshot tests (`bun test`) ensure the emitted S-expression stays identical to KiCad's own formatting.
