@@ -1,5 +1,6 @@
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { SxClass } from "./SxClass"
+import { quoteIfNeeded } from "../utils/quoteSExprString"
 
 export abstract class SxPrimitiveString extends SxClass {
   value: string
@@ -21,6 +22,6 @@ export abstract class SxPrimitiveString extends SxClass {
   }
 
   override getString() {
-    return `(${this.token} ${this.value})`
+    return `(${this.token} ${quoteIfNeeded(this.value)})`
   }
 }

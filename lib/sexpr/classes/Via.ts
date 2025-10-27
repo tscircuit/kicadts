@@ -344,10 +344,10 @@ export class Via extends SxClass {
     if (this._type !== undefined) {
       lines.push(`  (type ${this._type})`)
     }
-    if (this._locked) lines.push("  locked")
-    if (this._free) lines.push("  free")
-    if (this._removeUnusedLayers) lines.push("  remove_unused_layers")
-    if (this._keepEndLayers) lines.push("  keep_end_layers")
+    if (this._locked) lines.push("  (locked)")
+    if (this._free) lines.push("  (free)")
+    if (this._removeUnusedLayers) lines.push("  (remove_unused_layers)")
+    if (this._keepEndLayers) lines.push("  (keep_end_layers)")
     if (this._sxAt) lines.push(this._sxAt.getStringIndented())
     if (this._size !== undefined) lines.push(`  (size ${this._size})`)
     if (this._drill !== undefined) lines.push(`  (drill ${this._drill})`)
