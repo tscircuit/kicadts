@@ -5,6 +5,7 @@ const FLAG_TOKENS = new Set([
   "board_only",
   "exclude_from_pos_files",
   "exclude_from_bom",
+  "allow_soldermask_bridges",
 ])
 
 export class FootprintAttr extends SxClass {
@@ -16,6 +17,7 @@ export class FootprintAttr extends SxClass {
   private _boardOnly = false
   private _excludeFromPosFiles = false
   private _excludeFromBom = false
+  private _allowSoldermaskBridges = false
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -53,6 +55,9 @@ export class FootprintAttr extends SxClass {
       case "exclude_from_bom":
         this._excludeFromBom = true
         break
+      case "allow_soldermask_bridges":
+        this._allowSoldermaskBridges = true
+        break
     }
   }
 
@@ -88,6 +93,14 @@ export class FootprintAttr extends SxClass {
     this._excludeFromBom = value
   }
 
+  get allowSoldermaskBridges(): boolean {
+    return this._allowSoldermaskBridges
+  }
+
+  set allowSoldermaskBridges(value: boolean) {
+    this._allowSoldermaskBridges = value
+  }
+
   override getChildren(): SxClass[] {
     return []
   }
@@ -98,6 +111,7 @@ export class FootprintAttr extends SxClass {
     if (this._boardOnly) tokens.push("board_only")
     if (this._excludeFromPosFiles) tokens.push("exclude_from_pos_files")
     if (this._excludeFromBom) tokens.push("exclude_from_bom")
+    if (this._allowSoldermaskBridges) tokens.push("allow_soldermask_bridges")
     return `(${tokens.join(" ")})`
   }
 }
