@@ -1,9 +1,9 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { quoteSExprString } from "../utils/quoteSExprString"
 import { At, type AtInput } from "./At"
 import { Layers } from "./Layers"
 import { Uuid } from "./Uuid"
+import { Tstamp } from "./Tstamp"
 import { ViaNet } from "./ViaNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
@@ -28,7 +28,7 @@ export interface ViaConstructorParams {
   layers?: Layers | string[]
   net?: ViaNet
   uuid?: Uuid | string
-  tstamp?: string
+  tstamp?: Tstamp | string
   teardrops?: PadTeardrops
 }
 
@@ -47,7 +47,7 @@ export class Via extends SxClass {
   private _sxLayers?: Layers
   private _sxNet?: ViaNet
   private _sxUuid?: Uuid
-  private _tstamp?: string
+  private _sxTstamp?: Tstamp
   private _sxTeardrops?: PadTeardrops
 
   constructor(params: ViaConstructorParams = {}) {
@@ -194,7 +194,7 @@ export class Via extends SxClass {
         if (value === undefined) {
           throw new Error("via tstamp expects a string value")
         }
-        this._tstamp = value
+        this._sxTstamp = new Tstamp(value)
         return
       }
       default:
@@ -315,12 +315,16 @@ export class Via extends SxClass {
     this._sxTeardrops = value
   }
 
-  get tstamp(): string | undefined {
-    return this._tstamp
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
   }
 
-  set tstamp(value: string | undefined) {
-    this._tstamp = value
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
   }
 
   override getChildren(): SxClass[] {
@@ -329,6 +333,7 @@ export class Via extends SxClass {
     if (this._sxLayers) children.push(this._sxLayers)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxTeardrops) children.push(this._sxTeardrops)
     return children
   }
@@ -349,9 +354,7 @@ export class Via extends SxClass {
     if (this._sxLayers) lines.push(this._sxLayers.getStringIndented())
     if (this._sxNet) lines.push(this._sxNet.getStringIndented())
     if (this._sxUuid) lines.push(this._sxUuid.getStringIndented())
-    if (this._tstamp !== undefined) {
-      lines.push(`  (tstamp ${quoteSExprString(this._tstamp)})`)
-    }
+    if (this._sxTstamp) lines.push(this._sxTstamp.getStringIndented())
     if (this._sxTeardrops) {
       lines.push(this._sxTeardrops.getStringIndented())
     }

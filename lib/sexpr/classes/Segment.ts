@@ -5,6 +5,7 @@ import { SegmentEnd } from "./SegmentEnd"
 import { SegmentLocked } from "./SegmentLocked"
 import { SegmentNet } from "./SegmentNet"
 import { SegmentStart } from "./SegmentStart"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 
@@ -14,6 +15,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "width",
   "layer",
   "net",
+  "tstamp",
   "uuid",
   "locked",
 ])
@@ -24,6 +26,7 @@ export interface SegmentConstructorParams {
   width?: Width | number
   layer?: Layer | string | Array<string | number>
   net?: SegmentNet | { id: number; name?: string }
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
 }
@@ -37,6 +40,7 @@ export class Segment extends SxClass {
   private _sxWidth?: Width
   private _sxLayer?: Layer
   private _sxNet?: SegmentNet
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxLocked?: SegmentLocked
 
@@ -47,6 +51,7 @@ export class Segment extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.layer !== undefined) this.layer = params.layer
     if (params.net !== undefined) this.net = params.net
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
   }
@@ -100,6 +105,9 @@ export class Segment extends SxClass {
       (arrayPropertyMap.locked?.[0] as SegmentLocked | undefined) ??
       (propertyMap.locked as SegmentLocked | undefined)
     segment._sxLocked = locked && locked.value ? locked : undefined
+    segment._sxTstamp =
+      (arrayPropertyMap.tstamp?.[0] as Tstamp | undefined) ??
+      (propertyMap.tstamp as Tstamp | undefined)
     segment._sxUuid =
       (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
       (propertyMap.uuid as Uuid | undefined)
@@ -184,6 +192,18 @@ export class Segment extends SxClass {
     this._sxNet = new SegmentNet(value.id, value.name)
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -212,6 +232,7 @@ export class Segment extends SxClass {
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxLocked) children.push(this._sxLocked)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }

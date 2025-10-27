@@ -2,6 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { Pts } from "./Pts"
@@ -17,6 +18,7 @@ const SUPPORTED_TOKENS = new Set([
   "stroke",
   "fill",
   "locked",
+  "tstamp",
   "uuid",
 ])
 
@@ -27,6 +29,7 @@ export interface FpPolyConstructorParams {
   stroke?: Stroke
   fill?: FpPolyFill | boolean
   locked?: boolean
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
 }
 
@@ -40,6 +43,7 @@ export class FpPoly extends SxClass {
   private _sxStroke?: Stroke
   private _sxFill?: FpPolyFill
   private _sxLocked?: FpPolyLocked
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
 
   constructor(params: FpPolyConstructorParams = {}) {
@@ -50,6 +54,7 @@ export class FpPoly extends SxClass {
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
     if (params.locked !== undefined) this.locked = params.locked
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
 
@@ -110,6 +115,7 @@ export class FpPoly extends SxClass {
     const lockedClass = propertyMap.locked as FpPolyLocked | undefined
     fpPoly._sxLocked =
       lockedClass && lockedClass.value ? lockedClass : undefined
+    fpPoly._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     fpPoly._sxUuid = propertyMap.uuid as Uuid | undefined
 
     for (const primitive of primitiveSexprs) {
@@ -155,8 +161,8 @@ export class FpPoly extends SxClass {
     if (!fpPoly._sxLayer) {
       throw new Error("fp_poly requires a layer child token")
     }
-    if (!fpPoly._sxUuid) {
-      throw new Error("fp_poly requires a uuid child token")
+    if (!fpPoly._sxUuid && !fpPoly._sxTstamp) {
+      throw new Error("fp_poly requires a uuid or tstamp child token")
     }
 
     return fpPoly
@@ -259,6 +265,18 @@ export class FpPoly extends SxClass {
     this._sxLocked = value ? new FpPolyLocked(true) : undefined
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -279,6 +297,7 @@ export class FpPoly extends SxClass {
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxFill) children.push(this._sxFill)
     if (this._sxLocked) children.push(this._sxLocked)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }

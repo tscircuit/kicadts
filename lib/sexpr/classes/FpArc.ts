@@ -2,6 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { toNumberValue } from "../utils/toNumberValue"
@@ -13,6 +14,7 @@ export interface FpArcConstructorParams {
   layer?: Layer | string | string[]
   width?: number | Width
   stroke?: Stroke
+  tstamp?: Tstamp | string
   uuid?: string | Uuid
   locked?: boolean
 }
@@ -27,6 +29,7 @@ export class FpArc extends SxClass {
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _locked = false
 
@@ -38,6 +41,7 @@ export class FpArc extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
   }
@@ -58,6 +62,7 @@ export class FpArc extends SxClass {
     arc._sxLayer = propertyMap.layer as Layer | undefined
     arc._sxWidth = propertyMap.width as Width | undefined
     arc._sxStroke = propertyMap.stroke as Stroke | undefined
+    arc._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     arc._sxUuid = propertyMap.uuid as Uuid | undefined
 
     for (const primitive of primitiveSexprs) {
@@ -162,6 +167,18 @@ export class FpArc extends SxClass {
     this._sxStroke = value
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): string | undefined {
     return this._sxUuid?.value
   }
@@ -198,6 +215,7 @@ export class FpArc extends SxClass {
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxStroke) children.push(this._sxStroke)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }
@@ -215,6 +233,7 @@ export class FpArc extends SxClass {
     push(this._sxLayer)
     push(this._sxWidth)
     push(this._sxStroke)
+    push(this._sxTstamp)
     push(this._sxUuid)
 
     if (this._locked) {
