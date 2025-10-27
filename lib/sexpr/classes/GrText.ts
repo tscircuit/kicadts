@@ -6,6 +6,7 @@ import { At, type AtInput } from "./At"
 import { Xy } from "./Xy"
 import { Layer } from "./Layer"
 import { TextEffects } from "./TextEffects"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 
 export interface GrTextPosition {
@@ -18,6 +19,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "at",
   "xy",
   "layer",
+  "tstamp",
   "uuid",
   "effects",
 ])
@@ -26,6 +28,7 @@ export interface GrTextConstructorParams {
   text?: string
   position?: AtInput | Xy | GrTextPosition
   layer?: Layer | string | Array<string | number>
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
   effects?: TextEffects
 }
@@ -37,6 +40,7 @@ export class GrText extends SxClass {
   private _text = ""
   private _sxPosition?: At | Xy
   private _sxLayer?: Layer
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
 
@@ -48,6 +52,7 @@ export class GrText extends SxClass {
       if (params.text !== undefined) this.text = params.text
       if (params.position !== undefined) this.position = params.position
       if (params.layer !== undefined) this.layer = params.layer
+      if (params.tstamp !== undefined) this.tstamp = params.tstamp
       if (params.uuid !== undefined) this.uuid = params.uuid
       if (params.effects !== undefined) this.effects = params.effects
     }
@@ -110,6 +115,7 @@ export class GrText extends SxClass {
 
     grText._sxPosition = atInstance ?? xyInstance
     grText._sxLayer = propertyMap.layer as Layer | undefined
+    grText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grText._sxUuid = propertyMap.uuid as Uuid | undefined
     grText._sxEffects = propertyMap.effects as TextEffects | undefined
 
@@ -119,8 +125,8 @@ export class GrText extends SxClass {
     if (!grText._sxLayer) {
       throw new Error("gr_text requires a layer child token")
     }
-    if (!grText._sxUuid) {
-      throw new Error("gr_text requires a uuid child token")
+    if (!grText._sxUuid && !grText._sxTstamp) {
+      throw new Error("gr_text requires a uuid or tstamp child token")
     }
     if (!grText._sxEffects) {
       throw new Error("gr_text requires an effects child token")
@@ -187,6 +193,18 @@ export class GrText extends SxClass {
     this._sxLayer = new Layer(names)
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -211,6 +229,7 @@ export class GrText extends SxClass {
     const children: SxClass[] = []
     if (this._sxPosition) children.push(this._sxPosition)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxEffects) children.push(this._sxEffects)
     return children
