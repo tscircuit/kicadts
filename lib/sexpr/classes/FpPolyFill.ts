@@ -1,16 +1,22 @@
-import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { SxClass } from "../base-classes/SxClass"
 
-const truthyStrings = new Set(["yes", "true", "1"])
+const truthyStrings = new Set(["yes", "true", "1", "solid"])
 
-export class FpPolyFill extends SxPrimitiveBoolean {
+export class FpPolyFill extends SxClass {
   static override token = "fill"
   static override parentToken = "fp_poly"
   override token = "fill"
 
-  constructor(filled: boolean) {
-    super(filled)
+  value: string
+
+  constructor(value: string | boolean) {
+    super()
+    if (typeof value === "boolean") {
+      this.value = value ? "yes" : "no"
+    } else {
+      this.value = value
+    }
   }
 
   static override fromSexprPrimitives(
@@ -19,7 +25,7 @@ export class FpPolyFill extends SxPrimitiveBoolean {
     const [rawValue] = primitiveSexprs
 
     if (rawValue === undefined) {
-      return new FpPolyFill(false)
+      return new FpPolyFill("no")
     }
 
     if (typeof rawValue === "boolean") {
@@ -27,22 +33,22 @@ export class FpPolyFill extends SxPrimitiveBoolean {
     }
 
     if (typeof rawValue === "string") {
-      return new FpPolyFill(truthyStrings.has(rawValue.toLowerCase()))
+      return new FpPolyFill(rawValue)
     }
 
-    return new FpPolyFill(false)
+    return new FpPolyFill("no")
   }
 
   get filled(): boolean {
-    return this.value
+    return truthyStrings.has(this.value.toLowerCase())
   }
 
   set filled(filled: boolean) {
-    this.value = filled
+    this.value = filled ? "yes" : "no"
   }
 
   override getString(): string {
-    return `(fill ${this.value ? "yes" : "no"})`
+    return `(fill ${this.value})`
   }
 }
 SxClass.register(FpPolyFill)

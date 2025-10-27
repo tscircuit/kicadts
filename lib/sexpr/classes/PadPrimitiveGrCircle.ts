@@ -116,7 +116,7 @@ export class PadPrimitiveGrCircle extends SxClass {
   }
 
   get fill(): boolean | undefined {
-    return this._sxFill?.value
+    return this._sxFill?.filled
   }
 
   set fill(value: PadPrimitiveGrCircleFill | boolean | undefined) {
@@ -262,13 +262,25 @@ class PadPrimitiveGrCircleEnd extends PadPrimitiveGrCirclePoint {
 }
 SxClass.register(PadPrimitiveGrCircleEnd)
 
-export class PadPrimitiveGrCircleFill extends SxPrimitiveBoolean {
+const truthyFillStrings = new Set(["yes", "true"])
+const falsyFillStrings = new Set(["no", "false", "none"])
+
+export class PadPrimitiveGrCircleFill extends SxClass {
   static override token = "fill"
   static override parentToken = "gr_circle"
   override token = "fill"
 
-  constructor(value?: boolean) {
-    super(value ?? false)
+  value: string
+
+  constructor(value?: boolean | string) {
+    super()
+    if (value === undefined || value === false) {
+      this.value = "no"
+    } else if (value === true) {
+      this.value = "yes"
+    } else {
+      this.value = value
+    }
   }
 
   static override fromSexprPrimitives(
@@ -276,27 +288,35 @@ export class PadPrimitiveGrCircleFill extends SxPrimitiveBoolean {
   ): PadPrimitiveGrCircleFill {
     const [raw] = primitiveSexprs
     if (raw === undefined) {
-      return new PadPrimitiveGrCircleFill(false)
+      return new PadPrimitiveGrCircleFill("no")
     }
     if (typeof raw === "boolean") {
       return new PadPrimitiveGrCircleFill(raw)
     }
     if (typeof raw === "string") {
       const normalized = raw.toLowerCase()
-      if (normalized === "yes" || normalized === "true") {
-        return new PadPrimitiveGrCircleFill(true)
-      }
       if (
-        normalized === "no" ||
-        normalized === "false" ||
-        normalized === "none"
+        truthyFillStrings.has(normalized) ||
+        falsyFillStrings.has(normalized)
       ) {
-        return new PadPrimitiveGrCircleFill(false)
+        return new PadPrimitiveGrCircleFill(raw)
       }
     }
     throw new Error(
       `pad primitive gr_circle fill expects yes/no/none or boolean, received ${JSON.stringify(raw)}`,
     )
+  }
+
+  get filled(): boolean {
+    return truthyFillStrings.has(this.value.toLowerCase())
+  }
+
+  set filled(value: boolean) {
+    this.value = value ? "yes" : "no"
+  }
+
+  override getString(): string {
+    return `(fill ${this.value})`
   }
 }
 SxClass.register(PadPrimitiveGrCircleFill)

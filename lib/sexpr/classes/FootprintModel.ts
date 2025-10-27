@@ -21,6 +21,7 @@ export class FootprintModel extends SxClass {
   private _offset?: ModelVector
   private _scale?: ModelVector
   private _rotate?: ModelVector
+  private _hide = false
 
   constructor(path: string) {
     super()
@@ -43,6 +44,13 @@ export class FootprintModel extends SxClass {
     const model = new FootprintModel(path)
 
     for (const primitive of rest) {
+      if (typeof primitive === "string") {
+        if (primitive === "hide") {
+          model._hide = true
+          continue
+        }
+        throw new Error(`model encountered unsupported flag "${primitive}"`)
+      }
       if (!Array.isArray(primitive) || primitive.length === 0) {
         throw new Error(
           `model encountered invalid child expression: ${JSON.stringify(primitive)}`,
@@ -99,12 +107,23 @@ export class FootprintModel extends SxClass {
     this._rotate = value ? { ...value } : undefined
   }
 
+  get hide(): boolean {
+    return this._hide
+  }
+
+  set hide(value: boolean) {
+    this._hide = value
+  }
+
   override getChildren(): SxClass[] {
     return []
   }
 
   override getString(): string {
     const lines = [`(model ${quoteSExprString(this._path)}`]
+    if (this._hide) {
+      lines.push("  hide")
+    }
     if (this._offset) {
       lines.push(renderVectorBlock("offset", this._offset))
     }
