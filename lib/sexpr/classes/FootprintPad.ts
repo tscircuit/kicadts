@@ -28,6 +28,7 @@ import { PadZoneConnect } from "./PadZoneConnect"
 import { Property } from "./Property"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
+import { Tstamp } from "./Tstamp"
 import { Width } from "./Width"
 import { PadTeardrops } from "./PadTeardrops"
 import { PadRectDelta } from "./PadRectDelta"
@@ -44,6 +45,7 @@ const SINGLE_TOKENS = new Set([
   "chamfer_ratio",
   "chamfer",
   "net",
+  "tstamp",
   "uuid",
   "pinfunction",
   "pintype",
@@ -96,6 +98,7 @@ export interface FootprintPadConstructorParams {
   chamfer?: PadChamfer
   rectDelta?: PadRectDelta
   net?: PadNet
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
   pinFunction?: string | PadPinFunction
   pinType?: string | PadPinType
@@ -136,6 +139,7 @@ export class FootprintPad extends SxClass {
   private _sxChamfer?: PadChamfer
   private _sxRectDelta?: PadRectDelta
   private _sxNet?: PadNet
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxPinFunction?: PadPinFunction
   private _sxPinType?: PadPinType
@@ -188,6 +192,7 @@ export class FootprintPad extends SxClass {
     if (p.chamfer !== undefined) this.chamfer = p.chamfer
     if (p.rectDelta !== undefined) this.rectDelta = p.rectDelta
     if (p.net !== undefined) this.net = p.net
+    if (p.tstamp !== undefined) this.tstamp = p.tstamp
     if (p.uuid !== undefined) this.uuid = p.uuid
     if (p.pinFunction !== undefined) this.pinfunction = p.pinFunction
     if (p.pinType !== undefined) this.pintype = p.pinType
@@ -325,6 +330,7 @@ export class FootprintPad extends SxClass {
       | undefined
     pad._sxChamfer = propertyMap.chamfer as PadChamfer | undefined
     pad._sxNet = propertyMap.net as PadNet | undefined
+    pad._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     pad._sxUuid = propertyMap.uuid as Uuid | undefined
     pad._sxPinFunction = propertyMap.pinfunction as PadPinFunction | undefined
     pad._sxPinType = propertyMap.pintype as PadPinType | undefined
@@ -534,6 +540,18 @@ export class FootprintPad extends SxClass {
     this._sxNet = value
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -741,6 +759,7 @@ export class FootprintPad extends SxClass {
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
     if (this._sxThermalBridgeAngle) children.push(this._sxThermalBridgeAngle)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxRemoveUnusedLayers) children.push(this._sxRemoveUnusedLayers)
     if (this._sxKeepEndLayers) children.push(this._sxKeepEndLayers)

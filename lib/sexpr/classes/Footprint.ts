@@ -28,6 +28,7 @@ import { FpCircle } from "./FpCircle"
 import { FpArc } from "./FpArc"
 import { FpPoly } from "./FpPoly"
 import { Uuid } from "./Uuid"
+import { Tstamp } from "./Tstamp"
 import { Xy } from "./Xy"
 import { FootprintSheetname } from "./FootprintSheetname"
 import { FootprintSheetfile } from "./FootprintSheetfile"
@@ -42,6 +43,7 @@ const SINGLE_TOKENS = new Set([
   "locked",
   "placed",
   "tedit",
+  "tstamp",
   "uuid",
   "at",
   "xy",
@@ -85,6 +87,7 @@ export interface FootprintConstructorParams {
   locked?: boolean
   placed?: boolean
   layer?: Layer | string | string[]
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
   at?: AtInput | Xy
   descr?: string | FootprintDescr
@@ -127,6 +130,7 @@ export class Footprint extends SxClass {
 
   private _sxLayer?: Layer
   private _sxTedit?: FootprintTedit
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxAt?: At
   private _sxXy?: Xy
@@ -166,6 +170,7 @@ export class Footprint extends SxClass {
     if (params.locked !== undefined) this.locked = params.locked
     if (params.placed !== undefined) this.placed = params.placed
     if (params.layer !== undefined) this.layer = params.layer
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.at !== undefined) this.position = params.at
     if (params.descr !== undefined) this.descr = params.descr
@@ -269,6 +274,7 @@ export class Footprint extends SxClass {
     }
     footprint._sxLayer = propertyMap.layer as Layer | undefined
     footprint._sxTedit = propertyMap.tedit as FootprintTedit | undefined
+    footprint._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     footprint._sxUuid = propertyMap.uuid as Uuid | undefined
     footprint._sxAt = propertyMap.at as At | undefined
     footprint._sxXy = propertyMap.xy as Xy | undefined
@@ -423,6 +429,18 @@ export class Footprint extends SxClass {
     }
     this._sxTedit =
       value instanceof FootprintTedit ? value : new FootprintTedit(value)
+  }
+
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
   }
 
   get uuid(): Uuid | undefined {
@@ -800,6 +818,7 @@ export class Footprint extends SxClass {
     if (this._sxPlaced) children.push(this._sxPlaced)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxTedit) children.push(this._sxTedit)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxXy) children.push(this._sxXy)

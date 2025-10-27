@@ -6,6 +6,7 @@ import { At, type AtInput } from "./At"
 import { Layer } from "./Layer"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
+import { Tstamp } from "./Tstamp"
 import { Xy } from "./Xy"
 
 export type FpTextType = "reference" | "value" | "user" | string
@@ -15,6 +16,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "xy",
   "layer",
   "effects",
+  "tstamp",
   "uuid",
   "unlocked",
   "hide",
@@ -30,6 +32,7 @@ export interface FpTextConstructorParams {
   hidden?: boolean
   layer?: Layer | string | string[]
   effects?: TextEffects
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
 }
 
@@ -44,6 +47,7 @@ export class FpText extends SxClass {
   private _sxHide?: FpTextHide
   private _sxLayer?: Layer
   private _sxEffects?: TextEffects
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
 
   constructor(params: FpTextConstructorParams = {}) {
@@ -55,6 +59,7 @@ export class FpText extends SxClass {
     if (params.hidden !== undefined) this.hidden = params.hidden
     if (params.layer !== undefined) this.layer = params.layer
     if (params.effects !== undefined) this.effects = params.effects
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
 
@@ -144,6 +149,7 @@ export class FpText extends SxClass {
     fpText._sxPosition = atInstance ?? xyInstance
     fpText._sxLayer = propertyMap.layer as Layer | undefined
     fpText._sxEffects = propertyMap.effects as TextEffects | undefined
+    fpText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     fpText._sxUuid = propertyMap.uuid as Uuid | undefined
 
     const unlockedEntry = propertyMap.unlocked as FpTextUnlocked | undefined
@@ -251,6 +257,18 @@ export class FpText extends SxClass {
     this._sxEffects = value
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -270,6 +288,7 @@ export class FpText extends SxClass {
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxHide) children.push(this._sxHide)
     if (this._sxEffects) children.push(this._sxEffects)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }

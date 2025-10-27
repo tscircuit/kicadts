@@ -2,6 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { GrLineStart } from "./GrLineStart"
@@ -21,6 +22,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "layer",
   "width",
   "stroke",
+  "tstamp",
   "uuid",
   "locked",
 ])
@@ -32,6 +34,7 @@ export interface GrLineConstructorParams {
   layer?: Layer | string | Array<string | number>
   width?: Width | number
   stroke?: Stroke
+  tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
 }
@@ -46,6 +49,7 @@ export class GrLine extends SxClass {
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxLocked?: GrLineLocked
 
@@ -57,6 +61,7 @@ export class GrLine extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
   }
@@ -108,6 +113,7 @@ export class GrLine extends SxClass {
     grLine._sxStroke = propertyMap.stroke as Stroke | undefined
     const locked = propertyMap.locked as GrLineLocked | undefined
     grLine._sxLocked = locked && locked.value ? locked : undefined
+    grLine._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grLine._sxUuid = propertyMap.uuid as Uuid | undefined
 
     if (!grLine._sxStart) {
@@ -204,6 +210,18 @@ export class GrLine extends SxClass {
     this._sxStroke = value
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
@@ -233,6 +251,7 @@ export class GrLine extends SxClass {
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }
