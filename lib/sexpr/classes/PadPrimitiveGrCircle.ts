@@ -262,7 +262,7 @@ class PadPrimitiveGrCircleEnd extends PadPrimitiveGrCirclePoint {
 }
 SxClass.register(PadPrimitiveGrCircleEnd)
 
-class PadPrimitiveGrCircleFill extends SxPrimitiveBoolean {
+export class PadPrimitiveGrCircleFill extends SxPrimitiveBoolean {
   static override token = "fill"
   static override parentToken = "gr_circle"
   override token = "fill"
@@ -286,12 +286,16 @@ class PadPrimitiveGrCircleFill extends SxPrimitiveBoolean {
       if (normalized === "yes" || normalized === "true") {
         return new PadPrimitiveGrCircleFill(true)
       }
-      if (normalized === "no" || normalized === "false") {
+      if (
+        normalized === "no" ||
+        normalized === "false" ||
+        normalized === "none"
+      ) {
         return new PadPrimitiveGrCircleFill(false)
       }
     }
     throw new Error(
-      `pad primitive gr_circle fill expects yes/no or boolean, received ${JSON.stringify(raw)}`,
+      `pad primitive gr_circle fill expects yes/no/none or boolean, received ${JSON.stringify(raw)}`,
     )
   }
 }
