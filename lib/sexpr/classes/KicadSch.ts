@@ -19,6 +19,7 @@ import { Uuid } from "./Uuid"
 import { Wire } from "./Wire"
 import { Junction } from "./Junction"
 import { NoConnect } from "./NoConnect"
+import { Polyline } from "./Polyline"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -43,6 +44,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "wire",
   "no_connect",
   "sheet_instances",
+  "polyline",
 ])
 
 const SUPPORTED_CHILD_TOKENS = new Set([
@@ -70,6 +72,7 @@ export interface KicadSchConstructorParams {
   wires?: Wire[]
   junctions?: Junction[]
   noConnects?: NoConnect[]
+  polylines?: Polyline[]
 }
 
 export class KicadSch extends SxClass {
@@ -95,6 +98,7 @@ export class KicadSch extends SxClass {
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
   private _noConnects: NoConnect[] = []
+  private _polylines: Polyline[] = []
 
   constructor(params: KicadSchConstructorParams = {}) {
     super()
@@ -180,6 +184,10 @@ export class KicadSch extends SxClass {
     if (params.noConnects !== undefined) {
       this.noConnects = params.noConnects
     }
+
+    if (params.polylines !== undefined) {
+      this.polylines = params.polylines
+    }
   }
 
   static override fromSexprPrimitives(
@@ -246,6 +254,7 @@ export class KicadSch extends SxClass {
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
+      polylines: (arrayPropertyMap.polyline as Polyline[]) ?? [],
     })
   }
 
@@ -412,6 +421,14 @@ export class KicadSch extends SxClass {
     this._noConnects = [...value]
   }
 
+  get polylines(): Polyline[] {
+    return [...this._polylines]
+  }
+
+  set polylines(value: Polyline[]) {
+    this._polylines = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -433,6 +450,7 @@ export class KicadSch extends SxClass {
     children.push(...this._junctions)
     children.push(...this._wires)
     children.push(...this._noConnects)
+    children.push(...this._polylines)
     return children
   }
 }
