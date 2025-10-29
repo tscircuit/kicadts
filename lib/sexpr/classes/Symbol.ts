@@ -15,8 +15,8 @@ import { OnBoard } from "./OnBoard"
 import { FieldsAutoplaced } from "./FieldsAutoplaced"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
-import { Pts } from "./Pts"
 import { Stroke } from "./Stroke"
+import { SymbolPolyline } from "./Polyline"
 
 export class SymbolUnit extends SxPrimitiveNumber {
   static override token = "unit"
@@ -436,65 +436,6 @@ export class SymbolFillType extends SxClass {
   }
 }
 SxClass.register(SymbolFillType)
-
-export class SymbolPolyline extends SxClass {
-  static override token = "polyline"
-  static override parentToken = "symbol"
-  token = "polyline"
-
-  private _sxPts?: Pts
-  private _sxStroke?: Stroke
-  private _sxFill?: SymbolPolylineFill
-
-  static override fromSexprPrimitives(
-    primitiveSexprs: PrimitiveSExpr[],
-  ): SymbolPolyline {
-    const polyline = new SymbolPolyline()
-    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
-      primitiveSexprs,
-      this.token,
-    )
-
-    polyline._sxPts = propertyMap.pts as Pts
-    polyline._sxStroke = propertyMap.stroke as Stroke
-    polyline._sxFill = propertyMap.fill as SymbolPolylineFill
-
-    return polyline
-  }
-
-  get points(): Pts | undefined {
-    return this._sxPts
-  }
-
-  set points(value: Pts | undefined) {
-    this._sxPts = value
-  }
-
-  get stroke(): Stroke | undefined {
-    return this._sxStroke
-  }
-
-  set stroke(value: Stroke | undefined) {
-    this._sxStroke = value
-  }
-
-  get fill(): SymbolPolylineFill | undefined {
-    return this._sxFill
-  }
-
-  set fill(value: SymbolPolylineFill | undefined) {
-    this._sxFill = value
-  }
-
-  override getChildren(): SxClass[] {
-    const children: SxClass[] = []
-    if (this._sxPts) children.push(this._sxPts)
-    if (this._sxStroke) children.push(this._sxStroke)
-    if (this._sxFill) children.push(this._sxFill)
-    return children
-  }
-}
-SxClass.register(SymbolPolyline)
 
 export class SymbolRectangle extends SxClass {
   static override token = "rectangle"

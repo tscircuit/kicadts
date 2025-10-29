@@ -24,6 +24,7 @@ export * from "./classes/Wire"
 export * from "./classes/Bus"
 export * from "./classes/Junction"
 export * from "./classes/NoConnect"
+export * from "./classes/Polyline" // Exports Polyline, SchematicPolyline, SymbolPolyline
 export * from "./classes/BusEntry"
 export * from "./classes/Label"
 export * from "./classes/GlobalLabel"
