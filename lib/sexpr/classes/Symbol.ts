@@ -72,6 +72,39 @@ export class SymbolDuplicatePinNumbersAreJumpers extends SxPrimitiveBoolean {
 }
 SxClass.register(SymbolDuplicatePinNumbersAreJumpers)
 
+export class Mirror extends SxClass {
+  static override token = "mirror"
+  static override parentToken = "symbol"
+  token = "mirror"
+
+  value: string
+
+  constructor(value: string) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Mirror {
+    const [valuePrimitive] = primitiveSexprs
+    const value = toStringValue(valuePrimitive)
+    if (value === undefined) {
+      throw new Error("mirror expects a string value (x or y)")
+    }
+    return new Mirror(value)
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(mirror ${this.value})`
+  }
+}
+SxClass.register(Mirror)
+
 export class SymbolPinNumbers extends SxClass {
   static override token = "pin_numbers"
   static override parentToken = "symbol"
@@ -650,6 +683,7 @@ SxClass.register(SymbolPower)
 export interface SchematicSymbolConstructorParams {
   libraryId?: string
   at?: AtInput
+  mirror?: string | Mirror
   unit?: number | SymbolUnit
   pinNumbers?: SymbolPinNumbers
   pinNames?: SymbolPinNames
@@ -678,6 +712,7 @@ export class SchematicSymbol extends SxClass {
 
   private _sxLibId?: SymbolLibId
   _sxAt?: At
+  _sxMirror?: Mirror
   _sxUnit?: SymbolUnit
   _sxPinNumbers?: SymbolPinNumbers
   _sxPinNames?: SymbolPinNames
@@ -706,6 +741,7 @@ export class SchematicSymbol extends SxClass {
 
     if (params.libraryId !== undefined) this.libraryId = params.libraryId
     if (params.at !== undefined) this.at = params.at
+    if (params.mirror !== undefined) this.mirror = params.mirror
     if (params.unit !== undefined)
       this.unit =
         typeof params.unit === "number" ? params.unit : params.unit.value
@@ -761,6 +797,18 @@ export class SchematicSymbol extends SxClass {
 
   set at(value: AtInput | undefined) {
     this._sxAt = value !== undefined ? At.from(value) : undefined
+  }
+
+  get mirror(): string | undefined {
+    return this._sxMirror?.value
+  }
+
+  set mirror(value: string | Mirror | undefined) {
+    if (value === undefined) {
+      this._sxMirror = undefined
+      return
+    }
+    this._sxMirror = value instanceof Mirror ? value : new Mirror(value)
   }
 
   get unit(): number | undefined {
@@ -882,6 +930,7 @@ export class SchematicSymbol extends SxClass {
       symbol._inlineLibId = inlineId
     }
     symbol._sxAt = propertyMap.at as At
+    symbol._sxMirror = propertyMap.mirror as Mirror
     symbol._sxUnit = propertyMap.unit as SymbolUnit
     symbol._sxPinNumbers = propertyMap.pin_numbers as SymbolPinNumbers
     symbol._sxPinNames = propertyMap.pin_names as SymbolPinNames
@@ -913,6 +962,7 @@ export class SchematicSymbol extends SxClass {
     const children: SxClass[] = []
     if (this._sxLibId) children.push(this._sxLibId)
     if (this._sxAt) children.push(this._sxAt)
+    if (this._sxMirror) children.push(this._sxMirror)
     if (this._sxUnit) children.push(this._sxUnit)
     if (this._sxPinNumbers) children.push(this._sxPinNumbers)
     if (this._sxPinNames) children.push(this._sxPinNames)
