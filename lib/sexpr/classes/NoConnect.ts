@@ -38,11 +38,15 @@ export class NoConnect extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `no_connect does not support repeated child tokens: ${tokens}`,
-      )
+    for (const token of Object.keys(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        continue
+      }
+      if (arrayPropertyMap[token]!.length > 1) {
+        throw new Error(
+          `no_connect does not support repeated child tokens: ${token}`,
+        )
+      }
     }
 
     const unsupportedTokens = Object.keys(propertyMap).filter(
