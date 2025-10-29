@@ -18,6 +18,7 @@ import { TitleBlock } from "./TitleBlock"
 import { Uuid } from "./Uuid"
 import { Wire } from "./Wire"
 import { Junction } from "./Junction"
+import { NoConnect } from "./NoConnect"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -40,6 +41,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "global_label",
   "junction",
   "wire",
+  "no_connect",
   "sheet_instances",
 ])
 
@@ -67,6 +69,7 @@ export interface KicadSchConstructorParams {
   globalLabels?: GlobalLabel[]
   wires?: Wire[]
   junctions?: Junction[]
+  noConnects?: NoConnect[]
 }
 
 export class KicadSch extends SxClass {
@@ -91,6 +94,7 @@ export class KicadSch extends SxClass {
   private _globalLabels: GlobalLabel[] = []
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
+  private _noConnects: NoConnect[] = []
 
   constructor(params: KicadSchConstructorParams = {}) {
     super()
@@ -172,6 +176,10 @@ export class KicadSch extends SxClass {
     if (params.junctions !== undefined) {
       this.junctions = params.junctions
     }
+
+    if (params.noConnects !== undefined) {
+      this.noConnects = params.noConnects
+    }
   }
 
   static override fromSexprPrimitives(
@@ -237,6 +245,7 @@ export class KicadSch extends SxClass {
       globalLabels: (arrayPropertyMap.global_label as GlobalLabel[]) ?? [],
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
+      noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
     })
   }
 
@@ -395,6 +404,14 @@ export class KicadSch extends SxClass {
     this._wires = [...value]
   }
 
+  get noConnects(): NoConnect[] {
+    return [...this._noConnects]
+  }
+
+  set noConnects(value: NoConnect[]) {
+    this._noConnects = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -415,6 +432,7 @@ export class KicadSch extends SxClass {
     children.push(...this._globalLabels)
     children.push(...this._junctions)
     children.push(...this._wires)
+    children.push(...this._noConnects)
     return children
   }
 }
