@@ -127,6 +127,8 @@ export type TextEffectsFontProperty =
   | TextEffectsFontSize
   | TextEffectsFontThickness
   | TextEffectsFontLineSpacing
+  | TextEffectsFontBold
+  | TextEffectsFontItalic
 
 export class TextEffectsFont extends SxClass {
   static override token = "font"
@@ -137,8 +139,8 @@ export class TextEffectsFont extends SxClass {
   _sxSize?: TextEffectsFontSize
   _sxThickness?: TextEffectsFontThickness
   _sxLineSpacing?: TextEffectsFontLineSpacing
-  private _bold = false
-  private _italic = false
+  _sxBold?: TextEffectsFontBold
+  _sxItalic?: TextEffectsFontItalic
 
   get face(): string | undefined {
     return this._sxFace?.value
@@ -190,19 +192,19 @@ export class TextEffectsFont extends SxClass {
   }
 
   get bold(): boolean {
-    return this._bold
+    return this._sxBold?.value ?? false
   }
 
   set bold(value: boolean) {
-    this._bold = value
+    this._sxBold = value ? new TextEffectsFontBold(value) : undefined
   }
 
   get italic(): boolean {
-    return this._italic
+    return this._sxItalic?.value ?? false
   }
 
   set italic(value: boolean) {
-    this._italic = value
+    this._sxItalic = value ? new TextEffectsFontItalic(value) : undefined
   }
 
   static override fromSexprPrimitives(
@@ -218,15 +220,18 @@ export class TextEffectsFont extends SxClass {
     font._sxSize = propertyMap.size as TextEffectsFontSize
     font._sxThickness = propertyMap.thickness as TextEffectsFontThickness
     font._sxLineSpacing = propertyMap.line_spacing as TextEffectsFontLineSpacing
+    font._sxBold = propertyMap.bold as TextEffectsFontBold
+    font._sxItalic = propertyMap.italic as TextEffectsFontItalic
 
     for (const primitive of primitiveSexprs) {
       if (typeof primitive === "string") {
+        // Handle legacy format without parentheses
         if (primitive === "bold") {
-          font._bold = true
+          font._sxBold = new TextEffectsFontBold(true)
           continue
         }
         if (primitive === "italic") {
-          font._italic = true
+          font._sxItalic = new TextEffectsFontItalic(true)
           continue
         }
         throw new Error(`Unknown font token: ${primitive}`)
@@ -249,6 +254,8 @@ export class TextEffectsFont extends SxClass {
     if (this._sxFace) children.push(this._sxFace)
     if (this._sxSize) children.push(this._sxSize)
     if (this._sxThickness) children.push(this._sxThickness)
+    if (this._sxBold) children.push(this._sxBold)
+    if (this._sxItalic) children.push(this._sxItalic)
     if (this._sxLineSpacing) children.push(this._sxLineSpacing)
     return children
   }
@@ -264,11 +271,11 @@ export class TextEffectsFont extends SxClass {
     if (this._sxThickness) {
       lines.push(this._sxThickness.getStringIndented())
     }
-    if (this._bold) {
-      lines.push("  bold")
+    if (this._sxBold) {
+      lines.push(this._sxBold.getStringIndented())
     }
-    if (this._italic) {
-      lines.push("  italic")
+    if (this._sxItalic) {
+      lines.push(this._sxItalic.getStringIndented())
     }
     if (this._sxLineSpacing) {
       lines.push(this._sxLineSpacing.getStringIndented())
@@ -340,6 +347,38 @@ export class TextEffectsFontThickness extends SxPrimitiveNumber {
   token = "thickness"
 }
 SxClass.register(TextEffectsFontThickness)
+
+export class TextEffectsFontBold extends SxPrimitiveBoolean {
+  static override token = "bold"
+  static override parentToken = "font"
+  token = "bold"
+
+  constructor(value?: boolean) {
+    super(value ?? true)
+  }
+
+  override getString(): string {
+    // Output legacy format without parentheses for backward compatibility
+    return this.value ? "bold" : ""
+  }
+}
+SxClass.register(TextEffectsFontBold)
+
+export class TextEffectsFontItalic extends SxPrimitiveBoolean {
+  static override token = "italic"
+  static override parentToken = "font"
+  token = "italic"
+
+  constructor(value?: boolean) {
+    super(value ?? true)
+  }
+
+  override getString(): string {
+    // Output legacy format without parentheses for backward compatibility
+    return this.value ? "italic" : ""
+  }
+}
+SxClass.register(TextEffectsFontItalic)
 
 class TextEffectsHide extends SxPrimitiveBoolean {
   static override token = "hide"
