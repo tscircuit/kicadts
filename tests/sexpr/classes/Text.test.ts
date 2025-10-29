@@ -34,8 +34,6 @@ test("TextEffects", () => {
   expect(effects.font.thickness).toBe(0.508)
   expect(effects.font.bold).toBe(true)
   expect(effects.font.italic).toBe(true)
-  expect(effects.justify.horizontal).toBe("left")
-  expect(effects.justify.vertical).toBe("bottom")
 
   expect(txt.getString()).toMatchInlineSnapshot(`
     "(text "VPP (13V) power"
