@@ -13,6 +13,8 @@ import { Property } from "./Property"
 import { Segment } from "./Segment"
 import { GrLine } from "./GrLine"
 import { GrText } from "./GrText"
+import { GrPoly } from "./GrPoly"
+import { GrRect } from "./GrRect"
 import { Setup } from "./Setup/Setup"
 import { TitleBlock } from "./TitleBlock"
 import { Via } from "./Via"
@@ -34,6 +36,8 @@ export interface KicadPcbConstructorParams {
   segments?: Segment[]
   graphicLines?: GrLine[]
   graphicTexts?: GrText[]
+  graphicPolys?: GrPoly[]
+  graphicRects?: GrRect[]
   vias?: Via[]
   zones?: Zone[]
   otherChildren?: SxClass[]
@@ -58,6 +62,8 @@ export class KicadPcb extends SxClass {
   private _segments: Segment[] = []
   private _grLines: GrLine[] = []
   private _grTexts: GrText[] = []
+  private _grPolys: GrPoly[] = []
+  private _grRects: GrRect[] = []
   private _vias: Via[] = []
   private _zones: Zone[] = []
   private _otherChildren: SxClass[] = []
@@ -82,6 +88,10 @@ export class KicadPcb extends SxClass {
       this.graphicLines = params.graphicLines
     if (params.graphicTexts !== undefined)
       this.graphicTexts = params.graphicTexts
+    if (params.graphicPolys !== undefined)
+      this.graphicPolys = params.graphicPolys
+    if (params.graphicRects !== undefined)
+      this.graphicRects = params.graphicRects
     if (params.vias !== undefined) this.vias = params.vias
     if (params.zones !== undefined) this.zones = params.zones
     if (params.otherChildren !== undefined)
@@ -175,6 +185,14 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof GrText) {
       this._grTexts.push(child)
+      return
+    }
+    if (child instanceof GrPoly) {
+      this._grPolys.push(child)
+      return
+    }
+    if (child instanceof GrRect) {
+      this._grRects.push(child)
       return
     }
     if (child instanceof Via) {
@@ -311,6 +329,22 @@ export class KicadPcb extends SxClass {
     this._grTexts = [...value]
   }
 
+  get graphicPolys(): GrPoly[] {
+    return [...this._grPolys]
+  }
+
+  set graphicPolys(value: GrPoly[]) {
+    this._grPolys = [...value]
+  }
+
+  get graphicRects(): GrRect[] {
+    return [...this._grRects]
+  }
+
+  set graphicRects(value: GrRect[]) {
+    this._grRects = [...value]
+  }
+
   get vias(): Via[] {
     return [...this._vias]
   }
@@ -352,6 +386,8 @@ export class KicadPcb extends SxClass {
     children.push(...this._segments)
     children.push(...this._grLines)
     children.push(...this._grTexts)
+    children.push(...this._grPolys)
+    children.push(...this._grRects)
     children.push(...this._vias)
     children.push(...this._zones)
     children.push(...this._otherChildren)
