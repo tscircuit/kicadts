@@ -19,6 +19,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "width",
   "stroke",
   "fill",
+  "locked",
   "tstamp",
   "uuid",
 ])
@@ -30,6 +31,7 @@ export interface GrCircleConstructorParams {
   width?: Width | number
   stroke?: Stroke
   fill?: PadPrimitiveGrCircleFill | string
+  locked?: boolean
   tstamp?: Tstamp | string
   uuid?: Uuid | string
 }
@@ -44,6 +46,7 @@ export class GrCircle extends SxClass {
   private _sxWidth?: Width
   private _sxStroke?: Stroke
   private _sxFill?: PadPrimitiveGrCircleFill
+  private _sxLocked?: GrCircleLocked
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
 
@@ -55,6 +58,7 @@ export class GrCircle extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
+    if (params.locked !== undefined) this.locked = params.locked
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
@@ -104,6 +108,8 @@ export class GrCircle extends SxClass {
     grCircle._sxWidth = propertyMap.width as Width | undefined
     grCircle._sxStroke = propertyMap.stroke as Stroke | undefined
     grCircle._sxFill = propertyMap.fill as PadPrimitiveGrCircleFill | undefined
+    const locked = propertyMap.locked as GrCircleLocked | undefined
+    grCircle._sxLocked = locked && locked.value ? locked : undefined
     grCircle._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grCircle._sxUuid = propertyMap.uuid as Uuid | undefined
 
@@ -230,7 +236,11 @@ export class GrCircle extends SxClass {
     this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
   }
 
-  get uuid(): Uuid | undefined {
+  get uuid(): string | undefined {
+    return this._sxUuid?.value
+  }
+
+  get uuidClass(): Uuid | undefined {
     return this._sxUuid
   }
 
@@ -242,6 +252,14 @@ export class GrCircle extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: boolean) {
+    this._sxLocked = value ? new GrCircleLocked(true) : undefined
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxCenter) children.push(this._sxCenter)
@@ -249,6 +267,7 @@ export class GrCircle extends SxClass {
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxFill) children.push(this._sxFill)
+    if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
@@ -356,3 +375,31 @@ export class GrCircleEnd extends SxClass {
   }
 }
 SxClass.register(GrCircleEnd)
+
+export class GrCircleLocked extends SxClass {
+  static override token = "locked"
+  static override parentToken = "gr_circle"
+  override token = "locked"
+
+  value: boolean
+
+  constructor(value: boolean) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): GrCircleLocked {
+    if (primitiveSexprs.length === 0) {
+      return new GrCircleLocked(true)
+    }
+    const state = String(primitiveSexprs[0])
+    return new GrCircleLocked(state === "yes")
+  }
+
+  override getString(): string {
+    return this.value ? "(locked yes)" : "(locked no)"
+  }
+}
+SxClass.register(GrCircleLocked)
