@@ -212,6 +212,21 @@ export class PadPrimitiveGrPoly extends SxClass {
         continue
       }
 
+      if (parsed.token === "fill") {
+        if (polygon._sxFill) {
+          throw new Error("gr_poly encountered duplicate fill tokens")
+        }
+        // Handle any fill class that has a value or filled property
+        const fillValue =
+          "value" in parsed
+            ? parsed.value
+            : "filled" in parsed
+              ? parsed.filled
+              : false
+        polygon._sxFill = new PadPrimitiveFill({ value: fillValue as boolean })
+        continue
+      }
+
       throw new Error(`gr_poly encountered unsupported token "${parsed.token}"`)
     }
 
