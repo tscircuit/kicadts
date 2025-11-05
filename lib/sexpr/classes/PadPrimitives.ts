@@ -217,8 +217,12 @@ export class PadPrimitiveGrPoly extends SxClass {
           throw new Error("gr_poly encountered duplicate fill tokens")
         }
         // Handle any fill class that has a value or filled property
-        const fillValue = 'value' in parsed ? (parsed).value :
-                         'filled' in parsed ? (parsed).filled : false
+        const fillValue =
+          "value" in parsed
+            ? parsed.value
+            : "filled" in parsed
+              ? parsed.filled
+              : false
         polygon._sxFill = new PadPrimitiveFill({ value: fillValue as boolean })
         continue
       }
