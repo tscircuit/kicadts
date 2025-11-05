@@ -2,12 +2,14 @@ import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
+import { toNumberValue } from "../utils/toNumberValue"
 import { At, type AtInput } from "./At"
 import { Xy } from "./Xy"
 import { Layer } from "./Layer"
 import { TextEffects } from "./TextEffects"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
+import { Pts } from "./Pts"
 
 export interface GrTextPosition {
   x: number
@@ -22,6 +24,17 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "tstamp",
   "uuid",
   "effects",
+  "render_cache",
+])
+
+const SUPPORTED_ARRAY_TOKENS = new Set([
+  "at",
+  "xy",
+  "layer",
+  "tstamp",
+  "uuid",
+  "effects",
+  "render_cache",
 ])
 
 export interface GrTextConstructorParams {
@@ -31,6 +44,7 @@ export interface GrTextConstructorParams {
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   effects?: TextEffects
+  renderCaches?: GrTextRenderCache[]
 }
 
 export class GrText extends SxClass {
@@ -43,6 +57,7 @@ export class GrText extends SxClass {
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
+  private _renderCaches: GrTextRenderCache[] = []
 
   constructor(params: GrTextConstructorParams | string = {}) {
     super()
@@ -55,6 +70,8 @@ export class GrText extends SxClass {
       if (params.tstamp !== undefined) this.tstamp = params.tstamp
       if (params.uuid !== undefined) this.uuid = params.uuid
       if (params.effects !== undefined) this.effects = params.effects
+      if (params.renderCaches !== undefined)
+        this.renderCaches = params.renderCaches
     }
   }
 
@@ -83,11 +100,12 @@ export class GrText extends SxClass {
       }
     }
     for (const token of Object.keys(arrayPropertyMap)) {
-      if (!SUPPORTED_SINGLE_TOKENS.has(token)) {
+      if (!SUPPORTED_ARRAY_TOKENS.has(token)) {
         unexpectedTokens.add(token)
         continue
       }
-      if (arrayPropertyMap[token]!.length > 1) {
+      // render_cache can be repeated, others cannot
+      if (token !== "render_cache" && arrayPropertyMap[token]!.length > 1) {
         throw new Error(
           `gr_text does not support repeated child tokens: ${token}`,
         )
@@ -118,6 +136,13 @@ export class GrText extends SxClass {
     grText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grText._sxUuid = propertyMap.uuid as Uuid | undefined
     grText._sxEffects = propertyMap.effects as TextEffects | undefined
+
+    const renderCaches = arrayPropertyMap.render_cache as
+      | GrTextRenderCache[]
+      | undefined
+    if (renderCaches && renderCaches.length > 0) {
+      grText._renderCaches = renderCaches
+    }
 
     if (!grText._sxPosition) {
       throw new Error("gr_text requires a position child token")
@@ -225,6 +250,14 @@ export class GrText extends SxClass {
     this._sxEffects = value
   }
 
+  get renderCaches(): GrTextRenderCache[] {
+    return [...this._renderCaches]
+  }
+
+  set renderCaches(value: GrTextRenderCache[]) {
+    this._renderCaches = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxPosition) children.push(this._sxPosition)
@@ -232,6 +265,7 @@ export class GrText extends SxClass {
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxEffects) children.push(this._sxEffects)
+    children.push(...this._renderCaches)
     return children
   }
 
@@ -245,3 +279,156 @@ export class GrText extends SxClass {
   }
 }
 SxClass.register(GrText)
+
+// render_cache element for gr_text
+export class GrTextRenderCache extends SxClass {
+  static override token = "render_cache"
+  static override parentToken = "gr_text"
+  override token = "render_cache"
+
+  private _text: string = ""
+  private _angle: number = 0
+  private _polygons: GrTextRenderCachePolygon[] = []
+
+  constructor(
+    params: {
+      text?: string
+      angle?: number
+      polygons?: GrTextRenderCachePolygon[]
+    } = {},
+  ) {
+    super()
+    if (params.text !== undefined) this._text = params.text
+    if (params.angle !== undefined) this._angle = params.angle
+    if (params.polygons !== undefined) this._polygons = params.polygons
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): GrTextRenderCache {
+    const renderCache = new GrTextRenderCache()
+
+    // First two primitives are text and angle
+    if (primitiveSexprs.length >= 1) {
+      renderCache._text = toStringValue(primitiveSexprs[0]) ?? ""
+    }
+    if (primitiveSexprs.length >= 2) {
+      renderCache._angle = toNumberValue(primitiveSexprs[1]) ?? 0
+    }
+
+    // Rest are polygon elements
+    for (let i = 2; i < primitiveSexprs.length; i++) {
+      const primitive = primitiveSexprs[i]
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        continue
+      }
+
+      const parsed = SxClass.parsePrimitiveSexpr(primitive, {
+        parentToken: this.token,
+      })
+
+      if (parsed instanceof GrTextRenderCachePolygon) {
+        renderCache._polygons.push(parsed)
+      }
+    }
+
+    return renderCache
+  }
+
+  get text(): string {
+    return this._text
+  }
+
+  set text(value: string) {
+    this._text = value
+  }
+
+  get angle(): number {
+    return this._angle
+  }
+
+  set angle(value: number) {
+    this._angle = value
+  }
+
+  get polygons(): GrTextRenderCachePolygon[] {
+    return [...this._polygons]
+  }
+
+  set polygons(value: GrTextRenderCachePolygon[]) {
+    this._polygons = [...value]
+  }
+
+  override getChildren(): SxClass[] {
+    return [...this._polygons]
+  }
+
+  override getString(): string {
+    const lines = [
+      `(render_cache ${quoteSExprString(this._text)} ${this._angle}`,
+    ]
+    for (const polygon of this._polygons) {
+      lines.push(polygon.getStringIndented())
+    }
+    lines.push(")")
+    return lines.join("\n")
+  }
+}
+SxClass.register(GrTextRenderCache)
+
+// polygon element inside render_cache
+export class GrTextRenderCachePolygon extends SxClass {
+  static override token = "polygon"
+  static override parentToken = "render_cache"
+  override token = "polygon"
+
+  private _pts?: Pts
+
+  constructor(params: { pts?: Pts } = {}) {
+    super()
+    if (params.pts !== undefined) this._pts = params.pts
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): GrTextRenderCachePolygon {
+    const polygon = new GrTextRenderCachePolygon()
+
+    for (const primitive of primitiveSexprs) {
+      if (!Array.isArray(primitive) || primitive.length === 0) {
+        continue
+      }
+
+      const parsed = SxClass.parsePrimitiveSexpr(primitive, {
+        parentToken: this.token,
+      })
+
+      if (parsed instanceof Pts) {
+        polygon._pts = parsed
+      }
+    }
+
+    return polygon
+  }
+
+  get pts(): Pts | undefined {
+    return this._pts
+  }
+
+  set pts(value: Pts | undefined) {
+    this._pts = value
+  }
+
+  override getChildren(): SxClass[] {
+    return this._pts ? [this._pts] : []
+  }
+
+  override getString(): string {
+    if (!this._pts) return "(polygon)"
+    const lines = ["(polygon"]
+    lines.push(this._pts.getStringIndented())
+    lines.push(")")
+    return lines.join("\n")
+  }
+}
+SxClass.register(GrTextRenderCachePolygon)
