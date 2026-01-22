@@ -415,7 +415,9 @@ export class Footprint extends SxClass {
       return
     }
     this._sxGenerator =
-      value instanceof FootprintGenerator ? value : new FootprintGenerator(value)
+      value instanceof FootprintGenerator
+        ? value
+        : new FootprintGenerator(value)
   }
 
   get generatorVersion(): string | undefined {
