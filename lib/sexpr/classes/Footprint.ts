@@ -3,6 +3,9 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { At, type AtInput } from "./At"
 import { FootprintAttr } from "./FootprintAttr"
+import { FootprintVersion } from "./FootprintVersion"
+import { FootprintGenerator } from "./FootprintGenerator"
+import { FootprintGeneratorVersion } from "./FootprintGeneratorVersion"
 import { FootprintAutoplaceCost180 } from "./FootprintAutoplaceCost180"
 import { FootprintAutoplaceCost90 } from "./FootprintAutoplaceCost90"
 import { FootprintClearance } from "./FootprintClearance"
@@ -39,6 +42,9 @@ import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
 
 const SINGLE_TOKENS = new Set([
+  "version",
+  "generator",
+  "generator_version",
   "layer",
   "locked",
   "placed",
@@ -84,6 +90,9 @@ const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
 
 export interface FootprintConstructorParams {
   libraryLink?: string
+  version?: number | FootprintVersion
+  generator?: string | FootprintGenerator
+  generatorVersion?: string | FootprintGeneratorVersion
   locked?: boolean
   placed?: boolean
   layer?: Layer | string | string[]
@@ -125,6 +134,9 @@ export class Footprint extends SxClass {
   token = "footprint"
 
   private _libraryLink?: string
+  private _sxVersion?: FootprintVersion
+  private _sxGenerator?: FootprintGenerator
+  private _sxGeneratorVersion?: FootprintGeneratorVersion
   private _sxLocked?: FootprintLocked
   private _sxPlaced?: FootprintPlaced
 
@@ -167,6 +179,10 @@ export class Footprint extends SxClass {
   constructor(params: FootprintConstructorParams = {}) {
     super()
     if (params.libraryLink !== undefined) this.libraryLink = params.libraryLink
+    if (params.version !== undefined) this.version = params.version
+    if (params.generator !== undefined) this.generator = params.generator
+    if (params.generatorVersion !== undefined)
+      this.generatorVersion = params.generatorVersion
     if (params.locked !== undefined) this.locked = params.locked
     if (params.placed !== undefined) this.placed = params.placed
     if (params.layer !== undefined) this.layer = params.layer
@@ -264,6 +280,13 @@ export class Footprint extends SxClass {
       }
     }
 
+    footprint._sxVersion = propertyMap.version as FootprintVersion | undefined
+    footprint._sxGenerator = propertyMap.generator as
+      | FootprintGenerator
+      | undefined
+    footprint._sxGeneratorVersion = propertyMap.generator_version as
+      | FootprintGeneratorVersion
+      | undefined
     footprint._sxLocked = propertyMap.locked as FootprintLocked | undefined
     if (footprint._sxLocked && !footprint._sxLocked.value) {
       footprint._sxLocked = undefined
@@ -367,6 +390,47 @@ export class Footprint extends SxClass {
 
   set libraryLink(value: string | undefined) {
     this._libraryLink = value
+  }
+
+  get version(): number | undefined {
+    return this._sxVersion?.value
+  }
+
+  set version(value: number | FootprintVersion | undefined) {
+    if (value === undefined) {
+      this._sxVersion = undefined
+      return
+    }
+    this._sxVersion =
+      value instanceof FootprintVersion ? value : new FootprintVersion(value)
+  }
+
+  get generator(): string | undefined {
+    return this._sxGenerator?.value
+  }
+
+  set generator(value: string | FootprintGenerator | undefined) {
+    if (value === undefined) {
+      this._sxGenerator = undefined
+      return
+    }
+    this._sxGenerator =
+      value instanceof FootprintGenerator ? value : new FootprintGenerator(value)
+  }
+
+  get generatorVersion(): string | undefined {
+    return this._sxGeneratorVersion?.value
+  }
+
+  set generatorVersion(value: string | FootprintGeneratorVersion | undefined) {
+    if (value === undefined) {
+      this._sxGeneratorVersion = undefined
+      return
+    }
+    this._sxGeneratorVersion =
+      value instanceof FootprintGeneratorVersion
+        ? value
+        : new FootprintGeneratorVersion(value)
   }
 
   get locked(): boolean {
@@ -814,6 +878,9 @@ export class Footprint extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxVersion) children.push(this._sxVersion)
+    if (this._sxGenerator) children.push(this._sxGenerator)
+    if (this._sxGeneratorVersion) children.push(this._sxGeneratorVersion)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxPlaced) children.push(this._sxPlaced)
     if (this._sxLayer) children.push(this._sxLayer)
