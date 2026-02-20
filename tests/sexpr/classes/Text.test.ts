@@ -1,5 +1,5 @@
-import { SxClass, SchematicText, TextEffects, KicadSch } from "lib/sexpr"
 import { expect, test } from "bun:test"
+import { KicadSch, SchematicText, SxClass, type TextEffects } from "lib/sexpr"
 
 test("TextEffects", () => {
   const [parsed] = SxClass.parse(`
@@ -43,8 +43,8 @@ test("TextEffects", () => {
         (font
           (size 2.54 2.54)
           (thickness 0.508)
-          bold
-          italic
+          (bold yes)
+          (italic yes)
         )
         (justify left bottom)
       )

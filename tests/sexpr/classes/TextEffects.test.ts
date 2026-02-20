@@ -1,5 +1,5 @@
-import { SxClass, TextEffects, TextEffectsJustify } from "lib/sexpr"
 import { expect, test } from "bun:test"
+import { SxClass, TextEffects, TextEffectsJustify } from "lib/sexpr"
 
 test("TextEffects", () => {
   const [effects] = SxClass.parse(`
@@ -43,11 +43,11 @@ test("TextEffects", () => {
   expect(textEffects.getString()).toMatchInlineSnapshot(`
     "(effects
       (font
-        (face \"KiCad Font\")
+        (face "KiCad Font")
         (size 1.5 1.2)
         (thickness 0.3)
-        bold
-        italic
+        (bold yes)
+        (italic yes)
         (line_spacing 1.1)
       )
       (justify right bottom)
