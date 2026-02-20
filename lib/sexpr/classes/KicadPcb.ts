@@ -1,20 +1,21 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import { EmbeddedFonts } from "./EmbeddedFonts"
 import { Footprint } from "./Footprint"
+import { GrLine } from "./GrLine"
+import { GrPoly } from "./GrPoly"
+import { GrRect } from "./GrRect"
+import { GrText } from "./GrText"
 import { Image } from "./Image"
+import { Paper } from "./Paper"
 import { PcbGeneral } from "./PcbGeneral"
 import { PcbGenerator } from "./PcbGenerator"
 import { PcbGeneratorVersion } from "./PcbGeneratorVersion"
 import { PcbLayers } from "./PcbLayers"
 import { PcbNet } from "./PcbNet"
 import { PcbVersion } from "./PcbVersion"
-import { Paper } from "./Paper"
 import { Property } from "./Property"
 import { Segment } from "./Segment"
-import { GrLine } from "./GrLine"
-import { GrText } from "./GrText"
-import { GrPoly } from "./GrPoly"
-import { GrRect } from "./GrRect"
 import { Setup } from "./Setup/Setup"
 import { TitleBlock } from "./TitleBlock"
 import { Via } from "./Via"
@@ -40,6 +41,7 @@ export interface KicadPcbConstructorParams {
   graphicRects?: GrRect[]
   vias?: Via[]
   zones?: Zone[]
+  embeddedFonts?: EmbeddedFonts
   otherChildren?: SxClass[]
 }
 
@@ -66,6 +68,7 @@ export class KicadPcb extends SxClass {
   private _grRects: GrRect[] = []
   private _vias: Via[] = []
   private _zones: Zone[] = []
+  private _sxEmbeddedFonts?: EmbeddedFonts
   private _otherChildren: SxClass[] = []
 
   constructor(params: KicadPcbConstructorParams = {}) {
@@ -94,6 +97,8 @@ export class KicadPcb extends SxClass {
       this.graphicRects = params.graphicRects
     if (params.vias !== undefined) this.vias = params.vias
     if (params.zones !== undefined) this.zones = params.zones
+    if (params.embeddedFonts !== undefined)
+      this.embeddedFonts = params.embeddedFonts
     if (params.otherChildren !== undefined)
       this.otherChildren = params.otherChildren
   }
@@ -111,7 +116,7 @@ export class KicadPcb extends SxClass {
       }
 
       const parsed = SxClass.parsePrimitiveSexpr(primitive, {
-        parentToken: this.token,
+        parentToken: KicadPcb.token,
       })
 
       if (!(parsed instanceof SxClass)) {
@@ -201,6 +206,10 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof Zone) {
       this._zones.push(child)
+      return
+    }
+    if (child instanceof EmbeddedFonts) {
+      this._sxEmbeddedFonts = child
       return
     }
 
@@ -361,6 +370,14 @@ export class KicadPcb extends SxClass {
     this._zones = [...value]
   }
 
+  get embeddedFonts(): EmbeddedFonts | undefined {
+    return this._sxEmbeddedFonts
+  }
+
+  set embeddedFonts(value: EmbeddedFonts | undefined) {
+    this._sxEmbeddedFonts = value
+  }
+
   get otherChildren(): SxClass[] {
     return [...this._otherChildren]
   }
@@ -390,6 +407,7 @@ export class KicadPcb extends SxClass {
     children.push(...this._grRects)
     children.push(...this._vias)
     children.push(...this._zones)
+    if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     children.push(...this._otherChildren)
     return children
   }

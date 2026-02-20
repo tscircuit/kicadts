@@ -14,6 +14,7 @@ type CanonicalPrimitiveSExpr =
   | CanonicalPrimitiveSExpr[]
 
 const ORDERED_TAGS = new Set(["xy"])
+const LEGACY_BOOLEAN_CHILD_TOKENS = new Set(["bold", "italic", "hide"])
 
 const canonicalKey = (value: CanonicalPrimitiveSExpr): string =>
   JSON.stringify(value)
@@ -63,6 +64,23 @@ const canonicalizeNode = (
   const grouped = new Map<string, CanonicalPrimitiveSExpr[]>()
 
   for (const element of tail) {
+    if (
+      typeof element === "string" &&
+      LEGACY_BOOLEAN_CHILD_TOKENS.has(element)
+    ) {
+      const canonicalChild = canonicalizePrimitiveSExpr([
+        element,
+        "yes",
+      ] as CanonicalPrimitiveSExpr)
+      const bucket = grouped.get(element)
+      if (bucket) {
+        bucket.push(canonicalChild)
+      } else {
+        grouped.set(element, [canonicalChild])
+      }
+      continue
+    }
+
     if (Array.isArray(element)) {
       const tag = element[0]
       if (typeof tag === "string" && !ORDERED_TAGS.has(tag)) {

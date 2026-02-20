@@ -65,7 +65,7 @@ export class TextEffects extends SxClass {
 
     const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
       primitiveSexprs,
-      this.token,
+      TextEffects.token,
     )
 
     effects._sxFont = propertyMap.font as TextEffectsFont | undefined
@@ -213,7 +213,7 @@ export class TextEffectsFont extends SxClass {
     const font = new TextEffectsFont()
     const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
       primitiveSexprs,
-      this.token,
+      TextEffectsFont.token,
     )
 
     font._sxFace = propertyMap.face as TextEffectsFontFace
@@ -358,8 +358,7 @@ export class TextEffectsFontBold extends SxPrimitiveBoolean {
   }
 
   override getString(): string {
-    // Output legacy format without parentheses for backward compatibility
-    return this.value ? "bold" : ""
+    return `(bold ${this.value ? "yes" : "no"})`
   }
 }
 SxClass.register(TextEffectsFontBold)
@@ -374,8 +373,7 @@ export class TextEffectsFontItalic extends SxPrimitiveBoolean {
   }
 
   override getString(): string {
-    // Output legacy format without parentheses for backward compatibility
-    return this.value ? "italic" : ""
+    return `(italic ${this.value ? "yes" : "no"})`
   }
 }
 SxClass.register(TextEffectsFontItalic)
