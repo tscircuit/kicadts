@@ -20,6 +20,7 @@ import { Wire } from "./Wire"
 import { Junction } from "./Junction"
 import { NoConnect } from "./NoConnect"
 import { Polyline } from "./Polyline"
+import { SchematicTextBox } from "./SchematicTextBox"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -45,6 +46,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "no_connect",
   "sheet_instances",
   "polyline",
+  "text_box",
 ])
 
 const SUPPORTED_CHILD_TOKENS = new Set([
@@ -73,6 +75,7 @@ export interface KicadSchConstructorParams {
   junctions?: Junction[]
   noConnects?: NoConnect[]
   polylines?: Polyline[]
+  textBoxes?: SchematicTextBox[]
 }
 
 export class KicadSch extends SxClass {
@@ -99,6 +102,7 @@ export class KicadSch extends SxClass {
   private _junctions: Junction[] = []
   private _noConnects: NoConnect[] = []
   private _polylines: Polyline[] = []
+  private _textBoxes: SchematicTextBox[] = []
 
   constructor(params: KicadSchConstructorParams = {}) {
     super()
@@ -188,6 +192,10 @@ export class KicadSch extends SxClass {
     if (params.polylines !== undefined) {
       this.polylines = params.polylines
     }
+
+    if (params.textBoxes !== undefined) {
+      this.textBoxes = params.textBoxes
+    }
   }
 
   static override fromSexprPrimitives(
@@ -255,6 +263,7 @@ export class KicadSch extends SxClass {
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
       polylines: (arrayPropertyMap.polyline as Polyline[]) ?? [],
+      textBoxes: (arrayPropertyMap.text_box as SchematicTextBox[]) ?? [],
     })
   }
 
@@ -429,6 +438,14 @@ export class KicadSch extends SxClass {
     this._polylines = [...value]
   }
 
+  get textBoxes(): SchematicTextBox[] {
+    return [...this._textBoxes]
+  }
+
+  set textBoxes(value: SchematicTextBox[]) {
+    this._textBoxes = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -451,6 +468,7 @@ export class KicadSch extends SxClass {
     children.push(...this._wires)
     children.push(...this._noConnects)
     children.push(...this._polylines)
+    children.push(...this._textBoxes)
     return children
   }
 }
