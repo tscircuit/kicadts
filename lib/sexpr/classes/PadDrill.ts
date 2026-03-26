@@ -10,23 +10,27 @@ export class PadDrill extends SxClass {
   token = "drill"
 
   private _oval = false
+  private _rect = false
   private _diameter: number
   private _width?: number
   private _sxOffset?: PadDrillOffset
 
   constructor({
     oval = false,
+    rect = false,
     diameter,
     width,
     offset,
   }: {
     oval?: boolean
+    rect?: boolean
     diameter: number
     width?: number
     offset?: PadDrillOffset | { x: number; y: number }
   }) {
     super()
     this._oval = oval
+    this._rect = rect
     this._diameter = diameter
     this._width = width
     if (offset instanceof PadDrillOffset) {
@@ -41,8 +45,12 @@ export class PadDrill extends SxClass {
   ): PadDrill {
     const remaining = [...primitiveSexprs]
     let oval = false
+    let rect = false
     if (remaining[0] === "oval") {
       oval = true
+      remaining.shift()
+    } else if (remaining[0] === "rect") {
+      rect = true
       remaining.shift()
     }
 
@@ -58,7 +66,7 @@ export class PadDrill extends SxClass {
       remaining.shift()
     }
 
-    const drill = new PadDrill({ oval, diameter, width })
+    const drill = new PadDrill({ oval, rect, diameter, width })
 
     for (const primitive of remaining) {
       if (!Array.isArray(primitive)) {
@@ -89,6 +97,16 @@ export class PadDrill extends SxClass {
 
   set oval(value: boolean) {
     this._oval = value
+    if (value) this._rect = false
+  }
+
+  get rect(): boolean {
+    return this._rect
+  }
+
+  set rect(value: boolean) {
+    this._rect = value
+    if (value) this._oval = false
   }
 
   get diameter(): number {
@@ -129,6 +147,7 @@ export class PadDrill extends SxClass {
   override getString(): string {
     const tokens: string[] = []
     if (this._oval) tokens.push("oval")
+    if (this._rect) tokens.push("rect")
     tokens.push(String(this._diameter))
     if (this._width !== undefined) tokens.push(String(this._width))
 
