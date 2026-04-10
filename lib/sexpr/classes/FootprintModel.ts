@@ -57,6 +57,15 @@ export class FootprintModel extends SxClass {
         )
       }
       const [token, ...args] = primitive
+      if (token === "hide") {
+        if (args.length > 0) {
+          const val = toStringValue(args[0])
+          model._hide = val === "yes"
+        } else {
+          model._hide = true
+        }
+        continue
+      }
       if (token === "offset") {
         model._offset = parseVectorArgs(args, "offset")
         continue

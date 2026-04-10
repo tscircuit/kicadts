@@ -68,6 +68,7 @@ export class Property extends SxClass {
   private _sxEffects?: TextEffects
   private _sxUnlocked?: PropertyUnlocked
   private _sxHide?: PropertyHide
+  private _isFlag = false
 
   constructor(
     keyOrParams: string | PropertyConstructorParams = {},
@@ -119,22 +120,37 @@ export class Property extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): Property {
-    if (primitiveSexprs.length < 2) {
-      throw new Error("property requires key and value arguments")
-    }
-
     const [rawKey, rawValue, ...rest] = primitiveSexprs
 
     const key = primitiveToString(rawKey)
-    const value = primitiveToString(rawValue)
+    const value =
+      rawValue !== undefined ? primitiveToString(rawValue) : undefined
+
     if (key === undefined) {
       throw new Error("property key must be a printable value")
     }
-    if (value === undefined) {
-      throw new Error("property value must be a printable value")
+
+    let property: Property
+    let childrenToParse: PrimitiveSExpr[]
+
+    if (primitiveSexprs.length === 1) {
+      // Single argument property (flag)
+      property = new Property(key, "")
+      property._isFlag = true
+      childrenToParse = []
+    } else if (Array.isArray(rawValue)) {
+      // (property key (child ...)) -> key is key, value is empty, rawValue is first child
+      property = new Property(key, "")
+      property._isFlag = true
+      childrenToParse = [rawValue, ...rest]
+    } else {
+      // (property key value (child ...))
+      property = new Property(key, value ?? "")
+      property._isFlag = false
+      childrenToParse = rest
     }
 
-    for (const primitive of rest) {
+    for (const primitive of childrenToParse) {
       if (!Array.isArray(primitive)) {
         throw new Error(
           `property encountered unexpected primitive child: ${JSON.stringify(primitive)}`,
@@ -147,10 +163,8 @@ export class Property extends SxClass {
       }
     }
 
-    const property = new Property(key, value)
-
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+      SxClass.parsePrimitivesToClassProperties(childrenToParse, this.token)
 
     for (const token of Object.keys(propertyMap)) {
       if (!SUPPORTED_SINGLE_CHILDREN.has(token)) {
@@ -288,9 +302,11 @@ export class Property extends SxClass {
   }
 
   override getString(): string {
-    const lines = [
-      `(property ${quoteSExprString(this._key)} ${quoteSExprString(this._value)}`,
-    ]
+    const parts = [`(property ${quoteSExprString(this._key)}`]
+    if (!this._isFlag) {
+      parts.push(quoteSExprString(this._value))
+    }
+    const lines = [parts.join(" ")]
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())
     }

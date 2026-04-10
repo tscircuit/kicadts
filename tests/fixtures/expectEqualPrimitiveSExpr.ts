@@ -22,6 +22,10 @@ const canonicalKey = (value: CanonicalPrimitiveSExpr): string =>
 const canonicalizePrimitiveSExpr = (
   value: PrimitiveSExpr,
 ): CanonicalPrimitiveSExpr => {
+  if (typeof value === "number") {
+    return value === 0 ? 0 : value
+  }
+
   if (!Array.isArray(value)) {
     return value
   }

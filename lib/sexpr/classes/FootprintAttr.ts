@@ -6,6 +6,7 @@ const FLAG_TOKENS = new Set([
   "exclude_from_pos_files",
   "exclude_from_bom",
   "allow_soldermask_bridges",
+  "dnp",
 ])
 
 export class FootprintAttr extends SxClass {
@@ -18,6 +19,7 @@ export class FootprintAttr extends SxClass {
   private _excludeFromPosFiles = false
   private _excludeFromBom = false
   private _allowSoldermaskBridges = false
+  private _dnp = false
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -57,6 +59,9 @@ export class FootprintAttr extends SxClass {
         break
       case "allow_soldermask_bridges":
         this._allowSoldermaskBridges = true
+        break
+      case "dnp":
+        this._dnp = true
         break
     }
   }
@@ -101,6 +106,14 @@ export class FootprintAttr extends SxClass {
     this._allowSoldermaskBridges = value
   }
 
+  get dnp(): boolean {
+    return this._dnp
+  }
+
+  set dnp(value: boolean) {
+    this._dnp = value
+  }
+
   override getChildren(): SxClass[] {
     return []
   }
@@ -112,6 +125,7 @@ export class FootprintAttr extends SxClass {
     if (this._excludeFromPosFiles) tokens.push("exclude_from_pos_files")
     if (this._excludeFromBom) tokens.push("exclude_from_bom")
     if (this._allowSoldermaskBridges) tokens.push("allow_soldermask_bridges")
+    if (this._dnp) tokens.push("dnp")
     return `(${tokens.join(" ")})`
   }
 }

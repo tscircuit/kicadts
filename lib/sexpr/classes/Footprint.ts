@@ -37,9 +37,10 @@ import { FootprintSheetname } from "./FootprintSheetname"
 import { FootprintSheetfile } from "./FootprintSheetfile"
 import { FpLine } from "./FpLine"
 import { FootprintModel } from "./FootprintModel"
-import { EmbeddedFonts } from "./EmbeddedFonts"
 import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
+import { EmbeddedFonts } from "./EmbeddedFonts"
+import { EmbeddedFiles } from "./EmbeddedFiles"
 
 const SINGLE_TOKENS = new Set([
   "version",
@@ -71,6 +72,7 @@ const SINGLE_TOKENS = new Set([
   "sheetname",
   "sheetfile",
   "embedded_fonts",
+  "embedded_files",
 ])
 
 const MULTI_TOKENS = new Set([
@@ -117,6 +119,7 @@ export interface FootprintConstructorParams {
   sheetname?: string | FootprintSheetname
   sheetfile?: string | FootprintSheetfile
   embeddedFonts?: EmbeddedFonts
+  embeddedFiles?: EmbeddedFiles
   properties?: Property[]
   fpTexts?: FpText[]
   fpTextBoxes?: FpTextBox[]
@@ -164,6 +167,7 @@ export class Footprint extends SxClass {
   private _sxSheetname?: FootprintSheetname
   private _sxSheetfile?: FootprintSheetfile
   private _sxEmbeddedFonts?: EmbeddedFonts
+  private _sxEmbeddedFiles?: EmbeddedFiles
 
   private _properties: Property[] = []
   private _fpTexts: FpText[] = []
@@ -216,6 +220,8 @@ export class Footprint extends SxClass {
     if (params.sheetfile !== undefined) this.sheetfile = params.sheetfile
     if (params.embeddedFonts !== undefined)
       this.embeddedFonts = params.embeddedFonts
+    if (params.embeddedFiles !== undefined)
+      this.embeddedFiles = params.embeddedFiles
     if (params.properties !== undefined) this.properties = params.properties
     if (params.fpTexts !== undefined) this.fpTexts = params.fpTexts
     if (params.fpTextBoxes !== undefined) this.fpTextBoxes = params.fpTextBoxes
@@ -349,6 +355,9 @@ export class Footprint extends SxClass {
       | undefined
     footprint._sxEmbeddedFonts = propertyMap.embedded_fonts as
       | EmbeddedFonts
+      | undefined
+    footprint._sxEmbeddedFiles = propertyMap.embedded_files as
+      | EmbeddedFiles
       | undefined
 
     footprint._properties = (arrayPropertyMap.property as Property[]) ?? []
@@ -798,6 +807,14 @@ export class Footprint extends SxClass {
     this._sxEmbeddedFonts = value
   }
 
+  get embeddedFiles(): EmbeddedFiles | undefined {
+    return this._sxEmbeddedFiles
+  }
+
+  set embeddedFiles(value: EmbeddedFiles | undefined) {
+    this._sxEmbeddedFiles = value
+  }
+
   get properties(): Property[] {
     return [...this._properties]
   }
@@ -909,6 +926,7 @@ export class Footprint extends SxClass {
     if (this._sxSheetname) children.push(this._sxSheetname)
     if (this._sxSheetfile) children.push(this._sxSheetfile)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
+    if (this._sxEmbeddedFiles) children.push(this._sxEmbeddedFiles)
     children.push(...this._properties)
     children.push(...this._fpTexts)
     children.push(...this._fpTextBoxes)

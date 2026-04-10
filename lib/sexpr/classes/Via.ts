@@ -49,6 +49,10 @@ export class Via extends SxClass {
   private _sxUuid?: Uuid
   private _sxTstamp?: Tstamp
   private _sxTeardrops?: PadTeardrops
+  private _lockedIsNode = false
+  private _freeIsNode = false
+  private _removeUnusedLayersIsNode = false
+  private _keepEndLayersIsNode = false
 
   constructor(params: ViaConstructorParams = {}) {
     super()
@@ -108,9 +112,11 @@ export class Via extends SxClass {
     switch (token) {
       case "locked":
         this._locked = true
+        this._lockedIsNode = false
         break
       case "free":
         this._free = true
+        this._freeIsNode = false
         break
       case "remove_unused_layers":
         this._removeUnusedLayers = true
@@ -133,15 +139,19 @@ export class Via extends SxClass {
       }
       case "locked":
         this._locked = this.parseYesNo(args)
+        this._lockedIsNode = true
         return
       case "free":
         this._free = this.parseYesNo(args)
+        this._freeIsNode = true
         return
       case "remove_unused_layers":
         this._removeUnusedLayers = this.parseYesNo(args)
+        this._removeUnusedLayersIsNode = true
         return
       case "keep_end_layers":
         this._keepEndLayers = this.parseYesNo(args)
+        this._keepEndLayersIsNode = true
         return
       case "at": {
         const parsed = SxClass.parsePrimitiveSexpr(["at", ...args] as any, {
@@ -344,10 +354,26 @@ export class Via extends SxClass {
     if (this._type !== undefined) {
       lines.push(`  (type ${this._type})`)
     }
-    if (this._locked) lines.push("  (locked)")
-    if (this._free) lines.push("  (free)")
-    if (this._removeUnusedLayers) lines.push("  (remove_unused_layers)")
-    if (this._keepEndLayers) lines.push("  (keep_end_layers)")
+    if (this._locked) {
+      lines.push(this._lockedIsNode ? `  (locked yes)` : "  locked")
+    }
+    if (this._free) {
+      lines.push(this._freeIsNode ? `  (free yes)` : "  free")
+    }
+    if (this._removeUnusedLayers) {
+      lines.push(
+        this._removeUnusedLayersIsNode
+          ? `  (remove_unused_layers yes)`
+          : "  remove_unused_layers",
+      )
+    }
+    if (this._keepEndLayers) {
+      lines.push(
+        this._keepEndLayersIsNode
+          ? `  (keep_end_layers yes)`
+          : "  keep_end_layers",
+      )
+    }
     if (this._sxAt) lines.push(this._sxAt.getStringIndented())
     if (this._size !== undefined) lines.push(`  (size ${this._size})`)
     if (this._drill !== undefined) lines.push(`  (drill ${this._drill})`)

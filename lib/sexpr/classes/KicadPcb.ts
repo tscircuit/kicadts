@@ -1,7 +1,9 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import { Arc } from "./Arc"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { Footprint } from "./Footprint"
+import { Generated } from "./Generated"
 import { GrLine } from "./GrLine"
 import { GrPoly } from "./GrPoly"
 import { GrRect } from "./GrRect"
@@ -33,6 +35,8 @@ export interface KicadPcbConstructorParams {
   properties?: Property[]
   nets?: PcbNet[]
   footprints?: Footprint[]
+  arcs?: Arc[]
+  generated?: Generated[]
   images?: Image[]
   segments?: Segment[]
   graphicLines?: GrLine[]
@@ -60,6 +64,8 @@ export class KicadPcb extends SxClass {
   private _properties: Property[] = []
   private _nets: PcbNet[] = []
   private _footprints: Footprint[] = []
+  private _arcs: Arc[] = []
+  private _generated: Generated[] = []
   private _images: Image[] = []
   private _segments: Segment[] = []
   private _grLines: GrLine[] = []
@@ -85,6 +91,8 @@ export class KicadPcb extends SxClass {
     if (params.properties !== undefined) this.properties = params.properties
     if (params.nets !== undefined) this.nets = params.nets
     if (params.footprints !== undefined) this.footprints = params.footprints
+    if (params.arcs !== undefined) this.arcs = params.arcs
+    if (params.generated !== undefined) this.generated = params.generated
     if (params.images !== undefined) this.images = params.images
     if (params.segments !== undefined) this.segments = params.segments
     if (params.graphicLines !== undefined)
@@ -174,6 +182,14 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof Footprint) {
       this._footprints.push(child)
+      return
+    }
+    if (child instanceof Arc) {
+      this._arcs.push(child)
+      return
+    }
+    if (child instanceof Generated) {
+      this._generated.push(child)
       return
     }
     if (child instanceof Image) {
@@ -306,6 +322,22 @@ export class KicadPcb extends SxClass {
     this._footprints = [...value]
   }
 
+  get arcs(): Arc[] {
+    return [...this._arcs]
+  }
+
+  set arcs(value: Arc[]) {
+    this._arcs = [...value]
+  }
+
+  get generated(): Generated[] {
+    return [...this._generated]
+  }
+
+  set generated(value: Generated[]) {
+    this._generated = [...value]
+  }
+
   get images(): Image[] {
     return [...this._images]
   }
@@ -399,6 +431,8 @@ export class KicadPcb extends SxClass {
     children.push(...this._properties)
     children.push(...this._nets)
     children.push(...this._footprints)
+    children.push(...this._arcs)
+    children.push(...this._generated)
     children.push(...this._images)
     children.push(...this._segments)
     children.push(...this._grLines)
