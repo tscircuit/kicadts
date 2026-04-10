@@ -36,9 +36,7 @@ export class Generated extends SxClass {
     const lines = ["(generated"]
     for (const child of this._rawChildren) {
       const rendered = printSExpr(child)
-      lines.push(
-        ...rendered.split("\n").map((line) => `  ${line}`),
-      )
+      lines.push(...rendered.split("\n").map((line) => `  ${line}`))
     }
     lines.push(")")
     return lines.join("\n")

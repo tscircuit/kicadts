@@ -198,10 +198,7 @@ function parsePoint(args: PrimitiveSExpr[], label: string): PcbArcPoint {
   }
 }
 
-function parseNumber(
-  value: PrimitiveSExpr | undefined,
-  label: string,
-): number {
+function parseNumber(value: PrimitiveSExpr | undefined, label: string): number {
   const numeric = toNumberValue(value)
   if (numeric === undefined) {
     throw new Error(`arc ${label} expects a numeric value`)
@@ -209,10 +206,7 @@ function parseNumber(
   return numeric
 }
 
-function parseString(
-  value: PrimitiveSExpr | undefined,
-  label: string,
-): string {
+function parseString(value: PrimitiveSExpr | undefined, label: string): string {
   if (typeof value !== "string") {
     throw new Error(`arc ${label} expects a string value`)
   }
