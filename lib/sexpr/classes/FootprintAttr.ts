@@ -5,6 +5,7 @@ const FLAG_TOKENS = new Set([
   "board_only",
   "exclude_from_pos_files",
   "exclude_from_bom",
+  "allow_missing_courtyard",
   "allow_soldermask_bridges",
   "dnp",
 ])
@@ -18,6 +19,7 @@ export class FootprintAttr extends SxClass {
   private _boardOnly = false
   private _excludeFromPosFiles = false
   private _excludeFromBom = false
+  private _allowMissingCourtyard = false
   private _allowSoldermaskBridges = false
   private _dnp = false
 
@@ -56,6 +58,9 @@ export class FootprintAttr extends SxClass {
         break
       case "exclude_from_bom":
         this._excludeFromBom = true
+        break
+      case "allow_missing_courtyard":
+        this._allowMissingCourtyard = true
         break
       case "allow_soldermask_bridges":
         this._allowSoldermaskBridges = true
@@ -106,6 +111,14 @@ export class FootprintAttr extends SxClass {
     this._allowSoldermaskBridges = value
   }
 
+  get allowMissingCourtyard(): boolean {
+    return this._allowMissingCourtyard
+  }
+
+  set allowMissingCourtyard(value: boolean) {
+    this._allowMissingCourtyard = value
+  }
+
   get dnp(): boolean {
     return this._dnp
   }
@@ -124,6 +137,7 @@ export class FootprintAttr extends SxClass {
     if (this._boardOnly) tokens.push("board_only")
     if (this._excludeFromPosFiles) tokens.push("exclude_from_pos_files")
     if (this._excludeFromBom) tokens.push("exclude_from_bom")
+    if (this._allowMissingCourtyard) tokens.push("allow_missing_courtyard")
     if (this._allowSoldermaskBridges) tokens.push("allow_soldermask_bridges")
     if (this._dnp) tokens.push("dnp")
     return `(${tokens.join(" ")})`
