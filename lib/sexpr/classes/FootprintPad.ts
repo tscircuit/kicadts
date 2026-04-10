@@ -25,7 +25,7 @@ import { PadThermalGap } from "./PadThermalGap"
 import { PadThermalWidth } from "./PadThermalWidth"
 import { PadThermalBridgeAngle } from "./PadThermalBridgeAngle"
 import { PadZoneConnect } from "./PadZoneConnect"
-import { Property } from "./Property"
+import { PadProperty } from "./PadProperty"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 import { Tstamp } from "./Tstamp"
@@ -92,7 +92,7 @@ export interface FootprintPadConstructorParams {
   layers?: PadLayersInput
   width?: Width | number
   stroke?: Stroke
-  properties?: Property[]
+  properties?: PadProperty[]
   roundrectRatio?: number | PadRoundrectRratio
   chamferRatio?: number | PadChamferRatio
   chamfer?: PadChamfer
@@ -133,7 +133,7 @@ export class FootprintPad extends SxClass {
   private _sxLayers?: PadLayers
   private _sxWidth?: Width
   private _sxStroke?: Stroke
-  private _properties: Property[] = []
+  private _properties: PadProperty[] = []
   private _sxRoundrectRatio?: PadRoundrectRratio
   private _sxChamferRatio?: PadChamferRatio
   private _sxChamfer?: PadChamfer
@@ -320,7 +320,7 @@ export class FootprintPad extends SxClass {
     pad._sxStroke = propertyMap.stroke as Stroke | undefined
     pad._sxRectDelta = propertyMap.rect_delta as PadRectDelta | undefined
 
-    pad._properties = (arrayPropertyMap.property as Property[]) ?? []
+    pad._properties = (arrayPropertyMap.property as PadProperty[]) ?? []
 
     pad._sxRoundrectRatio = propertyMap.roundrect_rratio as
       | PadRoundrectRratio
@@ -470,11 +470,11 @@ export class FootprintPad extends SxClass {
     this._sxStroke = value
   }
 
-  get properties(): Property[] {
+  get properties(): PadProperty[] {
     return [...this._properties]
   }
 
-  set properties(value: Property[]) {
+  set properties(value: PadProperty[]) {
     this._properties = [...value]
   }
 
