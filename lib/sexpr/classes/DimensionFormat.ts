@@ -51,7 +51,9 @@ export class DimensionFormat extends SxClass {
         throw new Error(`format does not support child token "${token}"`)
       }
       if (arrayPropertyMap[token]!.length > 1) {
-        throw new Error(`format does not support repeated child token "${token}"`)
+        throw new Error(
+          `format does not support repeated child token "${token}"`,
+        )
       }
     }
 

@@ -27,7 +27,9 @@ export class Target extends SxClass {
     this._shape = shape
   }
 
-  static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Target {
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): Target {
     const [rawShape, ...rest] = primitiveSexprs
     if (typeof rawShape !== "string") {
       throw new Error("target requires a shape string as its first argument")
@@ -43,7 +45,9 @@ export class Target extends SxClass {
         throw new Error(`target does not support child token "${token}"`)
       }
       if (arrayPropertyMap[token]!.length > 1) {
-        throw new Error(`target does not support repeated child token "${token}"`)
+        throw new Error(
+          `target does not support repeated child token "${token}"`,
+        )
       }
     }
 

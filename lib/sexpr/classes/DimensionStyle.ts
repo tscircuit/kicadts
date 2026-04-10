@@ -55,7 +55,9 @@ export class DimensionStyle extends SxClass {
         throw new Error(`style does not support child token "${token}"`)
       }
       if (arrayPropertyMap[token]!.length > 1) {
-        throw new Error(`style does not support repeated child token "${token}"`)
+        throw new Error(
+          `style does not support repeated child token "${token}"`,
+        )
       }
     }
 
@@ -82,7 +84,9 @@ export class DimensionStyle extends SxClass {
     style._sxExtensionHeight = propertyMap.extension_height as
       | DimensionExtensionHeight
       | undefined
-    style._sxTextFrame = propertyMap.text_frame as DimensionTextFrame | undefined
+    style._sxTextFrame = propertyMap.text_frame as
+      | DimensionTextFrame
+      | undefined
     style._sxExtensionOffset = propertyMap.extension_offset as
       | DimensionExtensionOffset
       | undefined
