@@ -1,6 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { EmbeddedFonts } from "./EmbeddedFonts"
+import { EmbeddedFiles } from "./EmbeddedFiles"
 import { Footprint } from "./Footprint"
 import { GrLine } from "./GrLine"
 import { GrPoly } from "./GrPoly"
@@ -42,6 +43,7 @@ export interface KicadPcbConstructorParams {
   vias?: Via[]
   zones?: Zone[]
   embeddedFonts?: EmbeddedFonts
+  embeddedFiles?: EmbeddedFiles
   otherChildren?: SxClass[]
 }
 
@@ -69,6 +71,7 @@ export class KicadPcb extends SxClass {
   private _vias: Via[] = []
   private _zones: Zone[] = []
   private _sxEmbeddedFonts?: EmbeddedFonts
+  private _sxEmbeddedFiles?: EmbeddedFiles
   private _otherChildren: SxClass[] = []
 
   constructor(params: KicadPcbConstructorParams = {}) {
@@ -99,6 +102,8 @@ export class KicadPcb extends SxClass {
     if (params.zones !== undefined) this.zones = params.zones
     if (params.embeddedFonts !== undefined)
       this.embeddedFonts = params.embeddedFonts
+    if (params.embeddedFiles !== undefined)
+      this.embeddedFiles = params.embeddedFiles
     if (params.otherChildren !== undefined)
       this.otherChildren = params.otherChildren
   }
@@ -210,6 +215,10 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof EmbeddedFonts) {
       this._sxEmbeddedFonts = child
+      return
+    }
+    if (child instanceof EmbeddedFiles) {
+      this._sxEmbeddedFiles = child
       return
     }
 
@@ -378,6 +387,14 @@ export class KicadPcb extends SxClass {
     this._sxEmbeddedFonts = value
   }
 
+  get embeddedFiles(): EmbeddedFiles | undefined {
+    return this._sxEmbeddedFiles
+  }
+
+  set embeddedFiles(value: EmbeddedFiles | undefined) {
+    this._sxEmbeddedFiles = value
+  }
+
   get otherChildren(): SxClass[] {
     return [...this._otherChildren]
   }
@@ -408,6 +425,7 @@ export class KicadPcb extends SxClass {
     children.push(...this._vias)
     children.push(...this._zones)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
+    if (this._sxEmbeddedFiles) children.push(this._sxEmbeddedFiles)
     children.push(...this._otherChildren)
     return children
   }

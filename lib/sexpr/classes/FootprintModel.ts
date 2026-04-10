@@ -1,5 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import { parseYesNo } from "../utils/parseYesNo"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
@@ -69,6 +70,10 @@ export class FootprintModel extends SxClass {
         model._rotate = parseVectorArgs(args, "rotate")
         continue
       }
+      if (token === "hide") {
+        model._hide = parseHideArgs(args)
+        continue
+      }
       throw new Error(`model encountered unsupported child token "${token}"`)
     }
 
@@ -122,7 +127,7 @@ export class FootprintModel extends SxClass {
   override getString(): string {
     const lines = [`(model ${quoteSExprString(this._path)}`]
     if (this._hide) {
-      lines.push("  hide")
+      lines.push("  (hide yes)")
     }
     if (this._offset) {
       lines.push(renderVectorBlock("offset", this._offset))
@@ -158,4 +163,21 @@ function parseVectorArgs(args: PrimitiveSExpr[], token: string): ModelVector {
 
 function renderVectorBlock(label: string, vector: ModelVector): string {
   return `  (${label}\n    (xyz ${vector.x} ${vector.y} ${vector.z})\n  )`
+}
+
+function parseHideArgs(args: PrimitiveSExpr[]): boolean {
+  if (args.length === 0) {
+    return true
+  }
+  if (args.length > 1) {
+    throw new Error("model hide expects at most one value")
+  }
+
+  const parsed = parseYesNo(args[0])
+  if (parsed === undefined) {
+    throw new Error(
+      `model hide expects yes/no, received ${JSON.stringify(args[0])}`,
+    )
+  }
+  return parsed
 }

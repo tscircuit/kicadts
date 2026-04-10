@@ -1,3 +1,4 @@
+import "./registerAll"
 import { SxClass } from "./base-classes/SxClass"
 import { Footprint } from "./classes/Footprint"
 import { KicadPcb } from "./classes/KicadPcb"
