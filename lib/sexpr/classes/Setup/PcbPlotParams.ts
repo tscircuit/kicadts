@@ -18,6 +18,7 @@ import {
   PlotParamSvgPrecision,
 } from "./PcbPlotParamsNumericProperties"
 import { PlotParamProperty } from "./PcbPlotParamsBase"
+import { PlotParamPlotFpText } from "./PlotParamPlotFpText"
 import {
   PlotParamCreateGerberJobFile,
   PlotParamDisableApertMacros,
@@ -73,6 +74,7 @@ const TOKEN_TO_KEY = {
   plotframeref: "plotframeref",
   plotreference: "plotreference",
   plotvalue: "plotvalue",
+  plotfptext: "plotfptext",
   plotothertext: "plotothertext",
   plotinvisibletext: "plotinvisibletext",
   padsonsilk: "padsonsilk",
@@ -128,6 +130,7 @@ const PCB_PLOT_PARAM_CHILD_ORDER: PlotParamKey[] = [
   "plotframeref",
   "plotreference",
   "plotvalue",
+  "plotfptext",
   "plotothertext",
   "mode",
   "useauxorigin",
@@ -392,6 +395,14 @@ export class PcbPlotParams extends SxClass {
 
   set plotvalue(value: string | undefined) {
     this.setStringProperty("plotvalue", value, PlotParamPlotValue)
+  }
+
+  get plotfptext(): string | undefined {
+    return this._properties.plotfptext?.value
+  }
+
+  set plotfptext(value: string | undefined) {
+    this.setStringProperty("plotfptext", value, PlotParamPlotFpText)
   }
 
   get plotothertext(): string | undefined {

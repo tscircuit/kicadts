@@ -3,7 +3,7 @@ import { expect, test } from "bun:test"
 import { Setup, SxClass } from "lib/sexpr"
 
 test("Setup", () => {
-  const [setup] = SxClass.parse(`
+  const [parsedSetup] = SxClass.parse(`
 (setup
   (stackup
     (layer "F.SilkS"
@@ -78,6 +78,7 @@ test("Setup", () => {
     (psnegative no)
     (psa4output no)
     (plot_black_and_white yes)
+    (plotfptext yes)
     (plotinvisibletext no)
     (sketchpadsonfab no)
     (plotpadnumbers no)
@@ -94,7 +95,9 @@ test("Setup", () => {
 )
 `)
 
-  expect(setup).toBeInstanceOf(Setup)
+  expect(parsedSetup).toBeInstanceOf(Setup)
+  const setup = parsedSetup as Setup
+  expect(setup.pcbPlotParams?.plotfptext).toBe("yes")
   expect(setup!.getString()).toMatchInlineSnapshot(`
     "(setup
       (stackup
@@ -155,6 +158,7 @@ test("Setup", () => {
         (dashed_line_gap_ratio 3)
         (svgprecision 6)
         (plotframeref no)
+        (plotfptext yes)
         (mode 1)
         (useauxorigin no)
         (hpglpennumber 1)
