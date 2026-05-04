@@ -4,6 +4,7 @@ import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { FpRectNet } from "./FpRectNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
@@ -14,6 +15,7 @@ export interface FpRectConstructorParams {
   width?: number | Width
   stroke?: Stroke
   fill?: boolean | FpRectFill
+  net?: FpRectNet | number
   uuid?: string | Uuid
   locked?: boolean
 }
@@ -28,6 +30,7 @@ export class FpRect extends SxClass {
   private _sxWidth?: Width
   private _sxStroke?: Stroke
   private _sxFill?: FpRectFill
+  private _sxNet?: FpRectNet
   private _sxUuid?: Uuid
   private _locked = false
 
@@ -39,6 +42,7 @@ export class FpRect extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
+    if (params.net !== undefined) this.net = params.net
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
   }
@@ -59,6 +63,7 @@ export class FpRect extends SxClass {
     rect._sxWidth = propertyMap.width as Width | undefined
     rect._sxStroke = propertyMap.stroke as Stroke | undefined
     rect._sxFill = propertyMap.fill as FpRectFill | undefined
+    rect._sxNet = propertyMap.net as FpRectNet | undefined
     rect._sxUuid = propertyMap.uuid as Uuid | undefined
 
     for (const primitive of primitiveSexprs) {
@@ -167,6 +172,18 @@ export class FpRect extends SxClass {
     return this._sxFill
   }
 
+  get net(): FpRectNet | undefined {
+    return this._sxNet
+  }
+
+  set net(value: FpRectNet | number | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof FpRectNet ? value : new FpRectNet(value)
+  }
+
   get uuid(): string | undefined {
     return this._sxUuid?.value
   }
@@ -203,6 +220,7 @@ export class FpRect extends SxClass {
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxFill) children.push(this._sxFill)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }
@@ -220,6 +238,7 @@ export class FpRect extends SxClass {
     push(this._sxWidth)
     push(this._sxStroke)
     push(this._sxFill)
+    push(this._sxNet)
     push(this._sxUuid)
 
     if (this._locked) {
