@@ -5,6 +5,7 @@ import { Stroke } from "./Stroke"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { FpLineNet } from "./FpLineNet"
 
 const SUPPORTED_SINGLE_TOKENS = new Set([
   "start",
@@ -12,6 +13,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "layer",
   "width",
   "stroke",
+  "net",
   "tstamp",
   "uuid",
 ])
@@ -22,6 +24,7 @@ export interface FpLineConstructorParams {
   layer?: Layer | string | string[]
   width?: number
   stroke?: Stroke
+  net?: FpLineNet | number
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
@@ -37,6 +40,7 @@ export class FpLine extends SxClass {
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
+  private _sxNet?: FpLineNet
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _locked = false
@@ -48,6 +52,7 @@ export class FpLine extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.net !== undefined) this.net = params.net
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
@@ -120,6 +125,9 @@ export class FpLine extends SxClass {
     fpLine._sxStroke =
       (arrayPropertyMap.stroke?.[0] as Stroke | undefined) ??
       (propertyMap.stroke as Stroke | undefined)
+    fpLine._sxNet =
+      (arrayPropertyMap.net?.[0] as FpLineNet | undefined) ??
+      (propertyMap.net as FpLineNet | undefined)
     fpLine._sxTstamp =
       (arrayPropertyMap.tstamp?.[0] as Tstamp | undefined) ??
       (propertyMap.tstamp as Tstamp | undefined)
@@ -199,6 +207,18 @@ export class FpLine extends SxClass {
     this._sxStroke = value
   }
 
+  get net(): FpLineNet | undefined {
+    return this._sxNet
+  }
+
+  set net(value: FpLineNet | number | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof FpLineNet ? value : new FpLineNet(value)
+  }
+
   get tstamp(): Tstamp | undefined {
     return this._sxTstamp
   }
@@ -241,6 +261,7 @@ export class FpLine extends SxClass {
       children.push(this._sxWidth)
     }
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._locked) children.push(new FpLineLocked())

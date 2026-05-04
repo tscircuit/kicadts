@@ -25,6 +25,7 @@ import { PadThermalGap } from "./PadThermalGap"
 import { PadThermalWidth } from "./PadThermalWidth"
 import { PadThermalBridgeAngle } from "./PadThermalBridgeAngle"
 import { PadZoneConnect } from "./PadZoneConnect"
+import { PadZoneLayerConnections } from "./PadZoneLayerConnections"
 import { PadProperty } from "./PadProperty"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
@@ -55,6 +56,7 @@ const SINGLE_TOKENS = new Set([
   "solder_paste_margin_ratio",
   "clearance",
   "zone_connect",
+  "zone_layer_connections",
   "thermal_width",
   "thermal_gap",
   "thermal_bridge_angle",
@@ -108,6 +110,7 @@ export interface FootprintPadConstructorParams {
   solderPasteMarginRatio?: number | PadSolderPasteMarginRatio
   clearance?: number | PadClearance
   zoneConnect?: number | PadZoneConnect
+  zoneLayerConnections?: PadZoneLayerConnections
   thermalWidth?: number | PadThermalWidth
   thermalGap?: number | PadThermalGap
   thermalBridgeAngle?: number | PadThermalBridgeAngle
@@ -149,6 +152,7 @@ export class FootprintPad extends SxClass {
   private _sxSolderPasteMarginRatio?: PadSolderPasteMarginRatio
   private _sxClearance?: PadClearance
   private _sxZoneConnect?: PadZoneConnect
+  private _sxZoneLayerConnections?: PadZoneLayerConnections
   private _sxThermalWidth?: PadThermalWidth
   private _sxThermalGap?: PadThermalGap
   private _sxThermalBridgeAngle?: PadThermalBridgeAngle
@@ -205,6 +209,8 @@ export class FootprintPad extends SxClass {
       this.solderPasteMarginRatio = p.solderPasteMarginRatio
     if (p.clearance !== undefined) this.clearance = p.clearance
     if (p.zoneConnect !== undefined) this.zoneConnect = p.zoneConnect
+    if (p.zoneLayerConnections !== undefined)
+      this.zoneLayerConnections = p.zoneLayerConnections
     if (p.thermalWidth !== undefined) this.thermalWidth = p.thermalWidth
     if (p.thermalGap !== undefined) this.thermalGap = p.thermalGap
     if (p.thermalBridgeAngle !== undefined)
@@ -306,6 +312,7 @@ export class FootprintPad extends SxClass {
     ensureSingle(arrayPropertyMap, "solder_paste_margin_ratio")
     ensureSingle(arrayPropertyMap, "clearance")
     ensureSingle(arrayPropertyMap, "zone_connect")
+    ensureSingle(arrayPropertyMap, "zone_layer_connections")
     ensureSingle(arrayPropertyMap, "thermal_width")
     ensureSingle(arrayPropertyMap, "thermal_gap")
     ensureSingle(arrayPropertyMap, "thermal_bridge_angle")
@@ -346,6 +353,9 @@ export class FootprintPad extends SxClass {
       | undefined
     pad._sxClearance = propertyMap.clearance as PadClearance | undefined
     pad._sxZoneConnect = propertyMap.zone_connect as PadZoneConnect | undefined
+    pad._sxZoneLayerConnections = propertyMap.zone_layer_connections as
+      | PadZoneLayerConnections
+      | undefined
     pad._sxThermalWidth = propertyMap.thermal_width as
       | PadThermalWidth
       | undefined
@@ -733,6 +743,14 @@ export class FootprintPad extends SxClass {
     this._sxTeardrops = value
   }
 
+  get zoneLayerConnections(): PadZoneLayerConnections | undefined {
+    return this._sxZoneLayerConnections
+  }
+
+  set zoneLayerConnections(value: PadZoneLayerConnections | undefined) {
+    this._sxZoneLayerConnections = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -756,6 +774,8 @@ export class FootprintPad extends SxClass {
       children.push(this._sxSolderPasteMarginRatio)
     if (this._sxClearance) children.push(this._sxClearance)
     if (this._sxZoneConnect) children.push(this._sxZoneConnect)
+    if (this._sxZoneLayerConnections)
+      children.push(this._sxZoneLayerConnections)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
     if (this._sxThermalBridgeAngle) children.push(this._sxThermalBridgeAngle)
