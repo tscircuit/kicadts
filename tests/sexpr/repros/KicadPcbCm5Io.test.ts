@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { KicadPcb, SxClass } from "lib/sexpr"
+import { KicadPcb, PcbArc, SxClass } from "lib/sexpr"
 import type { PrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 
@@ -33,6 +33,10 @@ test("kicad_pcb: CM5IO parses dimensions and target markers", async () => {
 
   expect(classes).toHaveLength(1)
   expect(classes[0]).toBeInstanceOf(KicadPcb)
+  const pcb = classes[0] as KicadPcb
+
+  expect(pcb.arcs.length).toBeGreaterThan(0)
+  expect(pcb.arcs[0]).toBeInstanceOf(PcbArc)
 
   const roundTrip = classes.map((instance) => instance.getString()).join("\n")
 
