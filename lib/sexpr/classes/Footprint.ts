@@ -92,6 +92,7 @@ const MULTI_TOKENS = new Set([
   "pad",
   "model",
   "point",
+  "group",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -137,6 +138,7 @@ export interface FootprintConstructorParams {
   pads?: FootprintPad[]
   models?: FootprintModel[]
   fpPoints?: FpPoint[]
+  groups?: Group[]
   units?: FootprintUnits
   duplicatePadNumbersAreJumpers?: DuplicatePadNumbersAreJumpers
 }
@@ -191,6 +193,7 @@ export class Footprint extends SxClass {
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
   private _fpPoints: FpPoint[] = []
+  private _groups: Group[] = []
 
   constructor(params: FootprintConstructorParams = {}) {
     super()
@@ -245,6 +248,7 @@ export class Footprint extends SxClass {
     if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
     if (params.fpPoints !== undefined) this.fpPoints = params.fpPoints
+    if (params.groups !== undefined) this.groups = params.groups
     if (params.units !== undefined) this.units = params.units
     if (params.duplicatePadNumbersAreJumpers !== undefined)
       this.duplicatePadNumbersAreJumpers = params.duplicatePadNumbersAreJumpers
@@ -393,6 +397,7 @@ export class Footprint extends SxClass {
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
     footprint._fpPoints = (arrayPropertyMap.point as FpPoint[]) ?? []
+    footprint._groups = (arrayPropertyMap.group as Group[]) ?? []
 
     for (const flag of pendingFlags) {
       if (flag === "locked") {
@@ -951,6 +956,14 @@ export class Footprint extends SxClass {
     this._fpPoints = [...value]
   }
 
+  get groups(): Group[] {
+    return [...this._groups]
+  }
+
+  set groups(value: Group[]) {
+    this._groups = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -997,6 +1010,7 @@ export class Footprint extends SxClass {
     children.push(...this._fpPads)
     children.push(...this._models)
     children.push(...this._fpPoints)
+    children.push(...this._groups)
     return children
   }
 
