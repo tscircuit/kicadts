@@ -3,6 +3,9 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { EmbeddedFiles } from "./EmbeddedFiles"
 import { Footprint } from "./Footprint"
+import { GrArc } from "./GrArc"
+import { GrCircle } from "./GrCircle"
+import { GrCurve } from "./GrCurve"
 import { GrLine } from "./GrLine"
 import { GrPoly } from "./GrPoly"
 import { GrRect } from "./GrRect"
@@ -14,6 +17,7 @@ import { PcbGenerator } from "./PcbGenerator"
 import { PcbGeneratorVersion } from "./PcbGeneratorVersion"
 import { PcbLayers } from "./PcbLayers"
 import { PcbNet } from "./PcbNet"
+import { PcbArc } from "./PcbArc"
 import { PcbVersion } from "./PcbVersion"
 import { Property } from "./Property"
 import { Segment } from "./Segment"
@@ -36,6 +40,10 @@ export interface KicadPcbConstructorParams {
   footprints?: Footprint[]
   images?: Image[]
   segments?: Segment[]
+  arcs?: PcbArc[]
+  graphicArcs?: GrArc[]
+  graphicCircles?: GrCircle[]
+  graphicCurves?: GrCurve[]
   graphicLines?: GrLine[]
   graphicTexts?: GrText[]
   graphicPolys?: GrPoly[]
@@ -64,6 +72,10 @@ export class KicadPcb extends SxClass {
   private _footprints: Footprint[] = []
   private _images: Image[] = []
   private _segments: Segment[] = []
+  private _arcs: PcbArc[] = []
+  private _grArcs: GrArc[] = []
+  private _grCircles: GrCircle[] = []
+  private _grCurves: GrCurve[] = []
   private _grLines: GrLine[] = []
   private _grTexts: GrText[] = []
   private _grPolys: GrPoly[] = []
@@ -90,6 +102,12 @@ export class KicadPcb extends SxClass {
     if (params.footprints !== undefined) this.footprints = params.footprints
     if (params.images !== undefined) this.images = params.images
     if (params.segments !== undefined) this.segments = params.segments
+    if (params.arcs !== undefined) this.arcs = params.arcs
+    if (params.graphicArcs !== undefined) this.graphicArcs = params.graphicArcs
+    if (params.graphicCircles !== undefined)
+      this.graphicCircles = params.graphicCircles
+    if (params.graphicCurves !== undefined)
+      this.graphicCurves = params.graphicCurves
     if (params.graphicLines !== undefined)
       this.graphicLines = params.graphicLines
     if (params.graphicTexts !== undefined)
@@ -187,6 +205,22 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof Segment) {
       this._segments.push(child)
+      return
+    }
+    if (child instanceof PcbArc) {
+      this._arcs.push(child)
+      return
+    }
+    if (child instanceof GrArc) {
+      this._grArcs.push(child)
+      return
+    }
+    if (child instanceof GrCircle) {
+      this._grCircles.push(child)
+      return
+    }
+    if (child instanceof GrCurve) {
+      this._grCurves.push(child)
       return
     }
     if (child instanceof GrLine) {
@@ -331,6 +365,38 @@ export class KicadPcb extends SxClass {
     this._segments = [...value]
   }
 
+  get arcs(): PcbArc[] {
+    return [...this._arcs]
+  }
+
+  set arcs(value: PcbArc[]) {
+    this._arcs = [...value]
+  }
+
+  get graphicArcs(): GrArc[] {
+    return [...this._grArcs]
+  }
+
+  set graphicArcs(value: GrArc[]) {
+    this._grArcs = [...value]
+  }
+
+  get graphicCircles(): GrCircle[] {
+    return [...this._grCircles]
+  }
+
+  set graphicCircles(value: GrCircle[]) {
+    this._grCircles = [...value]
+  }
+
+  get graphicCurves(): GrCurve[] {
+    return [...this._grCurves]
+  }
+
+  set graphicCurves(value: GrCurve[]) {
+    this._grCurves = [...value]
+  }
+
   get graphicLines(): GrLine[] {
     return [...this._grLines]
   }
@@ -418,6 +484,10 @@ export class KicadPcb extends SxClass {
     children.push(...this._footprints)
     children.push(...this._images)
     children.push(...this._segments)
+    children.push(...this._arcs)
+    children.push(...this._grArcs)
+    children.push(...this._grCircles)
+    children.push(...this._grCurves)
     children.push(...this._grLines)
     children.push(...this._grTexts)
     children.push(...this._grPolys)

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { KicadPcb, SxClass } from "lib/sexpr"
+import { GrArc, GrCircle, GrCurve, GrLine, KicadPcb, SxClass } from "lib/sexpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 import type { PrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 
@@ -29,6 +29,19 @@ test("kicad_pcb: Corne keyboard", async () => {
 
     expect(classes).toHaveLength(1)
     expect(classes[0]).toBeInstanceOf(KicadPcb)
+    const pcb = classes[0] as KicadPcb
+
+    expect(pcb.graphicArcs.length).toBeGreaterThan(0)
+    expect(pcb.graphicArcs[0]).toBeInstanceOf(GrArc)
+
+    expect(pcb.graphicCircles.length).toBeGreaterThan(0)
+    expect(pcb.graphicCircles[0]).toBeInstanceOf(GrCircle)
+
+    expect(pcb.graphicCurves.length).toBeGreaterThan(0)
+    expect(pcb.graphicCurves[0]).toBeInstanceOf(GrCurve)
+
+    expect(pcb.graphicLines.length).toBeGreaterThan(0)
+    expect(pcb.graphicLines[0]).toBeInstanceOf(GrLine)
 
     const roundTrip = classes.map((instance) => instance.getString()).join("\n")
 
