@@ -44,6 +44,7 @@ import { FootprintPlaced } from "./FootprintPlaced"
 import { FootprintUnits } from "./FootprintUnits"
 import { DuplicatePadNumbersAreJumpers } from "./DuplicatePadNumbersAreJumpers"
 import { FpPoint } from "./FpPoint"
+import { Group } from "./Group"
 
 const SINGLE_TOKENS = new Set([
   "version",
