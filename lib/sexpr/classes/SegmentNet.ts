@@ -9,10 +9,10 @@ export class SegmentNet extends SxClass {
   static override parentToken = "segment"
   override token = "net"
 
-  private _id: number
-  private _name?: string
+  private _id?: number
+  private _name: string
 
-  constructor(id: number, name?: string) {
+  constructor(name: string, id?: number) {
     super()
     this._id = id
     this._name = name
@@ -21,35 +21,40 @@ export class SegmentNet extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SegmentNet {
-    const [rawId, rawName] = primitiveSexprs
-    const id = toNumberValue(rawId)
-    if (id === undefined) {
-      throw new Error("net expects a numeric identifier")
+    const first = primitiveSexprs[0]
+    const second = primitiveSexprs[1]
+
+    if (typeof first === "number") {
+      return new SegmentNet(toStringValue(second) ?? "", first)
     }
-    const name = rawName === undefined ? undefined : toStringValue(rawName)
-    return new SegmentNet(id, name ?? undefined)
+
+    const name = toStringValue(first)
+    if (name === undefined) {
+      throw new Error(
+        `segment net requires a name, got: ${JSON.stringify(first)}`,
+      )
+    }
+    return new SegmentNet(name)
   }
 
-  get id(): number {
+  get id(): number | undefined {
     return this._id
   }
 
-  set id(value: number) {
+  set id(value: number | undefined) {
     this._id = value
   }
 
-  get name(): string | undefined {
+  get name(): string {
     return this._name
   }
 
-  set name(value: string | undefined) {
-    this._name = value === "" ? undefined : value
+  set name(value: string) {
+    this._name = value
   }
 
-  toObject(): { id: number; name?: string } {
-    return this._name === undefined
-      ? { id: this._id }
-      : { id: this._id, name: this._name }
+  toObject(): { id?: number; name: string } {
+    return { id: this._id, name: this._name }
   }
 
   override getChildren(): SxClass[] {
@@ -57,8 +62,10 @@ export class SegmentNet extends SxClass {
   }
 
   override getString(): string {
-    const namePart = this._name ? ` ${quoteSExprString(this._name)}` : ""
-    return `(net ${this._id}${namePart})`
+    if (this._id !== undefined) {
+      return `(net ${this._id} ${quoteSExprString(this._name)})`
+    }
+    return `(net ${quoteSExprString(this._name)})`
   }
 }
 SxClass.register(SegmentNet)

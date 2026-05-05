@@ -25,8 +25,33 @@ const demoPcbPaths = [
   "kicad-demos/demos/custom_pads_test/custom_pads_test.kicad_pcb",
 ]
 
+const demoPcbPaths2 = [
+  "kicad-demos/demos/pic_programmer/pic_programmer.kicad_pcb",
+]
 test("kicad_pcb round-trips selected KiCad demo boards", async () => {
   for (const path of demoPcbPaths) {
+    const original = await Bun.file(path).text()
+    const classes = SxClass.parse(original)
+
+    expect(classes).toHaveLength(1)
+    expect(classes[0]).toBeInstanceOf(KicadPcb)
+
+    const roundTrip = classes.map((instance) => instance.getString()).join("\n")
+
+    const originalPrimitive = parseToPrimitiveSExpr(original).map((form) =>
+      normalizePrimitive(form),
+    )
+
+    const roundTripPrimitive = parseToPrimitiveSExpr(roundTrip).map((form) =>
+      normalizePrimitive(form),
+    )
+
+    expectEqualPrimitiveSExpr(roundTripPrimitive, originalPrimitive, { path })
+  }
+})
+
+test("pic_programmer test", async () => {
+  for (const path of demoPcbPaths2) {
     const original = await Bun.file(path).text()
     const classes = SxClass.parse(original)
 

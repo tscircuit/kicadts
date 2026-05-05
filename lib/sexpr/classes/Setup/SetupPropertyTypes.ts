@@ -1,6 +1,9 @@
 import { PcbPlotParams } from "./PcbPlotParams"
 import { Stackup } from "./Stackup"
 import { Covering } from "../Covering"
+import { Plugging } from "../Plugging"
+import { Capping } from "../Capping"
+import { Filling } from "../Filling"
 import {
   SetupAuxAxisOrigin,
   SetupGridOrigin,
@@ -80,6 +83,9 @@ export interface SetupPropertyValues {
   padToPasteClearanceValues?: SetupPadToPasteClearanceValues
   traceWidth?: SetupTraceWidth
   covering?: Covering
+  plugging?: Plugging
+  capping?: Capping
+  filling?: Filling
 }
 
 export type SetupProperty =
@@ -120,3 +126,6 @@ export type SetupProperty =
   | SetupPadToPasteClearanceValues
   | SetupTraceWidth
   | Covering
+  | Plugging
+  | Capping
+  | Filling

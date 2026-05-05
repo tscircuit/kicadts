@@ -147,18 +147,27 @@ export abstract class SxClass {
   ): {
     propertyMap: Record<string, SxClass>
     arrayPropertyMap: Record<string, SxClass[]>
+    remaining: PrimitiveSExpr[]
   } {
     const propertyMap = {} as Record<string, SxClass>
     const arrayPropertyMap = {} as Record<string, SxClass[]>
+    const remaining = [] as PrimitiveSExpr[]
     for (const primitiveSexpr of primitiveSexprs) {
-      const sxClass = SxClass.parsePrimitiveSexpr(primitiveSexpr, {
-        parentToken,
-      }) as SxClass
-      if (!sxClass.isSxClass) continue
-      propertyMap[sxClass.token] = sxClass
-      arrayPropertyMap[sxClass.token] ??= []
-      arrayPropertyMap[sxClass.token]!.push(sxClass)
+      try {
+        const sxClass = SxClass.parsePrimitiveSexpr(primitiveSexpr, {
+          parentToken,
+        })
+        if (sxClass instanceof SxClass) {
+          propertyMap[sxClass.token] = sxClass
+          arrayPropertyMap[sxClass.token] ??= []
+          arrayPropertyMap[sxClass.token]!.push(sxClass)
+        } else {
+          remaining.push(primitiveSexpr)
+        }
+      } catch (e) {
+        remaining.push(primitiveSexpr)
+      }
     }
-    return { propertyMap, arrayPropertyMap }
+    return { propertyMap, arrayPropertyMap, remaining }
   }
 }

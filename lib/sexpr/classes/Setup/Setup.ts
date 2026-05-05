@@ -10,6 +10,9 @@ import {
   SetupZone45Only,
 } from "./setupStringProperties"
 import { Covering } from "../Covering"
+import { Plugging } from "../Plugging"
+import { Capping } from "../Capping"
+import { Filling } from "../Filling"
 import {
   SetupAuxAxisOrigin,
   SetupGridOrigin,
@@ -84,6 +87,9 @@ const TOKEN_TO_KEY: Record<string, SetupPropertyKey> = {
   pad_to_paste_clearance_values: "padToPasteClearanceValues",
   trace_width: "traceWidth",
   covering: "covering",
+  plugging: "plugging",
+  capping: "capping",
+  filling: "filling",
 }
 
 type SetupPropertyKey = keyof SetupPropertyValues
@@ -125,6 +131,9 @@ const SETUP_CHILD_ORDER: SetupPropertyKey[] = [
   "padToPasteClearanceValues",
   "traceWidth",
   "covering",
+  "plugging",
+  "capping",
+  "filling",
   "pcbPlotParams",
 ]
 
@@ -498,7 +507,7 @@ export class Setup extends SxClass {
       delete this._properties.tenting
       return
     }
-    this.setProperty("tenting", new SetupTenting(sides))
+    this.setProperty("tenting", new SetupTenting({ sides }))
   }
 
   get auxAxisOrigin(): Coordinate | undefined {
@@ -583,6 +592,39 @@ export class Setup extends SxClass {
       throw new Error("covering must be a Covering instance")
     }
     this.setProperty("covering", value)
+  }
+
+  get plugging(): Plugging | undefined {
+    return this.getPropertyInstance("plugging", Plugging)
+  }
+
+  set plugging(value: Plugging | undefined) {
+    if (value !== undefined && !(value instanceof Plugging)) {
+      throw new Error("plugging must be a Plugging instance")
+    }
+    this.setProperty("plugging", value)
+  }
+
+  get capping(): Capping | undefined {
+    return this.getPropertyInstance("capping", Capping)
+  }
+
+  set capping(value: Capping | undefined) {
+    if (value !== undefined && !(value instanceof Capping)) {
+      throw new Error("capping must be a Capping instance")
+    }
+    this.setProperty("capping", value)
+  }
+
+  get filling(): Filling | undefined {
+    return this.getPropertyInstance("filling", Filling)
+  }
+
+  set filling(value: Filling | undefined) {
+    if (value !== undefined && !(value instanceof Filling)) {
+      throw new Error("filling must be a Filling instance")
+    }
+    this.setProperty("filling", value)
   }
 }
 SxClass.register(Setup)

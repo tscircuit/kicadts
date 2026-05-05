@@ -9,10 +9,10 @@ export class PadNet extends SxClass {
   static override parentToken = "pad"
   token = "net"
 
-  private _id: number
+  private _id?: number
   private _name: string
 
-  constructor(id: number, name: string) {
+  constructor(name: string, id?: number) {
     super()
     this._id = id
     this._name = name
@@ -21,19 +21,25 @@ export class PadNet extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): PadNet {
-    const id = toNumberValue(primitiveSexprs[0])
-    const name = toStringValue(primitiveSexprs[1])
-    if (id === undefined || name === undefined) {
-      throw new Error("pad net requires numeric id and string name")
+    const first = primitiveSexprs[0]
+    const second = primitiveSexprs[1]
+
+    if (typeof first === "number" && typeof second === "string") {
+      return new PadNet(second, first)
     }
-    return new PadNet(id, name)
+
+    const name = toStringValue(first)
+    if (name === undefined) {
+      throw new Error(`pad net requires a name, got: ${JSON.stringify(first)}`)
+    }
+    return new PadNet(name)
   }
 
-  get id(): number {
+  get id(): number | undefined {
     return this._id
   }
 
-  set id(value: number) {
+  set id(value: number | undefined) {
     this._id = value
   }
 
@@ -50,7 +56,10 @@ export class PadNet extends SxClass {
   }
 
   override getString(): string {
-    return `(net ${this._id} ${quoteSExprString(this._name)})`
+    if (this._id !== undefined) {
+      return `(net ${this._id} ${quoteSExprString(this._name)})`
+    }
+    return `(net ${quoteSExprString(this._name)})`
   }
 }
 SxClass.register(PadNet)

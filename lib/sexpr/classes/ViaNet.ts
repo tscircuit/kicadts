@@ -9,10 +9,10 @@ export class ViaNet extends SxClass {
   static override parentToken = "via"
   token = "net"
 
-  private _id: number
-  private _name?: string
+  private _id?: number
+  private _name: string
 
-  constructor(id: number, name?: string) {
+  constructor(name: string, id?: number) {
     super()
     this._id = id
     this._name = name
@@ -21,28 +21,33 @@ export class ViaNet extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): ViaNet {
-    const id = toNumberValue(primitiveSexprs[0])
-    if (id === undefined) {
-      throw new Error("via net requires a numeric id")
+    const first = primitiveSexprs[0]
+    const second = primitiveSexprs[1]
+
+    if (typeof first === "number") {
+      return new ViaNet(toStringValue(second) ?? "", first)
     }
-    const name =
-      primitiveSexprs.length > 1 ? toStringValue(primitiveSexprs[1]) : undefined
-    return new ViaNet(id, name)
+
+    const name = toStringValue(first)
+    if (name === undefined) {
+      throw new Error(`via net requires a name, got: ${JSON.stringify(first)}`)
+    }
+    return new ViaNet(name)
   }
 
-  get id(): number {
+  get id(): number | undefined {
     return this._id
   }
 
-  set id(value: number) {
+  set id(value: number | undefined) {
     this._id = value
   }
 
-  get name(): string | undefined {
+  get name(): string {
     return this._name
   }
 
-  set name(value: string | undefined) {
+  set name(value: string) {
     this._name = value
   }
 
@@ -51,10 +56,10 @@ export class ViaNet extends SxClass {
   }
 
   override getString(): string {
-    if (this._name !== undefined) {
+    if (this._id !== undefined) {
       return `(net ${this._id} ${quoteSExprString(this._name)})`
     }
-    return `(net ${this._id})`
+    return `(net ${quoteSExprString(this._name)})`
   }
 }
 SxClass.register(ViaNet)

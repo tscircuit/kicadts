@@ -41,6 +41,9 @@ import { EmbeddedFiles } from "./EmbeddedFiles"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
+import { FootprintUnits } from "./FootprintUnits"
+import { DuplicatePadNumbersAreJumpers } from "./DuplicatePadNumbersAreJumpers"
+import { FpPoint } from "./FpPoint"
 
 const SINGLE_TOKENS = new Set([
   "version",
@@ -73,6 +76,8 @@ const SINGLE_TOKENS = new Set([
   "sheetfile",
   "embedded_fonts",
   "embedded_files",
+  "units",
+  "duplicate_pad_numbers_are_jumpers",
 ])
 
 const MULTI_TOKENS = new Set([
@@ -86,6 +91,7 @@ const MULTI_TOKENS = new Set([
   "fp_poly",
   "pad",
   "model",
+  "point",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -130,6 +136,9 @@ export interface FootprintConstructorParams {
   fpPolys?: FpPoly[]
   pads?: FootprintPad[]
   models?: FootprintModel[]
+  fpPoints?: FpPoint[]
+  units?: FootprintUnits
+  duplicatePadNumbersAreJumpers?: DuplicatePadNumbersAreJumpers
 }
 
 export class Footprint extends SxClass {
@@ -168,6 +177,8 @@ export class Footprint extends SxClass {
   private _sxSheetfile?: FootprintSheetfile
   private _sxEmbeddedFonts?: EmbeddedFonts
   private _sxEmbeddedFiles?: EmbeddedFiles
+  private _sxUnits?: FootprintUnits
+  private _sxDuplicatePadNumbersAreJumpers?: DuplicatePadNumbersAreJumpers
 
   private _properties: Property[] = []
   private _fpTexts: FpText[] = []
@@ -179,6 +190,7 @@ export class Footprint extends SxClass {
   private _fpPolys: FpPoly[] = []
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
+  private _fpPoints: FpPoint[] = []
 
   constructor(params: FootprintConstructorParams = {}) {
     super()
@@ -232,6 +244,10 @@ export class Footprint extends SxClass {
     if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
     if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
+    if (params.fpPoints !== undefined) this.fpPoints = params.fpPoints
+    if (params.units !== undefined) this.units = params.units
+    if (params.duplicatePadNumbersAreJumpers !== undefined)
+      this.duplicatePadNumbersAreJumpers = params.duplicatePadNumbersAreJumpers
   }
 
   static override fromSexprPrimitives(
@@ -359,6 +375,11 @@ export class Footprint extends SxClass {
     footprint._sxEmbeddedFiles = propertyMap.embedded_files as
       | EmbeddedFiles
       | undefined
+    footprint._sxUnits = propertyMap.units as FootprintUnits | undefined
+    footprint._sxDuplicatePadNumbersAreJumpers =
+      propertyMap.duplicate_pad_numbers_are_jumpers as
+        | DuplicatePadNumbersAreJumpers
+        | undefined
 
     footprint._properties = (arrayPropertyMap.property as Property[]) ?? []
     footprint._fpTexts = (arrayPropertyMap["fp_text"] as FpText[]) ?? []
@@ -371,6 +392,7 @@ export class Footprint extends SxClass {
     footprint._fpPolys = (arrayPropertyMap["fp_poly"] as FpPoly[]) ?? []
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
+    footprint._fpPoints = (arrayPropertyMap.point as FpPoint[]) ?? []
 
     for (const flag of pendingFlags) {
       if (flag === "locked") {
@@ -799,6 +821,32 @@ export class Footprint extends SxClass {
         : new FootprintSheetfile(value)
   }
 
+  get units(): FootprintUnits | undefined {
+    return this._sxUnits
+  }
+
+  set units(value: FootprintUnits | undefined) {
+    this._sxUnits = value
+  }
+
+  get duplicatePadNumbersAreJumpers(): boolean | undefined {
+    return this._sxDuplicatePadNumbersAreJumpers?.value
+  }
+
+  set duplicatePadNumbersAreJumpers(value:
+    | boolean
+    | DuplicatePadNumbersAreJumpers
+    | undefined,) {
+    if (value === undefined) {
+      this._sxDuplicatePadNumbersAreJumpers = undefined
+      return
+    }
+    this._sxDuplicatePadNumbersAreJumpers =
+      value instanceof DuplicatePadNumbersAreJumpers
+        ? value
+        : new DuplicatePadNumbersAreJumpers(value)
+  }
+
   get embeddedFonts(): EmbeddedFonts | undefined {
     return this._sxEmbeddedFonts
   }
@@ -895,6 +943,14 @@ export class Footprint extends SxClass {
     this._models = [...value]
   }
 
+  get fpPoints(): FpPoint[] {
+    return [...this._fpPoints]
+  }
+
+  set fpPoints(value: FpPoint[]) {
+    this._fpPoints = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -927,6 +983,9 @@ export class Footprint extends SxClass {
     if (this._sxSheetfile) children.push(this._sxSheetfile)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     if (this._sxEmbeddedFiles) children.push(this._sxEmbeddedFiles)
+    if (this._sxUnits) children.push(this._sxUnits)
+    if (this._sxDuplicatePadNumbersAreJumpers)
+      children.push(this._sxDuplicatePadNumbersAreJumpers)
     children.push(...this._properties)
     children.push(...this._fpTexts)
     children.push(...this._fpTextBoxes)
@@ -937,6 +996,7 @@ export class Footprint extends SxClass {
     children.push(...this._fpPolys)
     children.push(...this._fpPads)
     children.push(...this._models)
+    children.push(...this._fpPoints)
     return children
   }
 

@@ -9,6 +9,9 @@ import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import { PadTeardrops } from "./PadTeardrops"
 import { Covering } from "./Covering"
+import { Plugging } from "./Plugging"
+import { Capping } from "./Capping"
+import { Filling } from "./Filling"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -32,6 +35,9 @@ export interface ViaConstructorParams {
   tstamp?: Tstamp | string
   teardrops?: PadTeardrops
   covering?: Covering
+  plugging?: Plugging
+  capping?: Capping
+  filling?: Filling
 }
 
 export class Via extends SxClass {
@@ -52,6 +58,9 @@ export class Via extends SxClass {
   private _sxTstamp?: Tstamp
   private _sxTeardrops?: PadTeardrops
   private _sxCovering?: Covering
+  private _sxPlugging?: Plugging
+  private _sxCapping?: Capping
+  private _sxFilling?: Filling
 
   constructor(params: ViaConstructorParams = {}) {
     super()
@@ -71,6 +80,9 @@ export class Via extends SxClass {
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.teardrops !== undefined) this.teardrops = params.teardrops
     if (params.covering !== undefined) this.covering = params.covering
+    if (params.plugging !== undefined) this.plugging = params.plugging
+    if (params.capping !== undefined) this.capping = params.capping
+    if (params.filling !== undefined) this.filling = params.filling
   }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
@@ -187,6 +199,18 @@ export class Via extends SxClass {
       }
       case "covering": {
         this._sxCovering = Covering.fromSexprPrimitives(args)
+        return
+      }
+      case "plugging": {
+        this._sxPlugging = Plugging.fromSexprPrimitives(args)
+        return
+      }
+      case "capping": {
+        this._sxCapping = Capping.fromSexprPrimitives(args)
+        return
+      }
+      case "filling": {
+        this._sxFilling = Filling.fromSexprPrimitives(args)
         return
       }
       case "uuid": {
@@ -343,6 +367,30 @@ export class Via extends SxClass {
     this._sxCovering = value
   }
 
+  get plugging(): Plugging | undefined {
+    return this._sxPlugging
+  }
+
+  set plugging(value: Plugging | undefined) {
+    this._sxPlugging = value
+  }
+
+  get capping(): Capping | undefined {
+    return this._sxCapping
+  }
+
+  set capping(value: Capping | undefined) {
+    this._sxCapping = value
+  }
+
+  get filling(): Filling | undefined {
+    return this._sxFilling
+  }
+
+  set filling(value: Filling | undefined) {
+    this._sxFilling = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -352,6 +400,9 @@ export class Via extends SxClass {
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxTeardrops) children.push(this._sxTeardrops)
     if (this._sxCovering) children.push(this._sxCovering)
+    if (this._sxPlugging) children.push(this._sxPlugging)
+    if (this._sxCapping) children.push(this._sxCapping)
+    if (this._sxFilling) children.push(this._sxFilling)
     return children
   }
 
@@ -377,6 +428,15 @@ export class Via extends SxClass {
     }
     if (this._sxCovering) {
       lines.push(this._sxCovering.getStringIndented())
+    }
+    if (this._sxPlugging) {
+      lines.push(this._sxPlugging.getStringIndented())
+    }
+    if (this._sxCapping) {
+      lines.push(this._sxCapping.getStringIndented())
+    }
+    if (this._sxFilling) {
+      lines.push(this._sxFilling.getStringIndented())
     }
 
     lines.push(")")

@@ -25,7 +25,7 @@ export interface SegmentConstructorParams {
   end?: SegmentEnd | { x: number; y: number }
   width?: Width | number
   layer?: Layer | string | Array<string | number>
-  net?: SegmentNet | { id: number; name?: string }
+  net?: SegmentNet | { name: string; id?: number }
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
@@ -180,7 +180,7 @@ export class Segment extends SxClass {
     return this._sxNet
   }
 
-  set net(value: SegmentNet | { id: number; name?: string } | undefined) {
+  set net(value: SegmentNet | { name: string; id?: number } | undefined) {
     if (value === undefined) {
       this._sxNet = undefined
       return
@@ -189,7 +189,7 @@ export class Segment extends SxClass {
       this._sxNet = value
       return
     }
-    this._sxNet = new SegmentNet(value.id, value.name)
+    this._sxNet = new SegmentNet(value.name, value.id)
   }
 
   get tstamp(): Tstamp | undefined {
