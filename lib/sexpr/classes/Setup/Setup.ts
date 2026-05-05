@@ -9,6 +9,7 @@ import {
   SetupVisibleElements,
   SetupZone45Only,
 } from "./setupStringProperties"
+import { Covering } from "../Covering"
 import {
   SetupAuxAxisOrigin,
   SetupGridOrigin,
@@ -82,6 +83,7 @@ const TOKEN_TO_KEY: Record<string, SetupPropertyKey> = {
   visible_elements: "visibleElements",
   pad_to_paste_clearance_values: "padToPasteClearanceValues",
   trace_width: "traceWidth",
+  covering: "covering",
 }
 
 type SetupPropertyKey = keyof SetupPropertyValues
@@ -122,6 +124,7 @@ const SETUP_CHILD_ORDER: SetupPropertyKey[] = [
   "visibleElements",
   "padToPasteClearanceValues",
   "traceWidth",
+  "covering",
   "pcbPlotParams",
 ]
 
@@ -569,6 +572,17 @@ export class Setup extends SxClass {
       return
     }
     this.setProperty("traceWidth", new SetupTraceWidth(values))
+  }
+
+  get covering(): Covering | undefined {
+    return this.getPropertyInstance("covering", Covering)
+  }
+
+  set covering(value: Covering | undefined) {
+    if (value !== undefined && !(value instanceof Covering)) {
+      throw new Error("covering must be a Covering instance")
+    }
+    this.setProperty("covering", value)
   }
 }
 SxClass.register(Setup)

@@ -8,6 +8,7 @@ import { ViaNet } from "./ViaNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import { PadTeardrops } from "./PadTeardrops"
+import { Covering } from "./Covering"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -30,6 +31,7 @@ export interface ViaConstructorParams {
   uuid?: Uuid | string
   tstamp?: Tstamp | string
   teardrops?: PadTeardrops
+  covering?: Covering
 }
 
 export class Via extends SxClass {
@@ -49,6 +51,7 @@ export class Via extends SxClass {
   private _sxUuid?: Uuid
   private _sxTstamp?: Tstamp
   private _sxTeardrops?: PadTeardrops
+  private _sxCovering?: Covering
 
   constructor(params: ViaConstructorParams = {}) {
     super()
@@ -67,6 +70,7 @@ export class Via extends SxClass {
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.teardrops !== undefined) this.teardrops = params.teardrops
+    if (params.covering !== undefined) this.covering = params.covering
   }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
@@ -179,6 +183,10 @@ export class Via extends SxClass {
       }
       case "teardrops": {
         this._sxTeardrops = PadTeardrops.fromSexprPrimitives(args)
+        return
+      }
+      case "covering": {
+        this._sxCovering = Covering.fromSexprPrimitives(args)
         return
       }
       case "uuid": {
@@ -327,6 +335,14 @@ export class Via extends SxClass {
     this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
   }
 
+  get covering(): Covering | undefined {
+    return this._sxCovering
+  }
+
+  set covering(value: Covering | undefined) {
+    this._sxCovering = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -335,6 +351,7 @@ export class Via extends SxClass {
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxTeardrops) children.push(this._sxTeardrops)
+    if (this._sxCovering) children.push(this._sxCovering)
     return children
   }
 
@@ -357,6 +374,9 @@ export class Via extends SxClass {
     if (this._sxTstamp) lines.push(this._sxTstamp.getStringIndented())
     if (this._sxTeardrops) {
       lines.push(this._sxTeardrops.getStringIndented())
+    }
+    if (this._sxCovering) {
+      lines.push(this._sxCovering.getStringIndented())
     }
 
     lines.push(")")
