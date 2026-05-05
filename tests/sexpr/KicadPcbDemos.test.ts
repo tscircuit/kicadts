@@ -21,13 +21,14 @@ const normalizePrimitive = (value: PrimitiveSExpr): PrimitiveSExpr => {
 }
 
 const demoPcbPaths = [
-  "kicad-demos/demos/flat_hierarchy/flat_hierarchy.kicad_pcb",
-  "kicad-demos/demos/custom_pads_test/custom_pads_test.kicad_pcb",
+  "kicad-demos/demos/interf_u/interf_u.kicad_pcb",
+  "kicad-demos/demos/tiny_tapeout/tinytapeout-demo.kicad_pcb",
 ]
 
 const demoPcbPaths2 = [
   "kicad-demos/demos/pic_programmer/pic_programmer.kicad_pcb",
 ]
+
 test("kicad_pcb round-trips selected KiCad demo boards", async () => {
   for (const path of demoPcbPaths) {
     const original = await Bun.file(path).text()

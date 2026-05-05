@@ -10,9 +10,9 @@ export class SegmentNet extends SxClass {
   override token = "net"
 
   private _id?: number
-  private _name: string
+  private _name?: string
 
-  constructor(name: string, id?: number) {
+  constructor(name?: string, id?: number) {
     super()
     this._id = id
     this._name = name
@@ -25,15 +25,10 @@ export class SegmentNet extends SxClass {
     const second = primitiveSexprs[1]
 
     if (typeof first === "number") {
-      return new SegmentNet(toStringValue(second) ?? "", first)
+      return new SegmentNet(toStringValue(second), first)
     }
 
     const name = toStringValue(first)
-    if (name === undefined) {
-      throw new Error(
-        `segment net requires a name, got: ${JSON.stringify(first)}`,
-      )
-    }
     return new SegmentNet(name)
   }
 
@@ -45,15 +40,15 @@ export class SegmentNet extends SxClass {
     this._id = value
   }
 
-  get name(): string {
+  get name(): string | undefined {
     return this._name
   }
 
-  set name(value: string) {
+  set name(value: string | undefined) {
     this._name = value
   }
 
-  toObject(): { id?: number; name: string } {
+  toObject(): { id?: number; name?: string } {
     return { id: this._id, name: this._name }
   }
 
@@ -62,10 +57,10 @@ export class SegmentNet extends SxClass {
   }
 
   override getString(): string {
-    if (this._id !== undefined) {
-      return `(net ${this._id} ${quoteSExprString(this._name)})`
-    }
-    return `(net ${quoteSExprString(this._name)})`
+    const parts = ["net"]
+    if (this._id !== undefined) parts.push(String(this._id))
+    if (this._name !== undefined) parts.push(quoteSExprString(this._name))
+    return `(${parts.join(" ")})`
   }
 }
 SxClass.register(SegmentNet)
