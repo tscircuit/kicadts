@@ -1,5 +1,6 @@
 import { PcbPlotParams } from "./PcbPlotParams"
 import { Stackup } from "./Stackup"
+import { Covering } from "../Covering"
 import {
   SetupAuxAxisOrigin,
   SetupGridOrigin,
@@ -78,6 +79,7 @@ export interface SetupPropertyValues {
   visibleElements?: SetupVisibleElements
   padToPasteClearanceValues?: SetupPadToPasteClearanceValues
   traceWidth?: SetupTraceWidth
+  covering?: Covering
 }
 
 export type SetupProperty =
@@ -117,3 +119,4 @@ export type SetupProperty =
   | SetupVisibleElements
   | SetupPadToPasteClearanceValues
   | SetupTraceWidth
+  | Covering
