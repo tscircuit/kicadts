@@ -65,6 +65,9 @@ export class PadNet extends SxClass {
     if (this._id === undefined) {
       return `(net ${quoteSExprString(this._name ?? "")})`
     }
+    if (this._name === undefined) {
+      throw new Error("pad net with numeric id requires a name to serialize")
+    }
     return `(net ${this._id} ${quoteSExprString(this._name)})`
   }
 }
