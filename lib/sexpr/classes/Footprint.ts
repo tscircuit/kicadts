@@ -41,6 +41,9 @@ import { EmbeddedFiles } from "./EmbeddedFiles"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
+import { FootprintDuplicatePadNumbersAreJumpers } from "./FootprintDuplicatePadNumbersAreJumpers"
+import { FootprintPoint } from "./FootprintPoint"
+import { FootprintUnits } from "./FootprintUnits"
 import { Zone } from "./Zone"
 
 const SINGLE_TOKENS = new Set([
@@ -72,6 +75,8 @@ const SINGLE_TOKENS = new Set([
   "net_tie_pad_groups",
   "sheetname",
   "sheetfile",
+  "units",
+  "duplicate_pad_numbers_are_jumpers",
   "embedded_fonts",
   "embedded_files",
 ])
@@ -85,6 +90,7 @@ const MULTI_TOKENS = new Set([
   "fp_circle",
   "fp_arc",
   "fp_poly",
+  "point",
   "pad",
   "model",
   "zone",
@@ -120,6 +126,10 @@ export interface FootprintConstructorParams {
   netTiePadGroups?: FootprintNetTiePadGroups
   sheetname?: string | FootprintSheetname
   sheetfile?: string | FootprintSheetfile
+  units?: FootprintUnits
+  duplicatePadNumbersAreJumpers?:
+    | string
+    | FootprintDuplicatePadNumbersAreJumpers
   embeddedFonts?: EmbeddedFonts
   embeddedFiles?: EmbeddedFiles
   properties?: Property[]
@@ -130,6 +140,7 @@ export interface FootprintConstructorParams {
   fpCircles?: FpCircle[]
   fpArcs?: FpArc[]
   fpPolys?: FpPoly[]
+  points?: FootprintPoint[]
   pads?: FootprintPad[]
   models?: FootprintModel[]
   zones?: Zone[]
@@ -169,6 +180,8 @@ export class Footprint extends SxClass {
   private _sxNetTiePadGroups?: FootprintNetTiePadGroups
   private _sxSheetname?: FootprintSheetname
   private _sxSheetfile?: FootprintSheetfile
+  private _sxUnits?: FootprintUnits
+  private _sxDuplicatePadNumbersAreJumpers?: FootprintDuplicatePadNumbersAreJumpers
   private _sxEmbeddedFonts?: EmbeddedFonts
   private _sxEmbeddedFiles?: EmbeddedFiles
 
@@ -180,6 +193,7 @@ export class Footprint extends SxClass {
   private _fpCircles: FpCircle[] = []
   private _fpArcs: FpArc[] = []
   private _fpPolys: FpPoly[] = []
+  private _points: FootprintPoint[] = []
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
   private _zones: Zone[] = []
@@ -222,6 +236,10 @@ export class Footprint extends SxClass {
       this.netTiePadGroups = params.netTiePadGroups
     if (params.sheetname !== undefined) this.sheetname = params.sheetname
     if (params.sheetfile !== undefined) this.sheetfile = params.sheetfile
+    if (params.units !== undefined) this.units = params.units
+    if (params.duplicatePadNumbersAreJumpers !== undefined) {
+      this.duplicatePadNumbersAreJumpers = params.duplicatePadNumbersAreJumpers
+    }
     if (params.embeddedFonts !== undefined)
       this.embeddedFonts = params.embeddedFonts
     if (params.embeddedFiles !== undefined)
@@ -234,6 +252,7 @@ export class Footprint extends SxClass {
     if (params.fpCircles !== undefined) this.fpCircles = params.fpCircles
     if (params.fpArcs !== undefined) this.fpArcs = params.fpArcs
     if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
+    if (params.points !== undefined) this.points = params.points
     if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
     if (params.zones !== undefined) this.zones = params.zones
@@ -358,6 +377,11 @@ export class Footprint extends SxClass {
     footprint._sxSheetfile = propertyMap.sheetfile as
       | FootprintSheetfile
       | undefined
+    footprint._sxUnits = propertyMap.units as FootprintUnits | undefined
+    footprint._sxDuplicatePadNumbersAreJumpers =
+      propertyMap.duplicate_pad_numbers_are_jumpers as
+        | FootprintDuplicatePadNumbersAreJumpers
+        | undefined
     footprint._sxEmbeddedFonts = propertyMap.embedded_fonts as
       | EmbeddedFonts
       | undefined
@@ -374,6 +398,7 @@ export class Footprint extends SxClass {
     footprint._fpCircles = (arrayPropertyMap["fp_circle"] as FpCircle[]) ?? []
     footprint._fpArcs = (arrayPropertyMap["fp_arc"] as FpArc[]) ?? []
     footprint._fpPolys = (arrayPropertyMap["fp_poly"] as FpPoly[]) ?? []
+    footprint._points = (arrayPropertyMap.point as FootprintPoint[]) ?? []
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
     footprint._zones = (arrayPropertyMap.zone as Zone[]) ?? []
@@ -805,6 +830,32 @@ export class Footprint extends SxClass {
         : new FootprintSheetfile(value)
   }
 
+  get units(): FootprintUnits | undefined {
+    return this._sxUnits
+  }
+
+  set units(value: FootprintUnits | undefined) {
+    this._sxUnits = value
+  }
+
+  get duplicatePadNumbersAreJumpers(): string | undefined {
+    return this._sxDuplicatePadNumbersAreJumpers?.value
+  }
+
+  set duplicatePadNumbersAreJumpers(value:
+    | string
+    | FootprintDuplicatePadNumbersAreJumpers
+    | undefined,) {
+    if (value === undefined) {
+      this._sxDuplicatePadNumbersAreJumpers = undefined
+      return
+    }
+    this._sxDuplicatePadNumbersAreJumpers =
+      value instanceof FootprintDuplicatePadNumbersAreJumpers
+        ? value
+        : new FootprintDuplicatePadNumbersAreJumpers(value)
+  }
+
   get embeddedFonts(): EmbeddedFonts | undefined {
     return this._sxEmbeddedFonts
   }
@@ -885,6 +936,14 @@ export class Footprint extends SxClass {
     this._fpPolys = [...value]
   }
 
+  get points(): FootprintPoint[] {
+    return [...this._points]
+  }
+
+  set points(value: FootprintPoint[]) {
+    this._points = [...value]
+  }
+
   get fpPads(): FootprintPad[] {
     return [...this._fpPads]
   }
@@ -934,11 +993,15 @@ export class Footprint extends SxClass {
     if (this._sxZoneConnect) children.push(this._sxZoneConnect)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
-    if (this._sxAttr) children.push(this._sxAttr)
     if (this._sxPrivateLayers) children.push(this._sxPrivateLayers)
     if (this._sxNetTiePadGroups) children.push(this._sxNetTiePadGroups)
     if (this._sxSheetname) children.push(this._sxSheetname)
     if (this._sxSheetfile) children.push(this._sxSheetfile)
+    if (this._sxUnits) children.push(this._sxUnits)
+    if (this._sxAttr) children.push(this._sxAttr)
+    if (this._sxDuplicatePadNumbersAreJumpers) {
+      children.push(this._sxDuplicatePadNumbersAreJumpers)
+    }
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     if (this._sxEmbeddedFiles) children.push(this._sxEmbeddedFiles)
     children.push(...this._properties)
@@ -949,6 +1012,7 @@ export class Footprint extends SxClass {
     children.push(...this._fpCircles)
     children.push(...this._fpArcs)
     children.push(...this._fpPolys)
+    children.push(...this._points)
     children.push(...this._fpPads)
     children.push(...this._models)
     children.push(...this._zones)

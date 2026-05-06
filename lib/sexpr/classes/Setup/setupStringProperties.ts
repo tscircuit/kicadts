@@ -2,6 +2,8 @@ import { SxClass } from "../../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
 import { toStringValue } from "../../utils/toStringValue"
 
+import { Back } from "./Back"
+import { Front } from "./Front"
 import { SingleValueProperty } from "./base"
 
 abstract class SetupStringProperty extends SingleValueProperty<string> {
@@ -38,6 +40,8 @@ export class SetupTenting extends SxClass {
   token = "tenting"
 
   private _sides: string[] = []
+  private _sxFront?: Front
+  private _sxBack?: Back
 
   constructor(sides: string[] = []) {
     super()
@@ -47,6 +51,18 @@ export class SetupTenting extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SetupTenting {
+    if (primitiveSexprs.some((primitive) => Array.isArray(primitive))) {
+      const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
+        primitiveSexprs,
+        this.token,
+      )
+
+      const tenting = new SetupTenting()
+      tenting._sxFront = propertyMap.front as Front | undefined
+      tenting._sxBack = propertyMap.back as Back | undefined
+      return tenting
+    }
+
     const sides = primitiveSexprs
       .map((primitive) => toStringValue(primitive))
       .filter((value): value is string => value !== undefined)
@@ -62,10 +78,16 @@ export class SetupTenting extends SxClass {
   }
 
   override getChildren(): SxClass[] {
-    return []
+    const children: SxClass[] = []
+    if (this._sxFront) children.push(this._sxFront)
+    if (this._sxBack) children.push(this._sxBack)
+    return children
   }
 
   override getString(): string {
+    if (this._sxFront || this._sxBack) {
+      return super.getString()
+    }
     if (this._sides.length === 0) {
       return "(tenting)"
     }

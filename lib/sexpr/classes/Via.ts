@@ -8,6 +8,10 @@ import { ViaNet } from "./ViaNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 import { PadTeardrops } from "./PadTeardrops"
+import { Capping } from "./Setup/Capping"
+import { Covering } from "./Setup/Covering"
+import { Filling } from "./Setup/Filling"
+import { Plugging } from "./Setup/Plugging"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -30,6 +34,10 @@ export interface ViaConstructorParams {
   uuid?: Uuid | string
   tstamp?: Tstamp | string
   teardrops?: PadTeardrops
+  capping?: string | Capping
+  covering?: Covering
+  plugging?: Plugging
+  filling?: string | Filling
 }
 
 export class Via extends SxClass {
@@ -49,6 +57,10 @@ export class Via extends SxClass {
   private _sxUuid?: Uuid
   private _sxTstamp?: Tstamp
   private _sxTeardrops?: PadTeardrops
+  private _sxCapping?: Capping
+  private _sxCovering?: Covering
+  private _sxPlugging?: Plugging
+  private _sxFilling?: Filling
 
   constructor(params: ViaConstructorParams = {}) {
     super()
@@ -67,6 +79,10 @@ export class Via extends SxClass {
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.teardrops !== undefined) this.teardrops = params.teardrops
+    if (params.capping !== undefined) this.capping = params.capping
+    if (params.covering !== undefined) this.covering = params.covering
+    if (params.plugging !== undefined) this.plugging = params.plugging
+    if (params.filling !== undefined) this.filling = params.filling
   }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
@@ -179,6 +195,54 @@ export class Via extends SxClass {
       }
       case "teardrops": {
         this._sxTeardrops = PadTeardrops.fromSexprPrimitives(args)
+        return
+      }
+      case "capping": {
+        const parsed = SxClass.parsePrimitiveSexpr(
+          ["capping", ...args] as any,
+          {
+            parentToken: this.token,
+          },
+        )
+        if (!(parsed instanceof Capping)) {
+          throw new Error("via failed to parse capping child")
+        }
+        this._sxCapping = parsed
+        return
+      }
+      case "covering": {
+        const parsed = SxClass.parsePrimitiveSexpr(
+          ["covering", ...args] as any,
+          { parentToken: this.token },
+        )
+        if (!(parsed instanceof Covering)) {
+          throw new Error("via failed to parse covering child")
+        }
+        this._sxCovering = parsed
+        return
+      }
+      case "plugging": {
+        const parsed = SxClass.parsePrimitiveSexpr(
+          ["plugging", ...args] as any,
+          { parentToken: this.token },
+        )
+        if (!(parsed instanceof Plugging)) {
+          throw new Error("via failed to parse plugging child")
+        }
+        this._sxPlugging = parsed
+        return
+      }
+      case "filling": {
+        const parsed = SxClass.parsePrimitiveSexpr(
+          ["filling", ...args] as any,
+          {
+            parentToken: this.token,
+          },
+        )
+        if (!(parsed instanceof Filling)) {
+          throw new Error("via failed to parse filling child")
+        }
+        this._sxFilling = parsed
         return
       }
       case "uuid": {
@@ -315,6 +379,46 @@ export class Via extends SxClass {
     this._sxTeardrops = value
   }
 
+  get capping(): string | undefined {
+    return this._sxCapping?.value
+  }
+
+  set capping(value: string | Capping | undefined) {
+    if (value === undefined) {
+      this._sxCapping = undefined
+      return
+    }
+    this._sxCapping = value instanceof Capping ? value : new Capping(value)
+  }
+
+  get covering(): Covering | undefined {
+    return this._sxCovering
+  }
+
+  set covering(value: Covering | undefined) {
+    this._sxCovering = value
+  }
+
+  get plugging(): Plugging | undefined {
+    return this._sxPlugging
+  }
+
+  set plugging(value: Plugging | undefined) {
+    this._sxPlugging = value
+  }
+
+  get filling(): string | undefined {
+    return this._sxFilling?.value
+  }
+
+  set filling(value: string | Filling | undefined) {
+    if (value === undefined) {
+      this._sxFilling = undefined
+      return
+    }
+    this._sxFilling = value instanceof Filling ? value : new Filling(value)
+  }
+
   get tstamp(): Tstamp | undefined {
     return this._sxTstamp
   }
@@ -331,6 +435,10 @@ export class Via extends SxClass {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxLayers) children.push(this._sxLayers)
+    if (this._sxCapping) children.push(this._sxCapping)
+    if (this._sxCovering) children.push(this._sxCovering)
+    if (this._sxPlugging) children.push(this._sxPlugging)
+    if (this._sxFilling) children.push(this._sxFilling)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxTstamp) children.push(this._sxTstamp)
@@ -352,6 +460,10 @@ export class Via extends SxClass {
     if (this._size !== undefined) lines.push(`  (size ${this._size})`)
     if (this._drill !== undefined) lines.push(`  (drill ${this._drill})`)
     if (this._sxLayers) lines.push(this._sxLayers.getStringIndented())
+    if (this._sxCapping) lines.push(this._sxCapping.getStringIndented())
+    if (this._sxCovering) lines.push(this._sxCovering.getStringIndented())
+    if (this._sxPlugging) lines.push(this._sxPlugging.getStringIndented())
+    if (this._sxFilling) lines.push(this._sxFilling.getStringIndented())
     if (this._sxNet) lines.push(this._sxNet.getStringIndented())
     if (this._sxUuid) lines.push(this._sxUuid.getStringIndented())
     if (this._sxTstamp) lines.push(this._sxTstamp.getStringIndented())

@@ -1,7 +1,11 @@
 import { SxClass } from "../../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../../parseToPrimitiveSExpr"
 
+import { Capping } from "./Capping"
+import { Covering } from "./Covering"
+import { Filling } from "./Filling"
 import { PcbPlotParams } from "./PcbPlotParams"
+import { Plugging } from "./Plugging"
 import {
   SetupAllowSoldermaskBridgesInFootprints,
   SetupTenting,
@@ -77,6 +81,10 @@ const TOKEN_TO_KEY: Record<string, SetupPropertyKey> = {
   pad_drill: "padDrill",
   allow_soldermask_bridges_in_footprints: "allowSoldermaskBridgesInFootprints",
   tenting: "tenting",
+  covering: "covering",
+  plugging: "plugging",
+  capping: "capping",
+  filling: "filling",
   aux_axis_origin: "auxAxisOrigin",
   grid_origin: "gridOrigin",
   visible_elements: "visibleElements",
@@ -117,6 +125,10 @@ const SETUP_CHILD_ORDER: SetupPropertyKey[] = [
   "padDrill",
   "allowSoldermaskBridgesInFootprints",
   "tenting",
+  "covering",
+  "plugging",
+  "capping",
+  "filling",
   "auxAxisOrigin",
   "gridOrigin",
   "visibleElements",
@@ -496,6 +508,44 @@ export class Setup extends SxClass {
       return
     }
     this.setProperty("tenting", new SetupTenting(sides))
+  }
+
+  get covering(): Covering | undefined {
+    return this.getPropertyInstance("covering", Covering)
+  }
+
+  set covering(value: Covering | undefined) {
+    this.setProperty("covering", value)
+  }
+
+  get plugging(): Plugging | undefined {
+    return this.getPropertyInstance("plugging", Plugging)
+  }
+
+  set plugging(value: Plugging | undefined) {
+    this.setProperty("plugging", value)
+  }
+
+  get capping(): string | undefined {
+    return this.getPropertyInstance("capping", Capping)?.value
+  }
+
+  set capping(value: string | undefined) {
+    this.setProperty(
+      "capping",
+      value === undefined ? undefined : new Capping(value),
+    )
+  }
+
+  get filling(): string | undefined {
+    return this.getPropertyInstance("filling", Filling)?.value
+  }
+
+  set filling(value: string | undefined) {
+    this.setProperty(
+      "filling",
+      value === undefined ? undefined : new Filling(value),
+    )
   }
 
   get auxAxisOrigin(): Coordinate | undefined {

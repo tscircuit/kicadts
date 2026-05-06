@@ -9,32 +9,43 @@ export class ViaNet extends SxClass {
   static override parentToken = "via"
   token = "net"
 
-  private _id: number
+  private _id?: number
   private _name?: string
 
-  constructor(id: number, name?: string) {
+  constructor(idOrName: number | string, name?: string) {
     super()
-    this._id = id
-    this._name = name
+    if (typeof idOrName === "number") {
+      this._id = idOrName
+      this._name = name
+      return
+    }
+    this._name = idOrName
   }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): ViaNet {
     const id = toNumberValue(primitiveSexprs[0])
-    if (id === undefined) {
-      throw new Error("via net requires a numeric id")
+    if (id !== undefined) {
+      const name =
+        primitiveSexprs.length > 1
+          ? toStringValue(primitiveSexprs[1])
+          : undefined
+      return new ViaNet(id, name)
     }
-    const name =
-      primitiveSexprs.length > 1 ? toStringValue(primitiveSexprs[1]) : undefined
-    return new ViaNet(id, name)
+
+    const name = toStringValue(primitiveSexprs[0])
+    if (name === undefined) {
+      throw new Error("via net requires a numeric id or string name")
+    }
+    return new ViaNet(name)
   }
 
-  get id(): number {
+  get id(): number | undefined {
     return this._id
   }
 
-  set id(value: number) {
+  set id(value: number | undefined) {
     this._id = value
   }
 
@@ -51,6 +62,9 @@ export class ViaNet extends SxClass {
   }
 
   override getString(): string {
+    if (this._id === undefined) {
+      return `(net ${quoteSExprString(this._name ?? "")})`
+    }
     if (this._name !== undefined) {
       return `(net ${this._id} ${quoteSExprString(this._name)})`
     }
