@@ -993,8 +993,6 @@ export class Footprint extends SxClass {
     if (this._sxZoneConnect) children.push(this._sxZoneConnect)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
-    if (this._sxPrivateLayers) children.push(this._sxPrivateLayers)
-    if (this._sxNetTiePadGroups) children.push(this._sxNetTiePadGroups)
     if (this._sxSheetname) children.push(this._sxSheetname)
     if (this._sxSheetfile) children.push(this._sxSheetfile)
     if (this._sxUnits) children.push(this._sxUnits)
@@ -1002,6 +1000,8 @@ export class Footprint extends SxClass {
     if (this._sxDuplicatePadNumbersAreJumpers) {
       children.push(this._sxDuplicatePadNumbersAreJumpers)
     }
+    if (this._sxPrivateLayers) children.push(this._sxPrivateLayers)
+    if (this._sxNetTiePadGroups) children.push(this._sxNetTiePadGroups)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     if (this._sxEmbeddedFiles) children.push(this._sxEmbeddedFiles)
     children.push(...this._properties)
