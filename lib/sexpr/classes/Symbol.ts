@@ -2,6 +2,7 @@ import { SxClass } from "../base-classes/SxClass"
 import { SxPrimitiveBoolean } from "../base-classes/SxPrimitiveBoolean"
 import { SxPrimitiveNumber } from "../base-classes/SxPrimitiveNumber"
 import { quoteSExprString } from "../utils/quoteSExprString"
+import { quoteIfNeeded } from "../utils/quoteSExprString"
 import { indentLines } from "../utils/indentLines"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
@@ -11,8 +12,14 @@ import { Dnp } from "./Dnp"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { ExcludeFromSim } from "./ExcludeFromSim"
 import { InBom } from "./InBom"
+import { InPosFiles } from "./InPosFiles"
 import { OnBoard } from "./OnBoard"
 import { FieldsAutoplaced } from "./FieldsAutoplaced"
+import { PropertyDoNotAutoplace } from "./PropertyDoNotAutoplace"
+import { PropertyHide } from "./PropertyHide"
+import { PropertyShowName } from "./PropertyShowName"
+import { SymbolBodyStyle } from "./SymbolBodyStyle"
+import { SymbolBodyStyles } from "./SymbolBodyStyles"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
@@ -674,8 +681,19 @@ export class SymbolPower extends SxClass {
   static override parentToken = "symbol"
   token = "power"
 
-  static override fromSexprPrimitives(): SymbolPower {
-    return new SymbolPower()
+  value?: string
+
+  constructor(value?: string) {
+    super()
+    this.value = value
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPower {
+    const [valuePrimitive] = primitiveSexprs
+    const value = toStringValue(valuePrimitive)
+    return new SymbolPower(value)
   }
 
   override getChildren(): SxClass[] {
@@ -683,7 +701,10 @@ export class SymbolPower extends SxClass {
   }
 
   override getString(): string {
-    return "(power)"
+    if (this.value === undefined) {
+      return "(power)"
+    }
+    return `(power ${quoteIfNeeded(this.value)})`
   }
 }
 SxClass.register(SymbolPower)
@@ -694,11 +715,14 @@ export interface SchematicSymbolConstructorParams {
   at?: AtInput
   mirror?: string | Mirror
   unit?: number | SymbolUnit
+  bodyStyle?: number | SymbolBodyStyle
+  bodyStyles?: string | SymbolBodyStyles
   pinNumbers?: SymbolPinNumbers
   pinNames?: SymbolPinNames
   excludeFromSim?: boolean
   inBom?: boolean
   onBoard?: boolean
+  inPosFiles?: boolean
   dnp?: boolean
   uuid?: string
   duplicatePinNumbersAreJumpers?: boolean
@@ -725,11 +749,14 @@ export class SchematicSymbol extends SxClass {
   _sxAt?: At
   _sxMirror?: Mirror
   _sxUnit?: SymbolUnit
+  _sxBodyStyle?: SymbolBodyStyle
+  _sxBodyStyles?: SymbolBodyStyles
   _sxPinNumbers?: SymbolPinNumbers
   _sxPinNames?: SymbolPinNames
   _sxExcludeFromSim?: ExcludeFromSim
   _sxInBom?: InBom
   _sxOnBoard?: OnBoard
+  _sxInPosFiles?: InPosFiles
   _sxDnp?: Dnp
   _sxUuid?: Uuid
   _sxDuplicatePinNumbersAreJumpers?: SymbolDuplicatePinNumbersAreJumpers
@@ -758,12 +785,15 @@ export class SchematicSymbol extends SxClass {
     if (params.unit !== undefined)
       this.unit =
         typeof params.unit === "number" ? params.unit : params.unit.value
+    if (params.bodyStyle !== undefined) this.bodyStyle = params.bodyStyle
+    if (params.bodyStyles !== undefined) this.bodyStyles = params.bodyStyles
     if (params.pinNumbers !== undefined) this.pinNumbers = params.pinNumbers
     if (params.pinNames !== undefined) this.pinNames = params.pinNames
     if (params.excludeFromSim !== undefined)
       this.excludeFromSim = params.excludeFromSim
     if (params.inBom !== undefined) this.inBom = params.inBom
     if (params.onBoard !== undefined) this.onBoard = params.onBoard
+    if (params.inPosFiles !== undefined) this.inPosFiles = params.inPosFiles
     if (params.dnp !== undefined) this.dnp = params.dnp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.duplicatePinNumbersAreJumpers !== undefined)
@@ -846,6 +876,32 @@ export class SchematicSymbol extends SxClass {
     this._sxUnit = value === undefined ? undefined : SymbolUnit.from(value)
   }
 
+  get bodyStyle(): number | undefined {
+    return this._sxBodyStyle?.value
+  }
+
+  set bodyStyle(value: number | SymbolBodyStyle | undefined) {
+    if (value === undefined) {
+      this._sxBodyStyle = undefined
+      return
+    }
+    this._sxBodyStyle =
+      value instanceof SymbolBodyStyle ? value : new SymbolBodyStyle(value)
+  }
+
+  get bodyStyles(): string | undefined {
+    return this._sxBodyStyles?.value
+  }
+
+  set bodyStyles(value: string | SymbolBodyStyles | undefined) {
+    if (value === undefined) {
+      this._sxBodyStyles = undefined
+      return
+    }
+    this._sxBodyStyles =
+      value instanceof SymbolBodyStyles ? value : new SymbolBodyStyles(value)
+  }
+
   get pinNumbers(): SymbolPinNumbers | undefined {
     return this._sxPinNumbers
   }
@@ -884,6 +940,14 @@ export class SchematicSymbol extends SxClass {
 
   set onBoard(value: boolean | undefined) {
     this._sxOnBoard = value === undefined ? undefined : new OnBoard(value)
+  }
+
+  get inPosFiles(): boolean | undefined {
+    return this._sxInPosFiles?.value
+  }
+
+  set inPosFiles(value: boolean | undefined) {
+    this._sxInPosFiles = value === undefined ? undefined : new InPosFiles(value)
   }
 
   get dnp(): boolean {
@@ -960,11 +1024,14 @@ export class SchematicSymbol extends SxClass {
     symbol._sxAt = propertyMap.at as At
     symbol._sxMirror = propertyMap.mirror as Mirror
     symbol._sxUnit = propertyMap.unit as SymbolUnit
+    symbol._sxBodyStyle = propertyMap.body_style as SymbolBodyStyle
+    symbol._sxBodyStyles = propertyMap.body_styles as SymbolBodyStyles
     symbol._sxPinNumbers = propertyMap.pin_numbers as SymbolPinNumbers
     symbol._sxPinNames = propertyMap.pin_names as SymbolPinNames
     symbol._sxExcludeFromSim = propertyMap.exclude_from_sim as ExcludeFromSim
     symbol._sxInBom = propertyMap.in_bom as InBom
     symbol._sxOnBoard = propertyMap.on_board as OnBoard
+    symbol._sxInPosFiles = propertyMap.in_pos_files as InPosFiles
     symbol._sxDnp = propertyMap.dnp as Dnp
     symbol._sxUuid = propertyMap.uuid as Uuid
     symbol._sxDuplicatePinNumbersAreJumpers =
@@ -994,11 +1061,14 @@ export class SchematicSymbol extends SxClass {
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxMirror) children.push(this._sxMirror)
     if (this._sxUnit) children.push(this._sxUnit)
+    if (this._sxBodyStyle) children.push(this._sxBodyStyle)
+    if (this._sxBodyStyles) children.push(this._sxBodyStyles)
     if (this._sxPinNumbers) children.push(this._sxPinNumbers)
     if (this._sxPinNames) children.push(this._sxPinNames)
     if (this._sxExcludeFromSim) children.push(this._sxExcludeFromSim)
     if (this._sxInBom) children.push(this._sxInBom)
     if (this._sxOnBoard) children.push(this._sxOnBoard)
+    if (this._sxInPosFiles) children.push(this._sxInPosFiles)
     if (this._sxDnp) children.push(this._sxDnp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxDuplicatePinNumbersAreJumpers) {
@@ -1060,6 +1130,9 @@ export class SymbolProperty extends SxClass {
   value: string
   _sxId?: SymbolPropertyId
   _sxAt?: At
+  _sxShowName?: PropertyShowName
+  _sxDoNotAutoplace?: PropertyDoNotAutoplace
+  _sxHide?: PropertyHide
   _sxEffects?: TextEffects
 
   constructor(params: {
@@ -1067,6 +1140,9 @@ export class SymbolProperty extends SxClass {
     value: string
     id?: number | SymbolPropertyId
     at?: AtInput
+    showName?: boolean | PropertyShowName
+    doNotAutoplace?: boolean | PropertyDoNotAutoplace
+    hidden?: boolean | PropertyHide
     effects?: TextEffects
   }) {
     super()
@@ -1075,6 +1151,24 @@ export class SymbolProperty extends SxClass {
     this._sxId =
       params.id !== undefined ? SymbolPropertyId.from(params.id) : undefined
     this._sxAt = params.at !== undefined ? At.from(params.at) : undefined
+    if (params.showName !== undefined) {
+      this._sxShowName =
+        params.showName instanceof PropertyShowName
+          ? params.showName
+          : new PropertyShowName(params.showName)
+    }
+    if (params.doNotAutoplace !== undefined) {
+      this._sxDoNotAutoplace =
+        params.doNotAutoplace instanceof PropertyDoNotAutoplace
+          ? params.doNotAutoplace
+          : new PropertyDoNotAutoplace(params.doNotAutoplace)
+    }
+    if (params.hidden !== undefined) {
+      this._sxHide =
+        params.hidden instanceof PropertyHide
+          ? params.hidden
+          : new PropertyHide(params.hidden)
+    }
     this._sxEffects = params.effects
   }
 
@@ -1096,6 +1190,11 @@ export class SymbolProperty extends SxClass {
       value,
       id: propertyMap.id as SymbolPropertyId,
       at: propertyMap.at as At,
+      showName: propertyMap.show_name as PropertyShowName | undefined,
+      doNotAutoplace: propertyMap.do_not_autoplace as
+        | PropertyDoNotAutoplace
+        | undefined,
+      hidden: propertyMap.hide as PropertyHide | undefined,
       effects: propertyMap.effects as TextEffects,
     })
   }
@@ -1116,6 +1215,32 @@ export class SymbolProperty extends SxClass {
     this._sxAt = value !== undefined ? At.from(value) : undefined
   }
 
+  get showName(): boolean | undefined {
+    return this._sxShowName?.value
+  }
+
+  set showName(value: boolean | undefined) {
+    this._sxShowName =
+      value === undefined ? undefined : new PropertyShowName(value)
+  }
+
+  get doNotAutoplace(): boolean | undefined {
+    return this._sxDoNotAutoplace?.value
+  }
+
+  set doNotAutoplace(value: boolean | undefined) {
+    this._sxDoNotAutoplace =
+      value === undefined ? undefined : new PropertyDoNotAutoplace(value)
+  }
+
+  get hidden(): boolean {
+    return this._sxHide?.value ?? false
+  }
+
+  set hidden(value: boolean) {
+    this._sxHide = new PropertyHide(value)
+  }
+
   get effects(): TextEffects | undefined {
     return this._sxEffects
   }
@@ -1128,6 +1253,9 @@ export class SymbolProperty extends SxClass {
     const children: SxClass[] = []
     if (this._sxId) children.push(this._sxId)
     if (this._sxAt) children.push(this._sxAt)
+    if (this._sxShowName) children.push(this._sxShowName)
+    if (this._sxDoNotAutoplace) children.push(this._sxDoNotAutoplace)
+    if (this._sxHide) children.push(this._sxHide)
     if (this._sxEffects) children.push(this._sxEffects)
     return children
   }
@@ -1136,15 +1264,8 @@ export class SymbolProperty extends SxClass {
     const lines = [
       `(property ${quoteSExprString(this.key)} ${quoteSExprString(this.value)}`,
     ]
-
-    if (this._sxId) {
-      lines.push(...indentLines(this._sxId.getString()))
-    }
-    if (this._sxAt) {
-      lines.push(...indentLines(this._sxAt.getString()))
-    }
-    if (this._sxEffects) {
-      lines.push(...indentLines(this._sxEffects.getString()))
+    for (const child of this.getChildren()) {
+      lines.push(...indentLines(child.getString()))
     }
 
     lines.push(")")
