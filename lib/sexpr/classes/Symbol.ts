@@ -947,8 +947,7 @@ export class SchematicSymbol extends SxClass {
   }
 
   set inPosFiles(value: boolean | undefined) {
-    this._sxInPosFiles =
-      value === undefined ? undefined : new InPosFiles(value)
+    this._sxInPosFiles = value === undefined ? undefined : new InPosFiles(value)
   }
 
   get dnp(): boolean {
