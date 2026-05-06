@@ -24,6 +24,7 @@ const demoSchematics = [
   "kicad-demos/demos/simulation/rectifier/rectifier.kicad_sch",
   "kicad-demos/demos/simulation/up-down-counter/up-down-c.kicad_sch",
   "kicad-demos/demos/simulation/analog-multiplier/a-multi.kicad_sch",
+  "kicad-demos/demos/pic_programmer/pic_programmer.kicad_sch",
 ]
 
 test("kicad_sch round-trips kicad demo schematics", async () => {
