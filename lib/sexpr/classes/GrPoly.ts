@@ -7,6 +7,7 @@ import { Width } from "./Width"
 import { Pts } from "./Pts"
 import { Xy } from "./Xy"
 import { toStringValue } from "../utils/toStringValue"
+import { GrPolyNet } from "./GrPolyNet"
 
 export class GrPolyFill extends SxClass {
   static override token = "fill"
@@ -40,6 +41,7 @@ const SUPPORTED_TOKENS = new Set([
   "width",
   "stroke",
   "fill",
+  "net",
   "uuid",
 ])
 
@@ -49,6 +51,7 @@ export interface GrPolyConstructorParams {
   width?: Width | number
   stroke?: Stroke
   fill?: GrPolyFill | boolean
+  net?: GrPolyNet | number
   uuid?: Uuid | string
 }
 
@@ -61,6 +64,7 @@ export class GrPoly extends SxClass {
   private _sxWidth?: Width
   private _sxStroke?: Stroke
   private _sxFill?: GrPolyFill
+  private _sxNet?: GrPolyNet
   private _sxUuid?: Uuid
 
   constructor(params: GrPolyConstructorParams = {}) {
@@ -70,6 +74,7 @@ export class GrPoly extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
+    if (params.net !== undefined) this.net = params.net
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
 
@@ -127,6 +132,7 @@ export class GrPoly extends SxClass {
     grPoly._sxWidth = propertyMap.width as Width | undefined
     grPoly._sxStroke = propertyMap.stroke as Stroke | undefined
     grPoly._sxFill = propertyMap.fill as GrPolyFill | undefined
+    grPoly._sxNet = propertyMap.net as GrPolyNet | undefined
     grPoly._sxUuid = propertyMap.uuid as Uuid | undefined
 
     for (const primitive of primitiveSexprs) {
@@ -277,6 +283,18 @@ export class GrPoly extends SxClass {
     return this._sxUuid
   }
 
+  get net(): number | undefined {
+    return this._sxNet?.id
+  }
+
+  set net(value: GrPolyNet | number | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof GrPolyNet ? value : new GrPolyNet(value)
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxPts) children.push(this._sxPts)
@@ -284,6 +302,7 @@ export class GrPoly extends SxClass {
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxFill) children.push(this._sxFill)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
     return children
   }

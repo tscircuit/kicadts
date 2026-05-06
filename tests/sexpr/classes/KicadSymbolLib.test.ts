@@ -41,6 +41,7 @@ test("KicadSymbolLib parse with symbols", () => {
 
   expect(lib.version).toBe(20211014)
   expect(lib.generator).toBe("kicad_symbol_editor")
+  expect(lib.generatorVersion).toBeUndefined()
   expect(lib.symbols).toHaveLength(2)
 
   const [resistor, capacitor] = lib.symbols
@@ -50,6 +51,22 @@ test("KicadSymbolLib parse with symbols", () => {
 
   expect(capacitor).toBeInstanceOf(SchematicSymbol)
   expect(capacitor?.libraryId).toBe("C")
+})
+
+test("KicadSymbolLib parses generator_version", () => {
+  const [parsed] = SxClass.parse(`
+    (kicad_symbol_lib
+      (version 20231120)
+      (generator "kicad_symbol_editor")
+      (generator_version "8.0")
+      (symbol "Device:R")
+    )
+  `)
+
+  expect(parsed).toBeInstanceOf(KicadSymbolLib)
+  const lib = parsed as KicadSymbolLib
+  expect(lib.generatorVersion).toBe("8.0")
+  expect(lib.getString()).toContain("(generator_version 8.0)")
 })
 
 test("KicadSymbolLib construct and getString", () => {
