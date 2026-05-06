@@ -41,6 +41,7 @@ import { EmbeddedFiles } from "./EmbeddedFiles"
 import { EmbeddedFonts } from "./EmbeddedFonts"
 import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
+import { Zone } from "./Zone"
 
 const SINGLE_TOKENS = new Set([
   "version",
@@ -86,6 +87,7 @@ const MULTI_TOKENS = new Set([
   "fp_poly",
   "pad",
   "model",
+  "zone",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -130,6 +132,7 @@ export interface FootprintConstructorParams {
   fpPolys?: FpPoly[]
   pads?: FootprintPad[]
   models?: FootprintModel[]
+  zones?: Zone[]
 }
 
 export class Footprint extends SxClass {
@@ -179,6 +182,7 @@ export class Footprint extends SxClass {
   private _fpPolys: FpPoly[] = []
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
+  private _zones: Zone[] = []
 
   constructor(params: FootprintConstructorParams = {}) {
     super()
@@ -232,6 +236,7 @@ export class Footprint extends SxClass {
     if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
     if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
+    if (params.zones !== undefined) this.zones = params.zones
   }
 
   static override fromSexprPrimitives(
@@ -371,6 +376,7 @@ export class Footprint extends SxClass {
     footprint._fpPolys = (arrayPropertyMap["fp_poly"] as FpPoly[]) ?? []
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
+    footprint._zones = (arrayPropertyMap.zone as Zone[]) ?? []
 
     for (const flag of pendingFlags) {
       if (flag === "locked") {
@@ -895,6 +901,14 @@ export class Footprint extends SxClass {
     this._models = [...value]
   }
 
+  get zones(): Zone[] {
+    return [...this._zones]
+  }
+
+  set zones(value: Zone[]) {
+    this._zones = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -937,6 +951,7 @@ export class Footprint extends SxClass {
     children.push(...this._fpPolys)
     children.push(...this._fpPads)
     children.push(...this._models)
+    children.push(...this._zones)
     return children
   }
 

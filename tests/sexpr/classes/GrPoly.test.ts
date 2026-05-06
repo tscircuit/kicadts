@@ -56,6 +56,27 @@ test("GrPoly - simple polygon without arc", () => {
   expect(grPoly.fill).toBe(false)
 })
 
+test("GrPoly - net id", () => {
+  const [poly] = SxClass.parse(`
+    (gr_poly
+        (pts
+            (xy 0 0) (xy 10 0) (xy 10 10)
+        )
+        (stroke
+            (width 0)
+            (type default)
+        )
+        (fill solid)
+        (layer "F.Cu")
+        (net 17)
+    )
+  `)
+
+  const grPoly = poly as GrPoly
+  expect(grPoly.net).toBe(17)
+  expect(grPoly.getString()).toContain("(net 17)")
+})
+
 test("GrPoly - constructor", () => {
   const grPoly = new GrPoly({
     points: [

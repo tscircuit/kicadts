@@ -16,6 +16,9 @@ import { FieldsAutoplaced } from "./FieldsAutoplaced"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
+import { Color } from "./Color"
+import { SymbolLibName } from "./SymbolLibName"
+import { SymbolTextBox } from "./SymbolTextBox"
 import { SymbolPolyline } from "./Polyline"
 
 export class SymbolUnit extends SxPrimitiveNumber {
@@ -379,6 +382,7 @@ SxClass.register(SymbolCircleRadius)
 
 abstract class SymbolFillBase extends SxClass {
   protected _sxType?: SymbolFillType
+  protected _sxColor?: Color
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -389,6 +393,7 @@ abstract class SymbolFillBase extends SxClass {
       "fill",
     )
     fill._sxType = propertyMap.type as SymbolFillType
+    fill._sxColor = propertyMap.color as Color | undefined
     return fill
   }
 
@@ -405,7 +410,10 @@ abstract class SymbolFillBase extends SxClass {
   }
 
   override getChildren(): SxClass[] {
-    return this._sxType ? [this._sxType] : []
+    const children: SxClass[] = []
+    if (this._sxType) children.push(this._sxType)
+    if (this._sxColor) children.push(this._sxColor)
+    return children
   }
 }
 
@@ -682,6 +690,7 @@ SxClass.register(SymbolPower)
 
 export interface SchematicSymbolConstructorParams {
   libraryId?: string
+  libraryName?: string | SymbolLibName
   at?: AtInput
   mirror?: string | Mirror
   unit?: number | SymbolUnit
@@ -702,6 +711,7 @@ export interface SchematicSymbolConstructorParams {
   circles?: SymbolCircle[]
   arcs?: SymbolArc[]
   texts?: SymbolText[]
+  textBoxes?: SymbolTextBox[]
   embeddedFonts?: EmbeddedFonts
   instances?: SymbolInstances
 }
@@ -710,6 +720,7 @@ export class SchematicSymbol extends SxClass {
   static override token = "symbol"
   token = "symbol"
 
+  private _sxLibName?: SymbolLibName
   private _sxLibId?: SymbolLibId
   _sxAt?: At
   _sxMirror?: Mirror
@@ -731,6 +742,7 @@ export class SchematicSymbol extends SxClass {
   circles: SymbolCircle[] = []
   arcs: SymbolArc[] = []
   texts: SymbolText[] = []
+  textBoxes: SymbolTextBox[] = []
   _sxPower?: SymbolPower
   _sxEmbeddedFonts?: EmbeddedFonts
   _sxInstances?: SymbolInstances
@@ -740,6 +752,7 @@ export class SchematicSymbol extends SxClass {
     super()
 
     if (params.libraryId !== undefined) this.libraryId = params.libraryId
+    if (params.libraryName !== undefined) this.libraryName = params.libraryName
     if (params.at !== undefined) this.at = params.at
     if (params.mirror !== undefined) this.mirror = params.mirror
     if (params.unit !== undefined)
@@ -765,6 +778,7 @@ export class SchematicSymbol extends SxClass {
     if (params.circles !== undefined) this.circles = params.circles
     if (params.arcs !== undefined) this.arcs = params.arcs
     if (params.texts !== undefined) this.texts = params.texts
+    if (params.textBoxes !== undefined) this.textBoxes = params.textBoxes
     if (params.embeddedFonts !== undefined)
       this._sxEmbeddedFonts = params.embeddedFonts
     if (params.instances !== undefined) this.instances = params.instances
@@ -789,6 +803,19 @@ export class SchematicSymbol extends SxClass {
     }
     this._inlineLibId = value
     this._sxLibId = undefined
+  }
+
+  get libraryName(): string | undefined {
+    return this._sxLibName?.value
+  }
+
+  set libraryName(value: string | SymbolLibName | undefined) {
+    if (value === undefined) {
+      this._sxLibName = undefined
+      return
+    }
+    this._sxLibName =
+      value instanceof SymbolLibName ? value : new SymbolLibName(value)
   }
 
   get at(): At | undefined {
@@ -924,6 +951,7 @@ export class SchematicSymbol extends SxClass {
       SxClass.parsePrimitivesToClassProperties(remaining, this.token)
 
     const libIdClass = propertyMap.lib_id as SymbolLibId | undefined
+    symbol._sxLibName = propertyMap.lib_name as SymbolLibName | undefined
     if (libIdClass) {
       symbol._sxLibId = libIdClass
     } else if (inlineId !== undefined) {
@@ -953,6 +981,7 @@ export class SchematicSymbol extends SxClass {
     symbol.circles = (arrayPropertyMap.circle as SymbolCircle[]) ?? []
     symbol.arcs = (arrayPropertyMap.arc as SymbolArc[]) ?? []
     symbol.texts = (arrayPropertyMap.text as SymbolText[]) ?? []
+    symbol.textBoxes = (arrayPropertyMap.text_box as SymbolTextBox[]) ?? []
     symbol._sxInstances = propertyMap.instances as SymbolInstances
 
     return symbol
@@ -960,6 +989,7 @@ export class SchematicSymbol extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxLibName) children.push(this._sxLibName)
     if (this._sxLibId) children.push(this._sxLibId)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxMirror) children.push(this._sxMirror)
@@ -983,6 +1013,7 @@ export class SchematicSymbol extends SxClass {
     children.push(...this.circles)
     children.push(...this.arcs)
     children.push(...this.texts)
+    children.push(...this.textBoxes)
     if (this._sxPower) children.push(this._sxPower)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     if (this._sxInstances) children.push(this._sxInstances)

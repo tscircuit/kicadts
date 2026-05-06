@@ -2,7 +2,9 @@ import {
   KicadSch,
   Paper,
   Property,
+  SchematicRectangle,
   SchematicSymbol,
+  SchematicTextBox,
   Sheet,
   SxClass,
   TitleBlock,
@@ -92,6 +94,41 @@ test("KicadSch parse", () => {
       )
     )"
   `)
+})
+
+test("KicadSch parses root rectangles and text boxes", () => {
+  const [parsed] = SxClass.parse(`
+    (kicad_sch
+      (version 20240101)
+      (generator eeschema)
+      (uuid 01234567-89ab-cdef-0123-456789abcdef)
+      (paper A4)
+      (rectangle
+        (start 134.62 35.814)
+        (end 132.08 38.354)
+        (stroke (width 0.0254) (type solid) (color 128 0 0 1))
+        (fill (type color) (color 255 255 176 1))
+        (uuid 040e42d7-787e-4aba-984f-3ca88a39a07a)
+      )
+      (text_box "75"
+        (exclude_from_sim no)
+        (at 177.8 81.534 0)
+        (size 10.16 10.16)
+        (stroke (width 0) (type default) (color 0 0 0 1))
+        (fill (type none))
+        (effects (font (size 2.54 2.54) (thickness 0.508) (bold yes)))
+        (uuid "0087a9e2-23fa-483c-88c9-f4af0fc504e0")
+      )
+    )
+  `)
+
+  expect(parsed).toBeInstanceOf(KicadSch)
+  const schematic = parsed as KicadSch
+  expect(schematic.rectangles).toHaveLength(1)
+  expect(schematic.rectangles[0]).toBeInstanceOf(SchematicRectangle)
+  expect(schematic.textBoxes).toHaveLength(1)
+  expect(schematic.textBoxes[0]).toBeInstanceOf(SchematicTextBox)
+  expect(schematic.getString()).toContain('(text_box "75"')
 })
 
 test("KicadSch parse with lib_symbols, instances and sheet_instances", () => {

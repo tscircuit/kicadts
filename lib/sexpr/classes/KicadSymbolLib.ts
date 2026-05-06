@@ -1,10 +1,15 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { KicadSymbolLibGenerator } from "./KicadSymbolLibGenerator"
+import { KicadSymbolLibGeneratorVersion } from "./KicadSymbolLibGeneratorVersion"
 import { KicadSymbolLibVersion } from "./KicadSymbolLibVersion"
 import { SchematicSymbol } from "./Symbol"
 
-const SINGLE_CHILD_TOKENS = new Set(["version", "generator"])
+const SINGLE_CHILD_TOKENS = new Set([
+  "version",
+  "generator",
+  "generator_version",
+])
 
 const MULTI_CHILD_TOKENS = new Set(["symbol"])
 
@@ -16,6 +21,7 @@ const SUPPORTED_CHILD_TOKENS = new Set([
 export interface KicadSymbolLibConstructorParams {
   version?: number | KicadSymbolLibVersion
   generator?: string | KicadSymbolLibGenerator
+  generatorVersion?: string | KicadSymbolLibGeneratorVersion
   symbols?: SchematicSymbol[]
 }
 
@@ -25,6 +31,7 @@ export class KicadSymbolLib extends SxClass {
 
   private _sxVersion?: KicadSymbolLibVersion
   private _sxGenerator?: KicadSymbolLibGenerator
+  private _sxGeneratorVersion?: KicadSymbolLibGeneratorVersion
   private _symbols: SchematicSymbol[] = []
 
   constructor(params: KicadSymbolLibConstructorParams = {}) {
@@ -40,6 +47,12 @@ export class KicadSymbolLib extends SxClass {
       this._sxGenerator = params.generator
     } else if (params.generator !== undefined) {
       this.generator = params.generator
+    }
+
+    if (params.generatorVersion instanceof KicadSymbolLibGeneratorVersion) {
+      this._sxGeneratorVersion = params.generatorVersion
+    } else if (params.generatorVersion !== undefined) {
+      this.generatorVersion = params.generatorVersion
     }
 
     if (params.symbols !== undefined) {
@@ -90,6 +103,9 @@ export class KicadSymbolLib extends SxClass {
     return new KicadSymbolLib({
       version: propertyMap.version as KicadSymbolLibVersion | undefined,
       generator: propertyMap.generator as KicadSymbolLibGenerator | undefined,
+      generatorVersion: propertyMap.generator_version as
+        | KicadSymbolLibGeneratorVersion
+        | undefined,
       symbols: (arrayPropertyMap.symbol as SchematicSymbol[]) ?? [],
     })
   }
@@ -112,6 +128,17 @@ export class KicadSymbolLib extends SxClass {
       value === undefined ? undefined : new KicadSymbolLibGenerator(value)
   }
 
+  get generatorVersion(): string | undefined {
+    return this._sxGeneratorVersion?.value
+  }
+
+  set generatorVersion(value: string | undefined) {
+    this._sxGeneratorVersion =
+      value === undefined
+        ? undefined
+        : new KicadSymbolLibGeneratorVersion(value)
+  }
+
   get symbols(): SchematicSymbol[] {
     return [...this._symbols]
   }
@@ -124,6 +151,7 @@ export class KicadSymbolLib extends SxClass {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
     if (this._sxGenerator) children.push(this._sxGenerator)
+    if (this._sxGeneratorVersion) children.push(this._sxGeneratorVersion)
     children.push(...this._symbols)
     return children
   }

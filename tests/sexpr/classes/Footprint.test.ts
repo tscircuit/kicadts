@@ -85,6 +85,18 @@ test("Footprint", () => {
         (pintype "passive")
         (uuid 12121212-3434-5656-7878-909090909090)
       )
+      (zone
+        (net 0)
+        (net_name "")
+        (layer "F.Cu")
+        (uuid "8b274206-4812-4fb8-bc0c-557417fe74dd")
+        (hatch full 0.508)
+        (polygon
+          (pts
+            (xy 0 0) (xy 1 0) (xy 1 1) (xy 0 1)
+          )
+        )
+      )
     )
   `)
 
@@ -155,6 +167,7 @@ test("Footprint", () => {
   expect(pad.padType).toBe("smd")
   expect(pad.layers?.layers).toEqual(["F.Cu", "F.Paste", "F.Mask"])
   expect(pad.net?.name).toBe("GND")
+  expect(footprint.zones).toHaveLength(1)
 
   footprint.locked = false
   footprint.placed = false
@@ -271,6 +284,14 @@ test("Footprint", () => {
         (solder_mask_margin 0.05)
         (clearance 0.1)
         (uuid 12121212-3434-5656-7878-909090909090)
+      )
+      (zone
+        (net 0)
+        (net_name \"\")
+        (layer F.Cu)
+        (uuid 8b274206-4812-4fb8-bc0c-557417fe74dd)
+        (hatch full 0.508)
+        (polygon (pts (xy 0 0) (xy 1 0) (xy 1 1) (xy 0 1)))
       )
     )"
   `)
