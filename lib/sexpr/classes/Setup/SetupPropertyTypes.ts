@@ -1,5 +1,9 @@
 import { PcbPlotParams } from "./PcbPlotParams"
 import { Stackup } from "./Stackup"
+import { Capping } from "./Capping"
+import { Covering } from "./Covering"
+import { Filling } from "./Filling"
+import { Plugging } from "./Plugging"
 import {
   SetupAuxAxisOrigin,
   SetupGridOrigin,
@@ -73,6 +77,10 @@ export interface SetupPropertyValues {
   padDrill?: SetupPadDrill
   allowSoldermaskBridgesInFootprints?: SetupAllowSoldermaskBridgesInFootprints
   tenting?: SetupTenting
+  covering?: Covering
+  plugging?: Plugging
+  capping?: Capping
+  filling?: Filling
   auxAxisOrigin?: SetupAuxAxisOrigin
   gridOrigin?: SetupGridOrigin
   visibleElements?: SetupVisibleElements
@@ -112,6 +120,10 @@ export type SetupProperty =
   | SetupPadDrill
   | SetupAllowSoldermaskBridgesInFootprints
   | SetupTenting
+  | Covering
+  | Plugging
+  | Capping
+  | Filling
   | SetupAuxAxisOrigin
   | SetupGridOrigin
   | SetupVisibleElements
