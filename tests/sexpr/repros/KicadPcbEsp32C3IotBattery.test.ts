@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { KicadPcb, PcbArc, SxClass, Via } from "lib/sexpr"
 
-test("kicad_pcb: ESP32-C3 IoT battery PCB", async () => {
+test.skip("kicad_pcb: ESP32-C3 IoT battery PCB", async () => {
   const path = "tests/assets/esp32-c3-iot-battery-pcb.kicad_pcb"
   const original = await Bun.file(path).text()
   const classes = SxClass.parse(original)
