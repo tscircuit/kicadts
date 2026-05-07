@@ -22,6 +22,7 @@ export class FootprintModel extends SxClass {
   private _offset?: ModelVector
   private _scale?: ModelVector
   private _rotate?: ModelVector
+  private _opacity?: number
   private _hide = false
 
   constructor(path: string) {
@@ -70,6 +71,10 @@ export class FootprintModel extends SxClass {
         model._rotate = parseVectorArgs(args, "rotate")
         continue
       }
+      if (token === "opacity") {
+        model._opacity = parseOpacityArgs(args)
+        continue
+      }
       if (token === "hide") {
         model._hide = parseHideArgs(args)
         continue
@@ -112,6 +117,14 @@ export class FootprintModel extends SxClass {
     this._rotate = value ? { ...value } : undefined
   }
 
+  get opacity(): number | undefined {
+    return this._opacity
+  }
+
+  set opacity(value: number | undefined) {
+    this._opacity = value
+  }
+
   get hide(): boolean {
     return this._hide
   }
@@ -128,6 +141,9 @@ export class FootprintModel extends SxClass {
     const lines = [`(model ${quoteSExprString(this._path)}`]
     if (this._hide) {
       lines.push("  (hide yes)")
+    }
+    if (this._opacity !== undefined) {
+      lines.push(`  (opacity ${this._opacity})`)
     }
     if (this._offset) {
       lines.push(renderVectorBlock("offset", this._offset))
@@ -180,4 +196,17 @@ function parseHideArgs(args: PrimitiveSExpr[]): boolean {
     )
   }
   return parsed
+}
+
+function parseOpacityArgs(args: PrimitiveSExpr[]): number {
+  if (args.length !== 1) {
+    throw new Error("model opacity expects a single number")
+  }
+  const opacity = toNumberValue(args[0])
+  if (opacity === undefined) {
+    throw new Error(
+      `model opacity expects a number, received ${JSON.stringify(args[0])}`,
+    )
+  }
+  return opacity
 }

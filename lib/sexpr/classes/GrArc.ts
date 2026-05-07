@@ -5,6 +5,7 @@ import { Stroke } from "./Stroke"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { GrArcLocked } from "./GrArcLocked"
 
 export interface GrArcPoint {
   x: number
@@ -20,6 +21,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "stroke",
   "tstamp",
   "uuid",
+  "locked",
 ])
 
 export interface GrArcConstructorParams {
@@ -31,6 +33,7 @@ export interface GrArcConstructorParams {
   stroke?: Stroke
   tstamp?: Tstamp | string
   uuid?: Uuid | string
+  locked?: boolean
 }
 
 export class GrArc extends SxClass {
@@ -45,6 +48,7 @@ export class GrArc extends SxClass {
   private _sxStroke?: Stroke
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
+  private _sxLocked?: GrArcLocked
 
   constructor(params: GrArcConstructorParams = {}) {
     super()
@@ -56,6 +60,7 @@ export class GrArc extends SxClass {
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
   }
 
   static override fromSexprPrimitives(
@@ -105,6 +110,8 @@ export class GrArc extends SxClass {
     grArc._sxStroke = propertyMap.stroke as Stroke | undefined
     grArc._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grArc._sxUuid = propertyMap.uuid as Uuid | undefined
+    const locked = propertyMap.locked as GrArcLocked | undefined
+    grArc._sxLocked = locked && locked.value ? locked : undefined
 
     if (!grArc._sxStart) {
       throw new Error("gr_arc requires a start child token")
@@ -227,6 +234,14 @@ export class GrArc extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: boolean) {
+    this._sxLocked = value ? new GrArcLocked(true) : undefined
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxStart) children.push(this._sxStart)
@@ -234,6 +249,7 @@ export class GrArc extends SxClass {
     if (this._sxEnd) children.push(this._sxEnd)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxWidth) children.push(this._sxWidth)
+    if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
