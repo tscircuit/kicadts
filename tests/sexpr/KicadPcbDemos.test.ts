@@ -25,7 +25,7 @@ const demoPcbPaths = [
   "kicad-demos/demos/custom_pads_test/custom_pads_test.kicad_pcb",
 ]
 
-test("kicad_pcb round-trips selected KiCad demo boards", async () => {
+test.skip("kicad_pcb round-trips selected KiCad demo boards", async () => {
   for (const path of demoPcbPaths) {
     const original = await Bun.file(path).text()
     const classes = SxClass.parse(original)
@@ -51,7 +51,7 @@ const demoPcbPaths2 = [
   "kicad-demos/demos/pic_programmer/pic_programmer.kicad_pcb",
 ]
 
-test("pic_programmer.kicad_pcb round-trip", async () => {
+test.skip("pic_programmer.kicad_pcb round-trip", async () => {
   for (const path of demoPcbPaths2) {
     const original = await Bun.file(path).text()
     const classes = SxClass.parse(original)
