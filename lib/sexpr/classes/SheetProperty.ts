@@ -4,6 +4,8 @@ import { indentLines } from "../utils/indentLines"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 import { At } from "./At"
+import { PropertyDoNotAutoplace } from "./PropertyDoNotAutoplace"
+import { PropertyShowName } from "./PropertyShowName"
 import { TextEffects } from "./TextEffects"
 import { SymbolPropertyId as PropertyId } from "./Symbol"
 
@@ -16,6 +18,8 @@ export class SheetProperty extends SxClass {
   value: string
   private _sxId?: PropertyId
   private _sxAt?: At
+  private _sxShowName?: PropertyShowName
+  private _sxDoNotAutoplace?: PropertyDoNotAutoplace
   private _sxEffects?: TextEffects
 
   constructor(params: {
@@ -23,6 +27,8 @@ export class SheetProperty extends SxClass {
     value: string
     id?: number | PropertyId
     at?: At
+    showName?: boolean | PropertyShowName
+    doNotAutoplace?: boolean | PropertyDoNotAutoplace
     effects?: TextEffects
   }) {
     super()
@@ -30,6 +36,8 @@ export class SheetProperty extends SxClass {
     this.value = params.value
     this.id = params.id
     this.at = params.at
+    this.showName = params.showName
+    this.doNotAutoplace = params.doNotAutoplace
     this.effects = params.effects
   }
 
@@ -55,6 +63,10 @@ export class SheetProperty extends SxClass {
       value,
       id: propertyMap.id as PropertyId | undefined,
       at: propertyMap.at as At | undefined,
+      showName: propertyMap.show_name as PropertyShowName | undefined,
+      doNotAutoplace: propertyMap.do_not_autoplace as
+        | PropertyDoNotAutoplace
+        | undefined,
       effects: propertyMap.effects as TextEffects | undefined,
     })
   }
@@ -83,6 +95,34 @@ export class SheetProperty extends SxClass {
     this._sxAt = value
   }
 
+  get showName(): boolean | undefined {
+    return this._sxShowName?.value
+  }
+
+  set showName(value: boolean | PropertyShowName | undefined) {
+    if (value === undefined) {
+      this._sxShowName = undefined
+      return
+    }
+    this._sxShowName =
+      value instanceof PropertyShowName ? value : new PropertyShowName(value)
+  }
+
+  get doNotAutoplace(): boolean | undefined {
+    return this._sxDoNotAutoplace?.value
+  }
+
+  set doNotAutoplace(value: boolean | PropertyDoNotAutoplace | undefined) {
+    if (value === undefined) {
+      this._sxDoNotAutoplace = undefined
+      return
+    }
+    this._sxDoNotAutoplace =
+      value instanceof PropertyDoNotAutoplace
+        ? value
+        : new PropertyDoNotAutoplace(value)
+  }
+
   get effects(): TextEffects | undefined {
     return this._sxEffects
   }
@@ -95,6 +135,8 @@ export class SheetProperty extends SxClass {
     const children: SxClass[] = []
     if (this._sxId) children.push(this._sxId)
     if (this._sxAt) children.push(this._sxAt)
+    if (this._sxShowName) children.push(this._sxShowName)
+    if (this._sxDoNotAutoplace) children.push(this._sxDoNotAutoplace)
     if (this._sxEffects) children.push(this._sxEffects)
     return children
   }

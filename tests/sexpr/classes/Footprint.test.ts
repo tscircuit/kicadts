@@ -291,7 +291,14 @@ test("Footprint", () => {
         (layer F.Cu)
         (uuid 8b274206-4812-4fb8-bc0c-557417fe74dd)
         (hatch full 0.508)
-        (polygon (pts (xy 0 0) (xy 1 0) (xy 1 1) (xy 0 1)))
+        (polygon
+          (pts
+            (xy 0 0)
+            (xy 1 0)
+            (xy 1 1)
+            (xy 0 1)
+          )
+        )
       )
     )"
   `)
