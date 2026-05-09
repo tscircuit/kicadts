@@ -5,6 +5,8 @@ import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
+import { toStringValue } from "../utils/toStringValue"
+import { parseYesNo } from "../utils/parseYesNo"
 
 export interface PcbArcPoint {
   x: number
@@ -17,7 +19,8 @@ export interface PcbArcConstructorParams {
   end?: PcbArcPoint
   width?: number | Width
   layer?: string | Layer
-  net?: number
+  net?: number | string
+  locked?: boolean
   uuid?: string | Uuid
 }
 
@@ -31,7 +34,8 @@ export class PcbArc extends SxClass {
   private _end?: PcbArcPoint
   private _sxWidth?: Width
   private _sxLayer?: Layer
-  private _net?: number
+  private _net?: number | string
+  private _locked = false
   private _sxUuid?: Uuid
 
   constructor(params: PcbArcConstructorParams = {}) {
@@ -42,6 +46,7 @@ export class PcbArc extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.layer !== undefined) this.layer = params.layer
     if (params.net !== undefined) this.net = params.net
+    if (params.locked !== undefined) this.locked = params.locked
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
 
@@ -80,7 +85,11 @@ export class PcbArc extends SxClass {
         continue
       }
       if (token === "net") {
-        arc._net = parseNumber(args[0], "net")
+        arc._net = parseNet(args[0])
+        continue
+      }
+      if (token === "locked") {
+        arc._locked = parseLocked(args)
         continue
       }
       if (token === "uuid") {
@@ -149,12 +158,20 @@ export class PcbArc extends SxClass {
     this._sxLayer = value instanceof Layer ? value : new Layer([value])
   }
 
-  get net(): number | undefined {
+  get net(): number | string | undefined {
     return this._net
   }
 
-  set net(value: number | undefined) {
+  set net(value: number | string | undefined) {
     this._net = value
+  }
+
+  get locked(): boolean {
+    return this._locked
+  }
+
+  set locked(value: boolean) {
+    this._locked = value
   }
 
   get uuid(): Uuid | undefined {
@@ -179,8 +196,15 @@ export class PcbArc extends SxClass {
     if (this._mid) lines.push(renderPoint("mid", this._mid))
     if (this._end) lines.push(renderPoint("end", this._end))
     if (this._sxWidth) lines.push(this._sxWidth.getStringIndented())
+    if (this._locked) lines.push("  (locked yes)")
     if (this._sxLayer) lines.push(this._sxLayer.getStringIndented())
-    if (this._net !== undefined) lines.push(`  (net ${this._net})`)
+    if (this._net !== undefined) {
+      const netValue =
+        typeof this._net === "number"
+          ? String(this._net)
+          : quoteSExprString(this._net)
+      lines.push(`  (net ${netValue})`)
+    }
     if (this._sxUuid) lines.push(this._sxUuid.getStringIndented())
     lines.push(")")
     return lines.join("\n")
@@ -211,6 +235,30 @@ function parseString(value: PrimitiveSExpr | undefined, label: string): string {
     throw new Error(`arc ${label} expects a string value`)
   }
   return value
+}
+
+function parseNet(value: PrimitiveSExpr | undefined): number | string {
+  const numeric = toNumberValue(value)
+  if (numeric !== undefined) return numeric
+
+  const stringValue = toStringValue(value)
+  if (stringValue !== undefined) return stringValue
+
+  throw new Error("arc net expects a numeric id or string name")
+}
+
+function parseLocked(args: PrimitiveSExpr[]): boolean {
+  if (args.length === 0) return true
+  if (args.length !== 1) {
+    throw new Error("arc locked expects at most one value")
+  }
+  const parsed = parseYesNo(args[0])
+  if (parsed === undefined) {
+    throw new Error(
+      `arc locked expects yes/no, received ${JSON.stringify(args[0])}`,
+    )
+  }
+  return parsed
 }
 
 function parseLayer(args: PrimitiveSExpr[]): string {

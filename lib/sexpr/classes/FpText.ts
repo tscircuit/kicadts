@@ -18,6 +18,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "effects",
   "tstamp",
   "uuid",
+  "locked",
   "unlocked",
   "hide",
 ])
@@ -28,6 +29,7 @@ export interface FpTextConstructorParams {
   type?: FpTextType
   text?: string
   position?: AtInput | Xy
+  locked?: boolean
   unlocked?: boolean
   hidden?: boolean
   layer?: Layer | string | string[]
@@ -43,6 +45,7 @@ export class FpText extends SxClass {
   private _type?: FpTextType
   private _text = ""
   private _sxPosition?: At | Xy
+  private _sxLocked?: FpTextLocked
   private _sxUnlocked?: FpTextUnlocked
   private _sxHide?: FpTextHide
   private _sxLayer?: Layer
@@ -55,6 +58,7 @@ export class FpText extends SxClass {
     if (params.type !== undefined) this.type = params.type
     if (params.text !== undefined) this.text = params.text
     if (params.position !== undefined) this.position = params.position
+    if (params.locked !== undefined) this.locked = params.locked
     if (params.unlocked !== undefined) this.unlocked = params.unlocked
     if (params.hidden !== undefined) this.hidden = params.hidden
     if (params.layer !== undefined) this.layer = params.layer
@@ -151,6 +155,7 @@ export class FpText extends SxClass {
     fpText._sxEffects = propertyMap.effects as TextEffects | undefined
     fpText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     fpText._sxUuid = propertyMap.uuid as Uuid | undefined
+    fpText._sxLocked = propertyMap.locked as FpTextLocked | undefined
 
     const unlockedEntry = propertyMap.unlocked as FpTextUnlocked | undefined
     const hideEntry = propertyMap.hide as FpTextHide | undefined
@@ -210,6 +215,14 @@ export class FpText extends SxClass {
     }
     // Handle AtInput (At, array, or object)
     this._sxPosition = At.from(value as AtInput)
+  }
+
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: boolean) {
+    this._sxLocked = value ? new FpTextLocked({ value: true }) : undefined
   }
 
   get unlocked(): boolean {
@@ -283,6 +296,7 @@ export class FpText extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxPosition) children.push(this._sxPosition)
     if (this._sxUnlocked) children.push(this._sxUnlocked)
     if (this._sxLayer) children.push(this._sxLayer)
@@ -355,6 +369,38 @@ class FpTextUnlocked extends SxClass {
   }
 }
 SxClass.register(FpTextUnlocked)
+
+class FpTextLocked extends SxClass {
+  static override token = "locked"
+  static override parentToken = "fp_text"
+  token = "locked"
+
+  value: boolean
+
+  constructor(options: { value?: boolean } = {}) {
+    super()
+    this.value = options.value ?? true
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): FpTextLocked {
+    const [raw] = primitiveSexprs
+    const rawString = toStringValue(raw)
+    const value =
+      rawString === undefined ? true : !/^(no|false)$/iu.test(rawString)
+    return new FpTextLocked({ value })
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(locked ${this.value ? "yes" : "no"})`
+  }
+}
+SxClass.register(FpTextLocked)
 
 class FpTextHide extends SxClass {
   static override token = "hide"
