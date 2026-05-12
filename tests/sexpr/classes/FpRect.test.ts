@@ -38,3 +38,17 @@ test("FpRect", () => {
     )"
   `)
 })
+
+test("FpRect parses fill solid as filled", () => {
+  const [rect] = SxClass.parse(`
+    (fp_rect
+      (start 0 0)
+      (end 5 5)
+      (layer F.SilkS)
+      (stroke (width 0.2) (type solid))
+      (fill solid)
+    )
+  `)
+
+  expect((rect as FpRect).fill).toBe(true)
+})

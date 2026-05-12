@@ -323,7 +323,7 @@ export class FpRectFill extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): FpRectFill {
     const state = toStringValue(primitiveSexprs[0])
-    return new FpRectFill(state === "yes")
+    return new FpRectFill(/^(yes|true|1|solid)$/iu.test(state ?? ""))
   }
 
   override getString(): string {
