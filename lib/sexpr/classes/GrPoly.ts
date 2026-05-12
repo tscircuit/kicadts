@@ -25,7 +25,7 @@ export class GrPolyFill extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): GrPolyFill {
     const state = toStringValue(primitiveSexprs[0])
-    return new GrPolyFill(/^(yes|true|1|solid)$/iu.test(state ?? ""))
+    return new GrPolyFill(/^(yes|solid)$/iu.test(state ?? ""))
   }
 
   override getString(): string {

@@ -402,7 +402,7 @@ export class GrRectFill extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): GrRectFill {
     const state = toStringValue(primitiveSexprs[0])
-    return new GrRectFill(/^(yes|true|1|solid)$/iu.test(state ?? ""))
+    return new GrRectFill(/^(yes|solid)$/iu.test(state ?? ""))
   }
 
   override getString(): string {
