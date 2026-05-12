@@ -278,7 +278,7 @@ class PadPrimitiveFill extends SxPrimitiveBoolean {
   // class cannot also register under parentToken="gr_poly" without overriding
   // the board-level parser. PadPrimitiveGrPoly normalizes parsed fill tokens
   // into PadPrimitiveFill instances itself.
-  static override parentToken = "gr_poly"
+  static override parentToken = "pad_primitive_gr_poly"
   override token = "fill"
 
   constructor(options: { value?: boolean } = {}) {
