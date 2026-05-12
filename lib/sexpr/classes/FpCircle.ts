@@ -323,7 +323,7 @@ export class FpCircleFill extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): FpCircleFill {
     const state = toStringValue(primitiveSexprs[0])
-    return new FpCircleFill(state === "yes")
+    return new FpCircleFill(/^(yes|solid)$/iu.test(state ?? ""))
   }
 
   override getString(): string {

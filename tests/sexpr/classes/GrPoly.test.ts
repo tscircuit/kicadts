@@ -77,6 +77,24 @@ test("GrPoly - net id", () => {
   expect(grPoly.getString()).toContain("(net 17)")
 })
 
+test("GrPoly parses fill solid as filled", () => {
+  const [poly] = SxClass.parse(`
+    (gr_poly
+        (pts
+            (xy 0 0) (xy 10 0) (xy 10 10)
+        )
+        (stroke
+            (width 0)
+            (type default)
+        )
+        (fill solid)
+        (layer "B.SilkS")
+    )
+  `)
+
+  expect((poly as GrPoly).fill).toBe(true)
+})
+
 test("GrPoly - constructor", () => {
   const grPoly = new GrPoly({
     points: [

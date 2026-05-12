@@ -37,3 +37,17 @@ test("FpCircle", () => {
     )"
   `)
 })
+
+test("FpCircle parses fill solid as filled", () => {
+  const [circle] = SxClass.parse(`
+    (fp_circle
+      (center 1 1)
+      (end 2 1)
+      (layer F.SilkS)
+      (stroke (width 0.1) (type solid))
+      (fill solid)
+    )
+  `)
+
+  expect((circle as FpCircle).fill).toBe(true)
+})

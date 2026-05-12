@@ -76,3 +76,20 @@ test("GrRect - getString output", () => {
   expect(output).toContain("(layer Edge.Cuts)")
   expect(output).toContain("5b95af0e-1f3a-402d-b822-c10a6e4a88c8")
 })
+
+test("GrRect parses fill solid as filled", () => {
+  const [rect] = SxClass.parse(`
+    (gr_rect
+        (start 0 -55)
+        (end 90 0)
+        (stroke
+            (width 0.05)
+            (type default)
+        )
+        (fill solid)
+        (layer "B.SilkS")
+    )
+  `)
+
+  expect((rect as GrRect).fill).toBe(true)
+})
