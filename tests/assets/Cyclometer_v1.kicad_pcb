@@ -24743,7 +24743,6 @@
 	(gr_text "GND"
 		(at 122 52.2 0)
 		(layer "F.SilkS")
-		(uuid "8967e485-884c-457d-8ffb-4e2a6b183fe2")
 		(effects
 			(font
 				(size 1 0.75)
