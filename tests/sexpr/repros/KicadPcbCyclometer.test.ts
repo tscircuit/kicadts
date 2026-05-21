@@ -8,7 +8,6 @@ test("kicad_pcb: Cyclometer repro", async () => {
   )
   expect(original).toContain("(locked yes)")
 
-
   // Current failures:
   // - gr_text requires a uuid or tstamp child token
   // - Class "locked" not registered for parent "zone"
