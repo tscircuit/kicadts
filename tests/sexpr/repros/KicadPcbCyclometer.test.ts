@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test"
+import { GrText, KicadPcb, SxClass, Zone } from "lib/sexpr"
 
 test("kicad_pcb: Cyclometer repro", async () => {
   const original = await Bun.file("tests/assets/Cyclometer_v1.kicad_pcb").text()
@@ -8,9 +9,21 @@ test("kicad_pcb: Cyclometer repro", async () => {
   )
   expect(original).toContain("(locked yes)")
 
-  // Current failures:
-  // - gr_text requires a uuid or tstamp child token
-  // - Class "locked" not registered for parent "zone"
-  // const classes = SxClass.parse(original)
-  // expect(classes).toHaveLength(1)
+  const classes = SxClass.parse(original)
+  expect(classes).toHaveLength(1)
+  expect(classes[0]).toBeInstanceOf(KicadPcb)
+  const pcb = classes[0] as KicadPcb
+
+  expect(pcb.graphicTexts).toHaveLength(25)
+  expect(pcb.graphicTexts[0]).toBeInstanceOf(GrText)
+  expect(pcb.graphicTexts[0]?.uuid).toBeUndefined()
+  expect(pcb.graphicTexts[0]?.tstamp).toBeUndefined()
+
+  expect(pcb.zones).toHaveLength(1)
+  expect(pcb.zones[0]).toBeInstanceOf(Zone)
+  expect(pcb.zones[0]?.locked).toBe(true)
+
+  const roundTrip = classes.map((instance) => instance.getString()).join("\n")
+  const reparsedClasses = SxClass.parse(roundTrip)
+  expect(reparsedClasses).toHaveLength(1)
 })

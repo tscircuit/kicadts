@@ -11,6 +11,7 @@ import { ZoneFilledAreasThickness } from "./ZoneFilledAreasThickness"
 import { ZoneFilledPolygon } from "./ZoneFilledPolygon"
 import { ZoneHatch } from "./ZoneHatch"
 import { ZoneKeepout } from "./ZoneKeepout"
+import { ZoneLocked } from "./ZoneLocked"
 import { ZoneMinThickness } from "./ZoneMinThickness"
 import { ZoneName } from "./ZoneName"
 import { ZoneNet } from "./ZoneNet"
@@ -40,6 +41,7 @@ import "./ZoneKeepoutFootprints"
 import "./ZoneKeepoutPads"
 import "./ZoneKeepoutTracks"
 import "./ZoneKeepoutVias"
+import "./ZoneLocked"
 import "./ZoneMinThickness"
 import "./ZoneName"
 import "./ZoneNet"
@@ -57,6 +59,7 @@ const SINGLE_TOKENS = new Set([
   "layers",
   "tstamp",
   "uuid",
+  "locked",
   "name",
   "hatch",
   "priority",
@@ -79,6 +82,7 @@ export interface ZoneConstructorParams {
   layers?: Layers | string[]
   tstamp?: Tstamp | string
   uuid?: Uuid | string
+  locked?: ZoneLocked | boolean
   name?: ZoneName | string
   hatch?: ZoneHatch
   priority?: ZonePriority | number
@@ -103,6 +107,7 @@ export class Zone extends SxClass {
   private _sxLayers?: Layers
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
+  private _sxLocked?: ZoneLocked
   private _sxName?: ZoneName
   private _sxHatch?: ZoneHatch
   private _sxPriority?: ZonePriority
@@ -124,6 +129,7 @@ export class Zone extends SxClass {
     if (params.layers !== undefined) this.layers = params.layers
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.locked !== undefined) this.locked = params.locked
     if (params.name !== undefined) this.name = params.name
     if (params.hatch !== undefined) this.hatch = params.hatch
     if (params.priority !== undefined) this.priority = params.priority
@@ -173,6 +179,8 @@ export class Zone extends SxClass {
     }
     zone._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     zone._sxUuid = propertyMap.uuid as Uuid | undefined
+    const locked = propertyMap.locked as ZoneLocked | undefined
+    zone._sxLocked = locked && locked.value ? locked : undefined
     zone._sxName = propertyMap.name as ZoneName | undefined
     zone._sxHatch = propertyMap.hatch as ZoneHatch | undefined
     zone._sxPriority = propertyMap.priority as ZonePriority | undefined
@@ -276,6 +284,24 @@ export class Zone extends SxClass {
         : value instanceof Uuid
           ? value
           : new Uuid(value)
+  }
+
+  get locked(): boolean {
+    return this._sxLocked?.value ?? false
+  }
+
+  set locked(value: ZoneLocked | boolean | undefined) {
+    if (value === undefined) {
+      this._sxLocked = undefined
+      return
+    }
+
+    if (value instanceof ZoneLocked) {
+      this._sxLocked = value.value ? value : undefined
+      return
+    }
+
+    this._sxLocked = value ? new ZoneLocked(true) : undefined
   }
 
   get name(): string | undefined {
@@ -405,6 +431,7 @@ export class Zone extends SxClass {
     if (this._sxLayers) children.push(this._sxLayers)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxName) children.push(this._sxName)
     if (this._sxHatch) children.push(this._sxHatch)
     if (this._sxPriority) children.push(this._sxPriority)
