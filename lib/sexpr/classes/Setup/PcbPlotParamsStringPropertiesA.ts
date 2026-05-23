@@ -31,6 +31,12 @@ export class PlotParamCreateGerberJobFile extends PlotParamProperty<string> {
 }
 SxClass.register(PlotParamCreateGerberJobFile)
 
+export class PlotParamSvgUseInch extends PlotParamProperty<string> {
+  static override token = "svguseinch"
+  token = "svguseinch"
+}
+SxClass.register(PlotParamSvgUseInch)
+
 export class PlotParamExcludeEdgeLayer extends PlotParamProperty<string> {
   static override token = "excludeedgelayer"
   token = "excludeedgelayer"
