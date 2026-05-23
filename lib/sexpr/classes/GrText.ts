@@ -170,9 +170,6 @@ export class GrText extends SxClass {
     if (!grText._sxLayer) {
       throw new Error("gr_text requires a layer child token")
     }
-    if (!grText._sxUuid && !grText._sxTstamp) {
-      throw new Error("gr_text requires a uuid or tstamp child token")
-    }
     if (!grText._sxEffects) {
       throw new Error("gr_text requires an effects child token")
     }
