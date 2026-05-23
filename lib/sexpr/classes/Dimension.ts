@@ -132,5 +132,13 @@ export class Dimension extends SxClass {
     if (this._sxGrText) children.push(this._sxGrText)
     return children
   }
+
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
+  }
 }
 SxClass.register(Dimension)
