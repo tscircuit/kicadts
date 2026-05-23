@@ -12,7 +12,7 @@ import type { DimensionArrowDirection } from "./DimensionArrowDirection"
 import type { DimensionArrowLength } from "./DimensionArrowLength"
 import type { DimensionExtensionHeight } from "./DimensionExtensionHeight"
 import type { DimensionExtensionOffset } from "./DimensionExtensionOffset"
-import type { DimensionKeepTextAligned } from "./DimensionKeepTextAligned"
+import { DimensionKeepTextAligned } from "./DimensionKeepTextAligned"
 import type { DimensionStyleThickness } from "./DimensionStyleThickness"
 import type { DimensionTextFrame } from "./DimensionTextFrame"
 import type { DimensionTextPositionMode } from "./DimensionTextPositionMode"
@@ -61,8 +61,13 @@ export class DimensionStyle extends SxClass {
       }
     }
 
+    let hasBareKeepTextAligned = false
     for (const primitive of primitiveSexprs) {
       if (!Array.isArray(primitive)) {
+        if (primitive === "keep_text_aligned") {
+          hasBareKeepTextAligned = true
+          continue
+        }
         throw new Error(
           `style encountered unexpected primitive child ${JSON.stringify(primitive)}`,
         )
@@ -93,6 +98,9 @@ export class DimensionStyle extends SxClass {
     style._sxKeepTextAligned = propertyMap.keep_text_aligned as
       | DimensionKeepTextAligned
       | undefined
+    if (hasBareKeepTextAligned) {
+      style._sxKeepTextAligned = new DimensionKeepTextAligned(true)
+    }
 
     if (!style._sxThickness) {
       throw new Error("style requires a thickness child token")
