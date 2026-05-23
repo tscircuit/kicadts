@@ -32,6 +32,7 @@ import {
   PlotParamPdfSingleDocument,
   PlotParamPlotFrameRef,
   PlotParamPsNegative,
+  PlotParamSvgUseInch,
   PlotParamUseAuxOrigin,
   PlotParamUseGerberAdvancedAttributes,
   PlotParamUseGerberAttributes,
@@ -69,6 +70,7 @@ const TOKEN_TO_KEY = {
   excludeedgelayer: "excludeedgelayer",
   dashed_line_dash_ratio: "dashed_line_dash_ratio",
   dashed_line_gap_ratio: "dashed_line_gap_ratio",
+  svguseinch: "svguseinch",
   svgprecision: "svgprecision",
   linewidth: "linewidth",
   plotframeref: "plotframeref",
@@ -125,6 +127,7 @@ const PCB_PLOT_PARAM_CHILD_ORDER: PlotParamKey[] = [
   "excludeedgelayer",
   "dashed_line_dash_ratio",
   "dashed_line_gap_ratio",
+  "svguseinch",
   "svgprecision",
   "linewidth",
   "plotframeref",
@@ -355,6 +358,14 @@ export class PcbPlotParams extends SxClass {
       value,
       PlotParamDashedLineGapRatio,
     )
+  }
+
+  get svguseinch(): string | undefined {
+    return this._properties.svguseinch?.value
+  }
+
+  set svguseinch(value: string | undefined) {
+    this.setStringProperty("svguseinch", value, PlotParamSvgUseInch)
   }
 
   get svgprecision(): number | undefined {

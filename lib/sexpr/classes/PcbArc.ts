@@ -1,6 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
+import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { quoteSExprString } from "../utils/quoteSExprString"
@@ -21,6 +22,7 @@ export interface PcbArcConstructorParams {
   layer?: string | Layer
   net?: number | string
   locked?: boolean
+  tstamp?: string | Tstamp
   uuid?: string | Uuid
 }
 
@@ -36,6 +38,7 @@ export class PcbArc extends SxClass {
   private _sxLayer?: Layer
   private _net?: number | string
   private _locked = false
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
 
   constructor(params: PcbArcConstructorParams = {}) {
@@ -47,6 +50,7 @@ export class PcbArc extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.net !== undefined) this.net = params.net
     if (params.locked !== undefined) this.locked = params.locked
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
   }
 
@@ -94,6 +98,10 @@ export class PcbArc extends SxClass {
       }
       if (token === "uuid") {
         arc._sxUuid = new Uuid(parseString(args[0], "uuid"))
+        continue
+      }
+      if (token === "tstamp") {
+        arc._sxTstamp = new Tstamp(parseString(args[0], "tstamp"))
         continue
       }
 
@@ -186,6 +194,18 @@ export class PcbArc extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: string | Tstamp | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   override getChildren(): SxClass[] {
     return []
   }
@@ -205,6 +225,7 @@ export class PcbArc extends SxClass {
           : quoteSExprString(this._net)
       lines.push(`  (net ${netValue})`)
     }
+    if (this._sxTstamp) lines.push(this._sxTstamp.getStringIndented())
     if (this._sxUuid) lines.push(this._sxUuid.getStringIndented())
     lines.push(")")
     return lines.join("\n")

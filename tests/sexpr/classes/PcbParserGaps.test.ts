@@ -1,10 +1,14 @@
 import {
+  Dimension,
   DimensionStyle,
   Footprint,
   FpCurve,
+  GrRect,
   GrText,
   Group,
   PadTeardrops,
+  PcbArc,
+  Setup,
   SxClass,
   ZoneFilledPolygon,
 } from "lib/sexpr"
@@ -94,6 +98,88 @@ test("DimensionStyle parses bare keep_text_aligned", () => {
 
   expect(parsed).toBeInstanceOf(DimensionStyle)
   expect(parsed.getString()).toContain("(keep_text_aligned yes)")
+})
+
+test("Setup parses svguseinch plot parameter", () => {
+  const [parsed] = SxClass.parse(`
+    (setup
+      (pcbplotparams
+        (svguseinch false)
+        (svgprecision 6)
+      )
+    )
+  `)
+
+  const setup = parsed as Setup
+  expect(setup).toBeInstanceOf(Setup)
+  expect(setup.pcbPlotParams?.svguseinch).toBe("false")
+  expect(setup.pcbPlotParams?.svgprecision).toBe(6)
+  expect(setup.getString()).toContain("(svguseinch false)")
+})
+
+test("GrRect parses tstamp", () => {
+  const [parsed] = SxClass.parse(`
+    (gr_rect
+      (start 0 0)
+      (end 1 1)
+      (layer "Edge.Cuts")
+      (tstamp 00000000-0000-0000-0000-000000000001)
+    )
+  `)
+
+  const grRect = parsed as GrRect
+  expect(grRect).toBeInstanceOf(GrRect)
+  expect(grRect.tstamp?.value).toBe("00000000-0000-0000-0000-000000000001")
+  expect(grRect.getString()).toContain(
+    "(tstamp 00000000-0000-0000-0000-000000000001)",
+  )
+})
+
+test("PcbArc parses tstamp", () => {
+  const parsed = SxClass.parsePrimitiveSexpr(
+    [
+      "arc",
+      ["start", 0, 0],
+      ["mid", 1, 1],
+      ["end", 2, 0],
+      ["width", 0.1],
+      ["layer", "Edge.Cuts"],
+      ["tstamp", "00000000-0000-0000-0000-000000000001"],
+    ],
+    { parentToken: "kicad_pcb" },
+  )
+
+  const arc = parsed as PcbArc
+  expect(arc).toBeInstanceOf(PcbArc)
+  expect(arc.tstamp?.value).toBe("00000000-0000-0000-0000-000000000001")
+  expect(arc.getString()).toContain(
+    "(tstamp 00000000-0000-0000-0000-000000000001)",
+  )
+})
+
+test("Dimension parses tstamp", () => {
+  const parsed = SxClass.parsePrimitiveSexpr(
+    [
+      "dimension",
+      ["type", "aligned"],
+      ["layer", "Dwgs.User"],
+      ["tstamp", "00000000-0000-0000-0000-000000000001"],
+      ["pts", ["xy", 0, 0], ["xy", 1, 0]],
+      [
+        "style",
+        ["thickness", 0.15],
+        ["arrow_length", 1.27],
+        ["text_position_mode", 0],
+      ],
+    ],
+    { parentToken: "kicad_pcb" },
+  )
+
+  const dimension = parsed as Dimension
+  expect(dimension).toBeInstanceOf(Dimension)
+  expect(dimension.getString()).toContain(
+    "(tstamp 00000000-0000-0000-0000-000000000001)",
+  )
 })
 
 test("ZoneFilledPolygon parses island", () => {
