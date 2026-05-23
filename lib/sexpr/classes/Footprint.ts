@@ -15,6 +15,7 @@ import { FootprintPath } from "./FootprintPath"
 import { FootprintPrivateLayers } from "./FootprintPrivateLayers"
 import { FootprintSolderMaskMargin } from "./FootprintSolderMaskMargin"
 import { FootprintSolderPasteMargin } from "./FootprintSolderPasteMargin"
+import { FootprintSolderPasteMarginRatio } from "./FootprintSolderPasteMarginRatio"
 import { FootprintSolderPasteRatio } from "./FootprintSolderPasteRatio"
 import { FootprintTags } from "./FootprintTags"
 import { FootprintTedit } from "./FootprintTedit"
@@ -68,6 +69,7 @@ const SINGLE_TOKENS = new Set([
   "solder_mask_margin",
   "solder_paste_margin",
   "solder_paste_ratio",
+  "solder_paste_margin_ratio",
   "clearance",
   "zone_connect",
   "thermal_width",
@@ -121,6 +123,7 @@ export interface FootprintConstructorParams {
   solderMaskMargin?: number | FootprintSolderMaskMargin
   solderPasteMargin?: number | FootprintSolderPasteMargin
   solderPasteRatio?: number | FootprintSolderPasteRatio
+  solderPasteMarginRatio?: number | FootprintSolderPasteMarginRatio
   clearance?: number | FootprintClearance
   zoneConnect?: number | FootprintZoneConnect
   thermalWidth?: number | FootprintThermalWidth
@@ -232,6 +235,8 @@ export class Footprint extends SxClass {
       this.solderPasteMargin = params.solderPasteMargin
     if (params.solderPasteRatio !== undefined)
       this.solderPasteRatio = params.solderPasteRatio
+    if (params.solderPasteMarginRatio !== undefined)
+      this.solderPasteMarginRatio = params.solderPasteMarginRatio
     if (params.clearance !== undefined) this.clearance = params.clearance
     if (params.zoneConnect !== undefined) this.zoneConnect = params.zoneConnect
     if (params.thermalWidth !== undefined)
@@ -359,9 +364,18 @@ export class Footprint extends SxClass {
     footprint._sxSolderPasteMargin = propertyMap.solder_paste_margin as
       | FootprintSolderPasteMargin
       | undefined
-    footprint._sxSolderPasteRatio = propertyMap.solder_paste_ratio as
+    const solderPasteRatio = propertyMap.solder_paste_ratio as
       | FootprintSolderPasteRatio
       | undefined
+    const solderPasteMarginRatio = propertyMap.solder_paste_margin_ratio as
+      | FootprintSolderPasteMarginRatio
+      | undefined
+    if (solderPasteRatio && solderPasteMarginRatio) {
+      throw new Error(
+        "footprint cannot include both solder_paste_ratio and solder_paste_margin_ratio children",
+      )
+    }
+    footprint._sxSolderPasteRatio = solderPasteRatio ?? solderPasteMarginRatio
     footprint._sxClearance = propertyMap.clearance as
       | FootprintClearance
       | undefined
@@ -712,6 +726,26 @@ export class Footprint extends SxClass {
       value instanceof FootprintSolderPasteRatio
         ? value
         : new FootprintSolderPasteRatio(value)
+  }
+
+  get solderPasteMarginRatio(): FootprintSolderPasteMarginRatio | undefined {
+    return this._sxSolderPasteRatio instanceof FootprintSolderPasteMarginRatio
+      ? this._sxSolderPasteRatio
+      : undefined
+  }
+
+  set solderPasteMarginRatio(value:
+    | FootprintSolderPasteMarginRatio
+    | number
+    | undefined) {
+    if (value === undefined) {
+      this._sxSolderPasteRatio = undefined
+      return
+    }
+    this._sxSolderPasteRatio =
+      value instanceof FootprintSolderPasteMarginRatio
+        ? value
+        : new FootprintSolderPasteMarginRatio(value)
   }
 
   get clearance(): FootprintClearance | undefined {
