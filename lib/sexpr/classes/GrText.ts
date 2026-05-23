@@ -10,6 +10,7 @@ import { TextEffects } from "./TextEffects"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Pts } from "./Pts"
+import { parseYesNo } from "../utils/parseYesNo"
 
 export interface GrTextPosition {
   x: number
@@ -25,6 +26,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "uuid",
   "effects",
   "render_cache",
+  "locked",
 ])
 
 const SUPPORTED_ARRAY_TOKENS = new Set([
@@ -35,6 +37,7 @@ const SUPPORTED_ARRAY_TOKENS = new Set([
   "uuid",
   "effects",
   "render_cache",
+  "locked",
 ])
 
 export interface GrTextConstructorParams {
@@ -45,6 +48,7 @@ export interface GrTextConstructorParams {
   uuid?: Uuid | string
   effects?: TextEffects
   renderCaches?: GrTextRenderCache[]
+  locked?: boolean
 }
 
 export class GrText extends SxClass {
@@ -58,6 +62,7 @@ export class GrText extends SxClass {
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
   private _renderCaches: GrTextRenderCache[] = []
+  private _locked = false
 
   constructor(params: GrTextConstructorParams | string = {}) {
     super()
@@ -72,6 +77,7 @@ export class GrText extends SxClass {
       if (params.effects !== undefined) this.effects = params.effects
       if (params.renderCaches !== undefined)
         this.renderCaches = params.renderCaches
+      if (params.locked !== undefined) this.locked = params.locked
     }
   }
 
@@ -89,9 +95,21 @@ export class GrText extends SxClass {
     }
 
     const grText = new GrText(text)
+    const structuredRest: PrimitiveSExpr[] = []
+
+    for (const primitive of rest) {
+      if (primitive === "locked") {
+        if (grText._locked) {
+          throw new Error("gr_text encountered duplicate locked flags")
+        }
+        grText._locked = true
+        continue
+      }
+      structuredRest.push(primitive)
+    }
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rest, this.token)
+      SxClass.parsePrimitivesToClassProperties(structuredRest, this.token)
 
     const unexpectedTokens = new Set<string>()
     for (const token of Object.keys(propertyMap)) {
@@ -118,7 +136,7 @@ export class GrText extends SxClass {
       )
     }
 
-    for (const primitive of rest) {
+    for (const primitive of structuredRest) {
       if (Array.isArray(primitive)) continue
       throw new Error(
         `gr_text encountered unexpected primitive child: ${JSON.stringify(primitive)}`,
@@ -136,6 +154,8 @@ export class GrText extends SxClass {
     grText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grText._sxUuid = propertyMap.uuid as Uuid | undefined
     grText._sxEffects = propertyMap.effects as TextEffects | undefined
+    const locked = propertyMap.locked as GrTextLocked | undefined
+    grText._locked = grText._locked || (locked?.value ?? false)
 
     const renderCaches = arrayPropertyMap.render_cache as
       | GrTextRenderCache[]
@@ -258,6 +278,14 @@ export class GrText extends SxClass {
     this._renderCaches = [...value]
   }
 
+  get locked(): boolean {
+    return this._locked
+  }
+
+  set locked(value: boolean) {
+    this._locked = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxPosition) children.push(this._sxPosition)
@@ -265,6 +293,7 @@ export class GrText extends SxClass {
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxEffects) children.push(this._sxEffects)
+    if (this._locked) children.push(new GrTextLocked(true))
     children.push(...this._renderCaches)
     return children
   }
@@ -279,6 +308,31 @@ export class GrText extends SxClass {
   }
 }
 SxClass.register(GrText)
+
+export class GrTextLocked extends SxClass {
+  static override token = "locked"
+  static override parentToken = "gr_text"
+  override token = "locked"
+
+  constructor(public value = true) {
+    super()
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): GrTextLocked {
+    if (primitiveSexprs.length === 0) {
+      return new GrTextLocked(true)
+    }
+    const parsed = parseYesNo(primitiveSexprs[0])
+    return new GrTextLocked(parsed ?? false)
+  }
+
+  override getString(): string {
+    return "(locked)"
+  }
+}
+SxClass.register(GrTextLocked)
 
 // render_cache element for gr_text
 export class GrTextRenderCache extends SxClass {

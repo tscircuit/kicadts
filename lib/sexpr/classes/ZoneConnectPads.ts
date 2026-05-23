@@ -3,16 +3,25 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { parseYesNo } from "../utils/parseYesNo"
 import { ZoneConnectPadsClearance } from "./ZoneConnectPadsClearance"
 
+export type ZoneConnectPadsMode = "yes" | "no" | "thru_hole_only"
+
 export class ZoneConnectPads extends SxClass {
   static override token = "connect_pads"
   static override parentToken = "zone"
   override token = "connect_pads"
 
-  private _enabled?: boolean
+  private _mode?: ZoneConnectPadsMode
   private _sxClearance?: ZoneConnectPadsClearance
 
-  constructor(params: { enabled?: boolean; clearance?: number } = {}) {
+  constructor(
+    params: {
+      enabled?: boolean
+      mode?: ZoneConnectPadsMode
+      clearance?: number
+    } = {},
+  ) {
     super()
+    if (params.mode !== undefined) this.mode = params.mode
     if (params.enabled !== undefined) this.enabled = params.enabled
     if (params.clearance !== undefined) this.clearance = params.clearance
   }
@@ -25,6 +34,10 @@ export class ZoneConnectPads extends SxClass {
       const enabled = parseYesNo(primitive)
       if (enabled !== undefined) {
         connectPads.enabled = enabled
+        continue
+      }
+      if (primitive === "thru_hole_only") {
+        connectPads.mode = primitive
         continue
       }
       if (!Array.isArray(primitive) || typeof primitive[0] !== "string") {
@@ -52,11 +65,20 @@ export class ZoneConnectPads extends SxClass {
   }
 
   get enabled(): boolean | undefined {
-    return this._enabled
+    if (this._mode === undefined) return undefined
+    return this._mode !== "no"
   }
 
   set enabled(value: boolean | undefined) {
-    this._enabled = value
+    this._mode = value === undefined ? undefined : value ? "yes" : "no"
+  }
+
+  get mode(): ZoneConnectPadsMode | undefined {
+    return this._mode
+  }
+
+  set mode(value: ZoneConnectPadsMode | undefined) {
+    this._mode = value
   }
 
   get clearance(): number | undefined {
@@ -77,12 +99,12 @@ export class ZoneConnectPads extends SxClass {
   }
 
   override getString(): string {
-    if (this._enabled === undefined) return super.getString()
+    if (this._mode === undefined) return super.getString()
     const children = this.getChildren()
     if (children.length === 0) {
-      return `(connect_pads ${this._enabled ? "yes" : "no"})`
+      return `(connect_pads ${this._mode})`
     }
-    const lines = [`(connect_pads ${this._enabled ? "yes" : "no"}`]
+    const lines = [`(connect_pads ${this._mode}`]
     for (const child of children) lines.push(child.getStringIndented())
     lines.push(")")
     return lines.join("\n")

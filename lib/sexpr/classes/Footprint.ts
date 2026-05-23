@@ -15,6 +15,7 @@ import { FootprintPath } from "./FootprintPath"
 import { FootprintPrivateLayers } from "./FootprintPrivateLayers"
 import { FootprintSolderMaskMargin } from "./FootprintSolderMaskMargin"
 import { FootprintSolderPasteMargin } from "./FootprintSolderPasteMargin"
+import { FootprintSolderPasteMarginRatio } from "./FootprintSolderPasteMarginRatio"
 import { FootprintSolderPasteRatio } from "./FootprintSolderPasteRatio"
 import { FootprintTags } from "./FootprintTags"
 import { FootprintTedit } from "./FootprintTedit"
@@ -29,7 +30,9 @@ import { FpTextBox } from "./FpTextBox"
 import { FpRect } from "./FpRect"
 import { FpCircle } from "./FpCircle"
 import { FpArc } from "./FpArc"
+import { FpCurve } from "./FpCurve"
 import { FpPoly } from "./FpPoly"
+import { Group } from "./Group"
 import { Uuid } from "./Uuid"
 import { Tstamp } from "./Tstamp"
 import { Xy } from "./Xy"
@@ -66,6 +69,7 @@ const SINGLE_TOKENS = new Set([
   "solder_mask_margin",
   "solder_paste_margin",
   "solder_paste_ratio",
+  "solder_paste_margin_ratio",
   "clearance",
   "zone_connect",
   "thermal_width",
@@ -89,11 +93,13 @@ const MULTI_TOKENS = new Set([
   "fp_rect",
   "fp_circle",
   "fp_arc",
+  "fp_curve",
   "fp_poly",
   "point",
   "pad",
   "model",
   "zone",
+  "group",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -117,6 +123,7 @@ export interface FootprintConstructorParams {
   solderMaskMargin?: number | FootprintSolderMaskMargin
   solderPasteMargin?: number | FootprintSolderPasteMargin
   solderPasteRatio?: number | FootprintSolderPasteRatio
+  solderPasteMarginRatio?: number | FootprintSolderPasteMarginRatio
   clearance?: number | FootprintClearance
   zoneConnect?: number | FootprintZoneConnect
   thermalWidth?: number | FootprintThermalWidth
@@ -139,11 +146,13 @@ export interface FootprintConstructorParams {
   fpRects?: FpRect[]
   fpCircles?: FpCircle[]
   fpArcs?: FpArc[]
+  fpCurves?: FpCurve[]
   fpPolys?: FpPoly[]
   points?: FootprintPoint[]
   pads?: FootprintPad[]
   models?: FootprintModel[]
   zones?: Zone[]
+  groups?: Group[]
 }
 
 export class Footprint extends SxClass {
@@ -192,11 +201,13 @@ export class Footprint extends SxClass {
   private _fpRects: FpRect[] = []
   private _fpCircles: FpCircle[] = []
   private _fpArcs: FpArc[] = []
+  private _fpCurves: FpCurve[] = []
   private _fpPolys: FpPoly[] = []
   private _points: FootprintPoint[] = []
   private _fpPads: FootprintPad[] = []
   private _models: FootprintModel[] = []
   private _zones: Zone[] = []
+  private _groups: Group[] = []
 
   constructor(params: FootprintConstructorParams = {}) {
     super()
@@ -224,6 +235,8 @@ export class Footprint extends SxClass {
       this.solderPasteMargin = params.solderPasteMargin
     if (params.solderPasteRatio !== undefined)
       this.solderPasteRatio = params.solderPasteRatio
+    if (params.solderPasteMarginRatio !== undefined)
+      this.solderPasteMarginRatio = params.solderPasteMarginRatio
     if (params.clearance !== undefined) this.clearance = params.clearance
     if (params.zoneConnect !== undefined) this.zoneConnect = params.zoneConnect
     if (params.thermalWidth !== undefined)
@@ -251,11 +264,13 @@ export class Footprint extends SxClass {
     if (params.fpRects !== undefined) this.fpRects = params.fpRects
     if (params.fpCircles !== undefined) this.fpCircles = params.fpCircles
     if (params.fpArcs !== undefined) this.fpArcs = params.fpArcs
+    if (params.fpCurves !== undefined) this.fpCurves = params.fpCurves
     if (params.fpPolys !== undefined) this.fpPolys = params.fpPolys
     if (params.points !== undefined) this.points = params.points
     if (params.pads !== undefined) this.fpPads = params.pads
     if (params.models !== undefined) this.models = params.models
     if (params.zones !== undefined) this.zones = params.zones
+    if (params.groups !== undefined) this.groups = params.groups
   }
 
   static override fromSexprPrimitives(
@@ -349,9 +364,18 @@ export class Footprint extends SxClass {
     footprint._sxSolderPasteMargin = propertyMap.solder_paste_margin as
       | FootprintSolderPasteMargin
       | undefined
-    footprint._sxSolderPasteRatio = propertyMap.solder_paste_ratio as
+    const solderPasteRatio = propertyMap.solder_paste_ratio as
       | FootprintSolderPasteRatio
       | undefined
+    const solderPasteMarginRatio = propertyMap.solder_paste_margin_ratio as
+      | FootprintSolderPasteMarginRatio
+      | undefined
+    if (solderPasteRatio && solderPasteMarginRatio) {
+      throw new Error(
+        "footprint cannot include both solder_paste_ratio and solder_paste_margin_ratio children",
+      )
+    }
+    footprint._sxSolderPasteRatio = solderPasteRatio ?? solderPasteMarginRatio
     footprint._sxClearance = propertyMap.clearance as
       | FootprintClearance
       | undefined
@@ -397,11 +421,13 @@ export class Footprint extends SxClass {
     footprint._fpRects = (arrayPropertyMap["fp_rect"] as FpRect[]) ?? []
     footprint._fpCircles = (arrayPropertyMap["fp_circle"] as FpCircle[]) ?? []
     footprint._fpArcs = (arrayPropertyMap["fp_arc"] as FpArc[]) ?? []
+    footprint._fpCurves = (arrayPropertyMap["fp_curve"] as FpCurve[]) ?? []
     footprint._fpPolys = (arrayPropertyMap["fp_poly"] as FpPoly[]) ?? []
     footprint._points = (arrayPropertyMap.point as FootprintPoint[]) ?? []
     footprint._fpPads = (arrayPropertyMap.pad as FootprintPad[]) ?? []
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
     footprint._zones = (arrayPropertyMap.zone as Zone[]) ?? []
+    footprint._groups = (arrayPropertyMap.group as Group[]) ?? []
 
     for (const flag of pendingFlags) {
       if (flag === "locked") {
@@ -702,6 +728,26 @@ export class Footprint extends SxClass {
         : new FootprintSolderPasteRatio(value)
   }
 
+  get solderPasteMarginRatio(): FootprintSolderPasteMarginRatio | undefined {
+    return this._sxSolderPasteRatio instanceof FootprintSolderPasteMarginRatio
+      ? this._sxSolderPasteRatio
+      : undefined
+  }
+
+  set solderPasteMarginRatio(value:
+    | FootprintSolderPasteMarginRatio
+    | number
+    | undefined) {
+    if (value === undefined) {
+      this._sxSolderPasteRatio = undefined
+      return
+    }
+    this._sxSolderPasteRatio =
+      value instanceof FootprintSolderPasteMarginRatio
+        ? value
+        : new FootprintSolderPasteMarginRatio(value)
+  }
+
   get clearance(): FootprintClearance | undefined {
     return this._sxClearance
   }
@@ -928,6 +974,14 @@ export class Footprint extends SxClass {
     this._fpArcs = [...value]
   }
 
+  get fpCurves(): FpCurve[] {
+    return [...this._fpCurves]
+  }
+
+  set fpCurves(value: FpCurve[]) {
+    this._fpCurves = [...value]
+  }
+
   get fpPolys(): FpPoly[] {
     return [...this._fpPolys]
   }
@@ -966,6 +1020,14 @@ export class Footprint extends SxClass {
 
   set zones(value: Zone[]) {
     this._zones = [...value]
+  }
+
+  get groups(): Group[] {
+    return [...this._groups]
+  }
+
+  set groups(value: Group[]) {
+    this._groups = [...value]
   }
 
   override getChildren(): SxClass[] {
@@ -1011,11 +1073,13 @@ export class Footprint extends SxClass {
     children.push(...this._fpRects)
     children.push(...this._fpCircles)
     children.push(...this._fpArcs)
+    children.push(...this._fpCurves)
     children.push(...this._fpPolys)
     children.push(...this._points)
     children.push(...this._fpPads)
     children.push(...this._models)
     children.push(...this._zones)
+    children.push(...this._groups)
     return children
   }
 
