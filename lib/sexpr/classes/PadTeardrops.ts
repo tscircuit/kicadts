@@ -9,6 +9,7 @@ type NumericTeardropProperty =
   | "bestWidthRatio"
   | "maxWidth"
   | "filterRatio"
+  | "curvePoints"
 
 type BooleanTeardropProperty =
   | "curvedEdges"
@@ -22,6 +23,7 @@ const NUMERIC_TOKENS = new Map<string, NumericTeardropProperty>([
   ["best_width_ratio", "bestWidthRatio"],
   ["max_width", "maxWidth"],
   ["filter_ratio", "filterRatio"],
+  ["curve_points", "curvePoints"],
 ])
 
 const BOOLEAN_TOKENS = new Map<string, BooleanTeardropProperty>([
@@ -41,6 +43,7 @@ export class PadTeardrops extends SxClass {
   private _bestWidthRatio?: number
   private _maxWidth?: number
   private _filterRatio?: number
+  private _curvePoints?: number
   private _curvedEdges?: boolean
   private _enabled?: boolean
   private _allowTwoSegments?: boolean
@@ -134,6 +137,14 @@ export class PadTeardrops extends SxClass {
     this._filterRatio = value
   }
 
+  get curvePoints(): number | undefined {
+    return this._curvePoints
+  }
+
+  set curvePoints(value: number | undefined) {
+    this._curvePoints = value
+  }
+
   get curvedEdges(): boolean | undefined {
     return this._curvedEdges
   }
@@ -189,6 +200,9 @@ export class PadTeardrops extends SxClass {
     }
     if (this._filterRatio !== undefined) {
       lines.push(`  (filter_ratio ${this._filterRatio})`)
+    }
+    if (this._curvePoints !== undefined) {
+      lines.push(`  (curve_points ${this._curvePoints})`)
     }
     if (this._enabled !== undefined) {
       lines.push(`  (enabled ${this._enabled ? "yes" : "no"})`)
