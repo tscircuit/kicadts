@@ -17,12 +17,14 @@ import type { DimensionType } from "./DimensionType"
 import type { GrText } from "./GrText"
 import type { Layer } from "./Layer"
 import type { Pts } from "./Pts"
+import type { Tstamp } from "./Tstamp"
 import type { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set([
   "locked",
   "type",
   "layer",
+  "tstamp",
   "uuid",
   "pts",
   "height",
@@ -41,6 +43,7 @@ export class Dimension extends SxClass {
   private _sxLocked?: DimensionLocked
   private _sxType?: DimensionType
   private _sxLayer?: Layer
+  private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxPts?: Pts
   private _sxHeight?: DimensionHeight
@@ -80,6 +83,7 @@ export class Dimension extends SxClass {
     dimension._sxLocked = propertyMap.locked as DimensionLocked | undefined
     dimension._sxType = propertyMap.type as DimensionType | undefined
     dimension._sxLayer = propertyMap.layer as Layer | undefined
+    dimension._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     dimension._sxUuid = propertyMap.uuid as Uuid | undefined
     dimension._sxPts = propertyMap.pts as Pts | undefined
     dimension._sxHeight = propertyMap.height as DimensionHeight | undefined
@@ -99,8 +103,8 @@ export class Dimension extends SxClass {
     if (!dimension._sxLayer) {
       throw new Error("dimension requires a layer child token")
     }
-    if (!dimension._sxUuid) {
-      throw new Error("dimension requires a uuid child token")
+    if (!dimension._sxUuid && !dimension._sxTstamp) {
+      throw new Error("dimension requires a uuid or tstamp child token")
     }
     if (!dimension._sxPts) {
       throw new Error("dimension requires a pts child token")
@@ -117,6 +121,7 @@ export class Dimension extends SxClass {
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxType) children.push(this._sxType)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxPts) children.push(this._sxPts)
     if (this._sxHeight) children.push(this._sxHeight)
@@ -126,6 +131,14 @@ export class Dimension extends SxClass {
     if (this._sxStyle) children.push(this._sxStyle)
     if (this._sxGrText) children.push(this._sxGrText)
     return children
+  }
+
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
   }
 }
 SxClass.register(Dimension)
