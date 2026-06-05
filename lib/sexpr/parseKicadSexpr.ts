@@ -3,6 +3,7 @@ import { SxClass } from "./base-classes/SxClass"
 import { Footprint } from "./classes/Footprint"
 import { KicadPcb } from "./classes/KicadPcb"
 import { KicadSch } from "./classes/KicadSch"
+import { KicadSymbolLib } from "./classes/KicadSymbolLib"
 
 export const parseKicadSexpr = (sexpr: string) => {
   return SxClass.parse(sexpr)
@@ -23,6 +24,16 @@ export const parseKicadPcb = (sexpr: string): KicadPcb => {
   if (!(root instanceof KicadPcb)) {
     throw new Error(
       `Expected KicadPcb root, got ${root?.constructor.name ?? "undefined"}`,
+    )
+  }
+  return root
+}
+
+export const parseKicadSym = (sexpr: string): KicadSymbolLib => {
+  const [root] = parseKicadSexpr(sexpr)
+  if (!(root instanceof KicadSymbolLib)) {
+    throw new Error(
+      `Expected KicadSym root, got ${root?.constructor.name ?? "undefined"}`,
     )
   }
   return root

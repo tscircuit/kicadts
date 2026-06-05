@@ -1274,7 +1274,7 @@ export class SymbolProperty extends SxClass {
 }
 SxClass.register(SymbolProperty)
 
-type PinElectricalType =
+export type PinElectricalType =
   | "input"
   | "output"
   | "bidirectional"
@@ -1288,7 +1288,7 @@ type PinElectricalType =
   | "open_emitter"
   | "no_connect"
 
-type PinGraphicStyle =
+export type PinGraphicStyle =
   | "line"
   | "inverted"
   | "clock"
@@ -1438,6 +1438,74 @@ export class SymbolPinNumber extends SxClass {
 }
 SxClass.register(SymbolPinNumber)
 
+export interface SymbolPinAlternateConstructorParams {
+  alternateName: string
+  pinElectricalType: PinElectricalType
+  pinGraphicStyle: PinGraphicStyle
+}
+
+export class SymbolPinAlternate extends SxClass {
+  static override token = "alternate"
+  static override parentToken = "pin"
+  token = "alternate"
+
+  alternateName: string
+  pinElectricalType: PinElectricalType
+  pinGraphicStyle: PinGraphicStyle
+
+  constructor(params: SymbolPinAlternateConstructorParams) {
+    super()
+    this.alternateName = params.alternateName
+    this.pinElectricalType = params.pinElectricalType
+    this.pinGraphicStyle = params.pinGraphicStyle
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): SymbolPinAlternate {
+    const [namePrimitive, electricalTypePrimitive, graphicStylePrimitive] =
+      primitiveSexprs
+    const alternateName = toStringValue(namePrimitive)
+    const electricalType = toStringValue(electricalTypePrimitive)
+    const graphicStyle = toStringValue(graphicStylePrimitive)
+
+    if (alternateName === undefined) {
+      throw new Error("alternate expects a string name")
+    }
+    if (
+      electricalType === undefined ||
+      !electricalTypeSet.has(electricalType as PinElectricalType)
+    ) {
+      throw new Error(
+        `alternate encountered unsupported electrical type "${electricalType}"`,
+      )
+    }
+    if (
+      graphicStyle === undefined ||
+      !graphicStyleSet.has(graphicStyle as PinGraphicStyle)
+    ) {
+      throw new Error(
+        `alternate encountered unsupported graphic style "${graphicStyle}"`,
+      )
+    }
+
+    return new SymbolPinAlternate({
+      alternateName,
+      pinElectricalType: electricalType as PinElectricalType,
+      pinGraphicStyle: graphicStyle as PinGraphicStyle,
+    })
+  }
+
+  override getChildren(): SxClass[] {
+    return []
+  }
+
+  override getString(): string {
+    return `(alternate ${quoteSExprString(this.alternateName)} ${this.pinElectricalType} ${this.pinGraphicStyle})`
+  }
+}
+SxClass.register(SymbolPinAlternate)
+
 export class SymbolPin extends SxClass {
   static override token = "pin"
   static override parentToken = "symbol"
@@ -1452,6 +1520,7 @@ export class SymbolPin extends SxClass {
   _sxUuid?: Uuid
   private inlineNumber?: string
   private _sxHide?: SymbolPinHide
+  private _alternates: SymbolPinAlternate[] = []
 
   static override fromSexprPrimitives(args: PrimitiveSExpr[]): SymbolPin {
     const symbolPin = new SymbolPin()
@@ -1492,10 +1561,8 @@ export class SymbolPin extends SxClass {
       primitiveNodes.push(primitive)
     }
 
-    const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
-      primitiveNodes,
-      this.token,
-    )
+    const { propertyMap, arrayPropertyMap } =
+      SxClass.parsePrimitivesToClassProperties(primitiveNodes, this.token)
 
     symbolPin._sxAt = propertyMap.at as At
     symbolPin._sxLength = propertyMap.length as SymbolPinLength
@@ -1503,6 +1570,8 @@ export class SymbolPin extends SxClass {
     symbolPin._sxNumber = propertyMap.number as SymbolPinNumber
     symbolPin._sxUuid = propertyMap.uuid as Uuid
     symbolPin._sxHide = propertyMap.hide as SymbolPinHide | undefined
+    symbolPin.alternates =
+      (arrayPropertyMap.alternate as SymbolPinAlternate[]) ?? []
 
     for (const flag of primitiveStrings) {
       if (flag === "hide") {
@@ -1574,6 +1643,14 @@ export class SymbolPin extends SxClass {
     this._sxHide = value ? new SymbolPinHide(value) : undefined
   }
 
+  get alternates(): SymbolPinAlternate[] {
+    return [...this._alternates]
+  }
+
+  set alternates(value: SymbolPinAlternate[]) {
+    this._alternates = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
@@ -1582,6 +1659,7 @@ export class SymbolPin extends SxClass {
     if (this._sxNumber) children.push(this._sxNumber)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxHide) children.push(this._sxHide)
+    children.push(...this._alternates)
     return children
   }
 
