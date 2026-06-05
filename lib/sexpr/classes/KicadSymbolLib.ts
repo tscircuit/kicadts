@@ -157,3 +157,6 @@ export class KicadSymbolLib extends SxClass {
   }
 }
 SxClass.register(KicadSymbolLib)
+
+export const KicadSym = KicadSymbolLib
+export type KicadSym = KicadSymbolLib
