@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { SxClass, ZoneKeepout } from "lib/sexpr"
 
-test("ZoneKeepout - constructor", () => {
+test("ZoneKeepout - constructor serializes keepout rules", () => {
   const keepout = new ZoneKeepout({
     tracks: "not_allowed",
     vias: "not_allowed",
@@ -16,12 +16,15 @@ test("ZoneKeepout - constructor", () => {
   expect(keepout.copperpour).toBe("not_allowed")
   expect(keepout.footprints).toBe("allowed")
 
-  const output = keepout.getString()
-  expect(output).toContain("(tracks not_allowed)")
-  expect(output).toContain("(vias not_allowed)")
-  expect(output).toContain("(pads allowed)")
-  expect(output).toContain("(copperpour not_allowed)")
-  expect(output).toContain("(footprints allowed)")
+  expect(keepout.getString()).toMatchInlineSnapshot(`
+    "(keepout
+      (tracks not_allowed)
+      (vias not_allowed)
+      (pads allowed)
+      (copperpour not_allowed)
+      (footprints allowed)
+    )"
+  `)
 })
 
 test("ZoneKeepout - parses keepout rules", () => {
