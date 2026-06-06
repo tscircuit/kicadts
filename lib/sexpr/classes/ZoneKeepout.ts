@@ -14,6 +14,16 @@ const SINGLE_TOKENS = new Set([
   "footprints",
 ])
 
+export type ZoneKeepoutRule = "allowed" | "not_allowed"
+
+export interface ZoneKeepoutConstructorParams {
+  tracks?: ZoneKeepoutTracks | ZoneKeepoutRule
+  vias?: ZoneKeepoutVias | ZoneKeepoutRule
+  pads?: ZoneKeepoutPads | ZoneKeepoutRule
+  copperpour?: ZoneKeepoutCopperpour | ZoneKeepoutRule
+  footprints?: ZoneKeepoutFootprints | ZoneKeepoutRule
+}
+
 export class ZoneKeepout extends SxClass {
   static override token = "keepout"
   static override parentToken = "zone"
@@ -24,6 +34,15 @@ export class ZoneKeepout extends SxClass {
   private _sxPads?: ZoneKeepoutPads
   private _sxCopperpour?: ZoneKeepoutCopperpour
   private _sxFootprints?: ZoneKeepoutFootprints
+
+  constructor(params: ZoneKeepoutConstructorParams = {}) {
+    super()
+    if (params.tracks !== undefined) this.tracks = params.tracks
+    if (params.vias !== undefined) this.vias = params.vias
+    if (params.pads !== undefined) this.pads = params.pads
+    if (params.copperpour !== undefined) this.copperpour = params.copperpour
+    if (params.footprints !== undefined) this.footprints = params.footprints
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
