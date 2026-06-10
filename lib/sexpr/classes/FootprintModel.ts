@@ -59,7 +59,7 @@ export class FootprintModel extends SxClass {
         )
       }
       const [token, ...args] = primitive
-      if (token === "offset") {
+      if (token === "offset" || token === "at") {
         model._offset = parseVectorArgs(args, "offset")
         continue
       }
