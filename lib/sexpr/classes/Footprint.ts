@@ -276,7 +276,7 @@ export class Footprint extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): Footprint {
-    const footprint = new Footprint()
+    const footprint = new this() as Footprint
 
     const rawStrings: string[] = []
     const rawNodes: PrimitiveSExpr[] = []
@@ -302,7 +302,7 @@ export class Footprint extends SxClass {
     }
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(rawNodes, this.token)
+      SxClass.parsePrimitivesToClassProperties(rawNodes, Footprint.token)
 
     for (const token of Object.keys(propertyMap)) {
       if (!SUPPORTED_TOKENS.has(token)) {
@@ -1084,7 +1084,7 @@ export class Footprint extends SxClass {
   }
 
   override getString(): string {
-    const lines = ["(footprint"]
+    const lines = [`(${this.token}`]
     if (this._libraryLink !== undefined) {
       lines.push(`  ${quoteSExprString(this._libraryLink)}`)
     }
