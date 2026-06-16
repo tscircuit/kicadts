@@ -22,6 +22,7 @@ test("TextEffects", () => {
   const textEffects = effects as TextEffects
   expect(textEffects.font.face).toBe("KiCad Font")
   expect(textEffects.font.size).toEqual({ height: 1.5, width: 1.2 })
+  expect(textEffects.font.color).toBeUndefined()
   expect(textEffects.font.thickness).toBe(0.3)
   expect(textEffects.font.bold).toBe(true)
   expect(textEffects.font.italic).toBe(true)
@@ -51,6 +52,30 @@ test("TextEffects", () => {
         (line_spacing 1.1)
       )
       (justify right bottom)
+    )"
+  `)
+})
+
+test("TextEffects font color", () => {
+  const [effects] = SxClass.parse(`
+    (effects
+      (font
+        (size 1.5 1.2)
+        (color 0 0 0 1)
+      )
+    )
+  `)
+
+  expect(effects).toBeInstanceOf(TextEffects)
+
+  const textEffects = effects as TextEffects
+  expect(textEffects.font.color).toEqual({ r: 0, g: 0, b: 0, a: 1 })
+  expect(textEffects.getString()).toMatchInlineSnapshot(`
+    "(effects
+      (font
+        (size 1.5 1.2)
+        (color 0 0 0 1)
+      )
     )"
   `)
 })
