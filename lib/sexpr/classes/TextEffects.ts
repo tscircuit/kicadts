@@ -6,6 +6,7 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
+import { Color, type RGBAColor } from "./Color"
 
 export type TextEffectsProperty = TextEffectsFont | TextEffectsJustify
 
@@ -125,6 +126,7 @@ SxClass.register(TextEffects)
 export type TextEffectsFontProperty =
   | TextEffectsFontFace
   | TextEffectsFontSize
+  | Color
   | TextEffectsFontThickness
   | TextEffectsFontLineSpacing
   | TextEffectsFontBold
@@ -137,6 +139,7 @@ export class TextEffectsFont extends SxClass {
 
   _sxFace?: TextEffectsFontFace
   _sxSize?: TextEffectsFontSize
+  _sxColor?: Color
   _sxThickness?: TextEffectsFontThickness
   _sxLineSpacing?: TextEffectsFontLineSpacing
   _sxBold?: TextEffectsFontBold
@@ -171,6 +174,17 @@ export class TextEffectsFont extends SxClass {
     }
 
     this._sxSize = new TextEffectsFontSize(value.height, value.width)
+  }
+
+  get color(): RGBAColor | undefined {
+    return this._sxColor?.color
+  }
+
+  set color(value: RGBAColor | undefined) {
+    this._sxColor =
+      value === undefined
+        ? undefined
+        : new Color([value.r, value.g, value.b, value.a])
   }
 
   get thickness(): number | undefined {
@@ -218,6 +232,7 @@ export class TextEffectsFont extends SxClass {
 
     font._sxFace = propertyMap.face as TextEffectsFontFace
     font._sxSize = propertyMap.size as TextEffectsFontSize
+    font._sxColor = propertyMap.color as Color | undefined
     font._sxThickness = propertyMap.thickness as TextEffectsFontThickness
     font._sxLineSpacing = propertyMap.line_spacing as TextEffectsFontLineSpacing
     font._sxBold = propertyMap.bold as TextEffectsFontBold
@@ -253,6 +268,7 @@ export class TextEffectsFont extends SxClass {
     const children: SxClass[] = []
     if (this._sxFace) children.push(this._sxFace)
     if (this._sxSize) children.push(this._sxSize)
+    if (this._sxColor) children.push(this._sxColor)
     if (this._sxThickness) children.push(this._sxThickness)
     if (this._sxBold) children.push(this._sxBold)
     if (this._sxItalic) children.push(this._sxItalic)
@@ -267,6 +283,9 @@ export class TextEffectsFont extends SxClass {
     }
     if (this._sxSize) {
       lines.push(this._sxSize.getStringIndented())
+    }
+    if (this._sxColor) {
+      lines.push(this._sxColor.getStringIndented())
     }
     if (this._sxThickness) {
       lines.push(this._sxThickness.getStringIndented())
