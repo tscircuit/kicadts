@@ -136,7 +136,9 @@ export class SchematicArc extends SxClass {
       return
     }
     this._sxStart =
-      value instanceof SymbolArcStart ? value : new SymbolArcStart(value.x, value.y)
+      value instanceof SymbolArcStart
+        ? value
+        : new SymbolArcStart(value.x, value.y)
   }
 
   get mid(): SymbolArcMid | undefined {
