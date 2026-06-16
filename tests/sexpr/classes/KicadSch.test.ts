@@ -2,6 +2,7 @@ import {
   KicadSch,
   Paper,
   Property,
+  SchematicArc,
   SchematicRectangle,
   SchematicSymbol,
   SchematicTextBox,
@@ -129,6 +130,32 @@ test("KicadSch parses root rectangles and text boxes", () => {
   expect(schematic.textBoxes).toHaveLength(1)
   expect(schematic.textBoxes[0]).toBeInstanceOf(SchematicTextBox)
   expect(schematic.getString()).toContain('(text_box "75"')
+})
+
+test("KicadSch parses root arcs", () => {
+  const [parsed] = SxClass.parse(`
+    (kicad_sch
+      (version 20240101)
+      (generator eeschema)
+      (uuid 01234567-89ab-cdef-0123-456789abcdef)
+      (paper A4)
+      (arc
+        (start 163.5 112.5)
+        (mid 148.5 97.5)
+        (end 133.5 112.5)
+        (stroke (width 0.75) (type default))
+        (uuid 040e42d7-787e-4aba-984f-3ca88a39a07a)
+      )
+    )
+  `)
+
+  expect(parsed).toBeInstanceOf(KicadSch)
+  const schematic = parsed as KicadSch
+  expect(schematic.arcs).toHaveLength(1)
+  expect(schematic.arcs[0]).toBeInstanceOf(SchematicArc)
+  expect(schematic.arcs[0]?.start?.x).toBe(163.5)
+  expect(schematic.arcs[0]?.mid?.y).toBe(97.5)
+  expect(schematic.getString()).toContain("\n  (arc\n")
 })
 
 test("KicadSch parse with lib_symbols, instances and sheet_instances", () => {
