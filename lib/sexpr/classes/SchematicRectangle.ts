@@ -10,6 +10,19 @@ import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["start", "end", "stroke", "fill", "uuid"])
 
+export interface SchematicRectanglePoint {
+  x: number
+  y: number
+}
+
+export interface SchematicRectangleConstructorParams {
+  start?: SymbolRectangleStart | SchematicRectanglePoint
+  end?: SymbolRectangleEnd | SchematicRectanglePoint
+  stroke?: Stroke
+  fill?: SymbolRectangleFill
+  uuid?: string | Uuid
+}
+
 export class SchematicRectangle extends SxClass {
   static override token = "rectangle"
   static override parentToken = "kicad_sch"
@@ -20,6 +33,15 @@ export class SchematicRectangle extends SxClass {
   private _sxStroke?: Stroke
   private _sxFill?: SymbolRectangleFill
   private _sxUuid?: Uuid
+
+  constructor(params: SchematicRectangleConstructorParams = {}) {
+    super()
+    if (params.start !== undefined) this.start = params.start
+    if (params.end !== undefined) this.end = params.end
+    if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.fill !== undefined) this.fill = params.fill
+    if (params.uuid !== undefined) this.uuid = params.uuid
+  }
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
@@ -47,6 +69,64 @@ export class SchematicRectangle extends SxClass {
     rectangle._sxFill = propertyMap.fill as SymbolRectangleFill | undefined
     rectangle._sxUuid = propertyMap.uuid as Uuid | undefined
     return rectangle
+  }
+
+  get start(): SymbolRectangleStart | undefined {
+    return this._sxStart
+  }
+
+  set start(value: SymbolRectangleStart | SchematicRectanglePoint | undefined) {
+    if (value === undefined) {
+      this._sxStart = undefined
+      return
+    }
+    this._sxStart =
+      value instanceof SymbolRectangleStart
+        ? value
+        : new SymbolRectangleStart(value.x, value.y)
+  }
+
+  get end(): SymbolRectangleEnd | undefined {
+    return this._sxEnd
+  }
+
+  set end(value: SymbolRectangleEnd | SchematicRectanglePoint | undefined) {
+    if (value === undefined) {
+      this._sxEnd = undefined
+      return
+    }
+    this._sxEnd =
+      value instanceof SymbolRectangleEnd
+        ? value
+        : new SymbolRectangleEnd(value.x, value.y)
+  }
+
+  get stroke(): Stroke | undefined {
+    return this._sxStroke
+  }
+
+  set stroke(value: Stroke | undefined) {
+    this._sxStroke = value
+  }
+
+  get fill(): SymbolRectangleFill | undefined {
+    return this._sxFill
+  }
+
+  set fill(value: SymbolRectangleFill | undefined) {
+    this._sxFill = value
+  }
+
+  get uuid(): Uuid | undefined {
+    return this._sxUuid
+  }
+
+  set uuid(value: Uuid | string | undefined) {
+    if (value === undefined) {
+      this._sxUuid = undefined
+      return
+    }
+    this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
   override getChildren(): SxClass[] {
