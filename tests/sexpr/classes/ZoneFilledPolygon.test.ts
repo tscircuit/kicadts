@@ -1,11 +1,5 @@
 import { expect, test } from "bun:test"
-import {
-  Layer,
-  parseKicadPcb,
-  Pts,
-  Xy,
-  ZoneFilledPolygon,
-} from "lib/sexpr"
+import { Layer, parseKicadPcb, Pts, Xy, ZoneFilledPolygon } from "lib/sexpr"
 
 test("ZoneFilledPolygon constructor serializes layer, island, and pts", () => {
   const filledPolygon = new ZoneFilledPolygon({
