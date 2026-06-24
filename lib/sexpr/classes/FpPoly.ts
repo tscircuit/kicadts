@@ -161,10 +161,6 @@ export class FpPoly extends SxClass {
     if (!fpPoly._sxLayer) {
       throw new Error("fp_poly requires a layer child token")
     }
-    if (!fpPoly._sxUuid && !fpPoly._sxTstamp) {
-      throw new Error("fp_poly requires a uuid or tstamp child token")
-    }
-
     return fpPoly
   }
 
