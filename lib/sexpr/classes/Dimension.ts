@@ -140,5 +140,25 @@ export class Dimension extends SxClass {
   get uuid(): Uuid | undefined {
     return this._sxUuid
   }
+
+  get layer(): Layer | undefined {
+    return this._sxLayer
+  }
+
+  get pts(): Pts | undefined {
+    return this._sxPts
+  }
+
+  get height(): DimensionHeight | undefined {
+    return this._sxHeight
+  }
+
+  get style(): DimensionStyle | undefined {
+    return this._sxStyle
+  }
+
+  get grText(): GrText | undefined {
+    return this._sxGrText
+  }
 }
 SxClass.register(Dimension)
