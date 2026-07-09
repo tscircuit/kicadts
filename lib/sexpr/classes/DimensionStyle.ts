@@ -127,5 +127,37 @@ export class DimensionStyle extends SxClass {
     if (this._sxKeepTextAligned) children.push(this._sxKeepTextAligned)
     return children
   }
+
+  get thickness(): DimensionStyleThickness | undefined {
+    return this._sxThickness
+  }
+
+  get arrowLength(): DimensionArrowLength | undefined {
+    return this._sxArrowLength
+  }
+
+  get textPositionMode(): DimensionTextPositionMode | undefined {
+    return this._sxTextPositionMode
+  }
+
+  get arrowDirection(): DimensionArrowDirection | undefined {
+    return this._sxArrowDirection
+  }
+
+  get extensionHeight(): DimensionExtensionHeight | undefined {
+    return this._sxExtensionHeight
+  }
+
+  get textFrame(): DimensionTextFrame | undefined {
+    return this._sxTextFrame
+  }
+
+  get extensionOffset(): DimensionExtensionOffset | undefined {
+    return this._sxExtensionOffset
+  }
+
+  get keepTextAligned(): DimensionKeepTextAligned | undefined {
+    return this._sxKeepTextAligned
+  }
 }
 SxClass.register(DimensionStyle)
