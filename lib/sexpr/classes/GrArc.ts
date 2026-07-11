@@ -225,7 +225,12 @@ export class GrArc extends SxClass {
       this._sxNet = undefined
       return
     }
-    this._sxNet = value instanceof GrArcNet ? value : new GrArcNet(value)
+    if (value instanceof GrArcNet) {
+      this._sxNet = value
+      return
+    }
+
+    this._sxNet = new GrArcNet(value)
   }
 
   get tstamp(): Tstamp | undefined {
