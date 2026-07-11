@@ -6,6 +6,7 @@ import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { GrArcLocked } from "./GrArcLocked"
+import { GrArcNet } from "./GrArcNet"
 
 export interface GrArcPoint {
   x: number
@@ -19,6 +20,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "layer",
   "width",
   "stroke",
+  "net",
   "tstamp",
   "uuid",
   "locked",
@@ -31,6 +33,7 @@ export interface GrArcConstructorParams {
   layer?: Layer | string | Array<string | number>
   width?: Width | number
   stroke?: Stroke
+  net?: GrArcNet | number | string
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
@@ -46,6 +49,7 @@ export class GrArc extends SxClass {
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
+  private _sxNet?: GrArcNet
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxLocked?: GrArcLocked
@@ -58,6 +62,7 @@ export class GrArc extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.net !== undefined) this.net = params.net
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
@@ -108,6 +113,7 @@ export class GrArc extends SxClass {
     grArc._sxLayer = propertyMap.layer as Layer | undefined
     grArc._sxWidth = propertyMap.width as Width | undefined
     grArc._sxStroke = propertyMap.stroke as Stroke | undefined
+    grArc._sxNet = propertyMap.net as GrArcNet | undefined
     grArc._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     grArc._sxUuid = propertyMap.uuid as Uuid | undefined
     const locked = propertyMap.locked as GrArcLocked | undefined
@@ -210,6 +216,18 @@ export class GrArc extends SxClass {
     this._sxStroke = value
   }
 
+  get net(): number | string | undefined {
+    return this._sxNet?.value
+  }
+
+  set net(value: GrArcNet | number | string | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof GrArcNet ? value : new GrArcNet(value)
+  }
+
   get tstamp(): Tstamp | undefined {
     return this._sxTstamp
   }
@@ -249,6 +267,7 @@ export class GrArc extends SxClass {
     if (this._sxEnd) children.push(this._sxEnd)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxWidth) children.push(this._sxWidth)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxTstamp) children.push(this._sxTstamp)
