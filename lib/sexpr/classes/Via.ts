@@ -12,6 +12,8 @@ import { Capping } from "./Setup/Capping"
 import { Covering } from "./Setup/Covering"
 import { Filling } from "./Setup/Filling"
 import { Plugging } from "./Setup/Plugging"
+import { ViaZoneLayerConnections } from "./ViaZoneLayerConnections"
+import { ViaTenting } from "./ViaTenting"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -19,6 +21,8 @@ const BARE_FLAGS = new Set([
   "remove_unused_layers",
   "keep_end_layers",
 ])
+
+type ViaZoneLayerConnectionsInput = ViaZoneLayerConnections | string[]
 
 export interface ViaConstructorParams {
   type?: string
@@ -38,6 +42,8 @@ export interface ViaConstructorParams {
   covering?: Covering
   plugging?: Plugging
   filling?: string | Filling
+  zoneLayerConnections?: ViaZoneLayerConnectionsInput
+  tenting?: ViaTenting | string[]
 }
 
 export class Via extends SxClass {
@@ -61,6 +67,8 @@ export class Via extends SxClass {
   private _sxCovering?: Covering
   private _sxPlugging?: Plugging
   private _sxFilling?: Filling
+  private _sxZoneLayerConnections?: ViaZoneLayerConnections
+  private _sxTenting?: ViaTenting
 
   constructor(params: ViaConstructorParams = {}) {
     super()
@@ -83,6 +91,9 @@ export class Via extends SxClass {
     if (params.covering !== undefined) this.covering = params.covering
     if (params.plugging !== undefined) this.plugging = params.plugging
     if (params.filling !== undefined) this.filling = params.filling
+    if (params.zoneLayerConnections !== undefined)
+      this.zoneLayerConnections = params.zoneLayerConnections
+    if (params.tenting !== undefined) this.tenting = params.tenting
   }
 
   static override fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): Via {
@@ -261,6 +272,15 @@ export class Via extends SxClass {
         this._sxTstamp = new Tstamp(value)
         return
       }
+      case "zone_layer_connections": {
+        this._sxZoneLayerConnections =
+          ViaZoneLayerConnections.fromSexprPrimitives(args)
+        return
+      }
+      case "tenting": {
+        this._sxTenting = ViaTenting.fromSexprPrimitives(args)
+        return
+      }
       default:
         throw new Error(`via encountered unsupported child token "${token}"`)
     }
@@ -431,10 +451,41 @@ export class Via extends SxClass {
     this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
   }
 
+  get zoneLayerConnections(): ViaZoneLayerConnections | undefined {
+    return this._sxZoneLayerConnections
+  }
+
+  set zoneLayerConnections(value: ViaZoneLayerConnectionsInput | undefined) {
+    if (value === undefined) {
+      this._sxZoneLayerConnections = undefined
+      return
+    }
+    this._sxZoneLayerConnections =
+      value instanceof ViaZoneLayerConnections
+        ? value
+        : new ViaZoneLayerConnections(value)
+  }
+
+  get tenting(): ViaTenting | undefined {
+    return this._sxTenting
+  }
+
+  set tenting(value: ViaTenting | string[] | undefined) {
+    if (value === undefined) {
+      this._sxTenting = undefined
+      return
+    }
+    this._sxTenting =
+      value instanceof ViaTenting ? value : new ViaTenting(value)
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxLayers) children.push(this._sxLayers)
+    if (this._sxZoneLayerConnections)
+      children.push(this._sxZoneLayerConnections)
+    if (this._sxTenting) children.push(this._sxTenting)
     if (this._sxCapping) children.push(this._sxCapping)
     if (this._sxCovering) children.push(this._sxCovering)
     if (this._sxPlugging) children.push(this._sxPlugging)
@@ -460,6 +511,10 @@ export class Via extends SxClass {
     if (this._size !== undefined) lines.push(`  (size ${this._size})`)
     if (this._drill !== undefined) lines.push(`  (drill ${this._drill})`)
     if (this._sxLayers) lines.push(this._sxLayers.getStringIndented())
+    if (this._sxZoneLayerConnections) {
+      lines.push(this._sxZoneLayerConnections.getStringIndented())
+    }
+    if (this._sxTenting) lines.push(this._sxTenting.getStringIndented())
     if (this._sxCapping) lines.push(this._sxCapping.getStringIndented())
     if (this._sxCovering) lines.push(this._sxCovering.getStringIndented())
     if (this._sxPlugging) lines.push(this._sxPlugging.getStringIndented())

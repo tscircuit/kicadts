@@ -11,6 +11,8 @@ import {
   Setup,
   SxClass,
   ZoneFilledPolygon,
+  GrPoly,
+  Via,
 } from "lib/sexpr"
 import { expect, test } from "bun:test"
 
@@ -196,4 +198,61 @@ test("ZoneFilledPolygon parses island", () => {
   expect(parsed).toBeInstanceOf(ZoneFilledPolygon)
   expect(parsed.island).toBe(true)
   expect(parsed.getString()).toContain("(island)")
+})
+
+test("GrPoly parses legacy tstamp", () => {
+  const [parsed] = SxClass.parse(`
+    (gr_poly
+      (pts (xy 0 0) (xy 1 0) (xy 1 1))
+      (layer "F.SilkS")
+      (tstamp 00000000-0000-0000-0000-000000000001)
+    )
+  `)
+
+  const polygon = parsed as GrPoly
+  expect(polygon).toBeInstanceOf(GrPoly)
+  expect(polygon.tstamp?.value).toBe("00000000-0000-0000-0000-000000000001")
+  expect(polygon.getString()).toContain(
+    "(tstamp 00000000-0000-0000-0000-000000000001)",
+  )
+})
+
+test("Group parses legacy id", () => {
+  const [parsed] = SxClass.parse(`
+    (group "Legacy Group"
+      (id 00000000-0000-0000-0000-000000000001)
+      (members 00000000-0000-0000-0000-000000000002)
+    )
+  `)
+
+  const group = parsed as Group
+  expect(group).toBeInstanceOf(Group)
+  expect(group.id).toBe("00000000-0000-0000-0000-000000000001")
+  expect(group.getString()).toContain(
+    "(id 00000000-0000-0000-0000-000000000001)",
+  )
+})
+
+test("Via parses zone layer connections", () => {
+  const [parsed] = SxClass.parse(`
+    (via
+      (at 1 2)
+      (size 0.6)
+      (drill 0.3)
+      (layers "F.Cu" "B.Cu")
+      (zone_layer_connections "In1.Cu" "In2.Cu")
+      (tenting none)
+      (net 1)
+      (uuid 00000000-0000-0000-0000-000000000001)
+    )
+  `)
+
+  const via = parsed as Via
+  expect(via).toBeInstanceOf(Via)
+  expect(via.zoneLayerConnections?.layers).toEqual(["In1.Cu", "In2.Cu"])
+  expect(via.tenting?.sides).toEqual(["none"])
+  expect(via.getString()).toContain(
+    '(zone_layer_connections "In1.Cu" "In2.Cu")',
+  )
+  expect(via.getString()).toContain("(tenting none)")
 })
