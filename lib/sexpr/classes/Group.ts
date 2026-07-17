@@ -1,16 +1,18 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Uuid } from "./Uuid"
+import { GroupId } from "./GroupId"
 import { toStringValue } from "../utils/toStringValue"
 
 export interface GroupConstructorParams {
   name?: string
   uuid?: string | Uuid
+  id?: string | GroupId
   locked?: boolean
   members?: string[]
 }
 
-const SUPPORTED_SINGLE_TOKENS = new Set(["uuid", "locked", "members"])
+const SUPPORTED_SINGLE_TOKENS = new Set(["uuid", "id", "locked", "members"])
 
 export class Group extends SxClass {
   static override token = "group"
@@ -18,6 +20,7 @@ export class Group extends SxClass {
 
   private _name: string = ""
   private _sxUuid?: Uuid
+  private _sxId?: GroupId
   private _sxLocked?: GroupLocked
   private _sxMembers?: GroupMembers
 
@@ -25,6 +28,7 @@ export class Group extends SxClass {
     super()
     if (params.name !== undefined) this.name = params.name
     if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.id !== undefined) this.id = params.id
     if (params.locked !== undefined) this.locked = params.locked
     if (params.members !== undefined) this.members = params.members
   }
@@ -77,6 +81,7 @@ export class Group extends SxClass {
     }
 
     group._sxUuid = propertyMap.uuid as Uuid | undefined
+    group._sxId = propertyMap.id as GroupId | undefined
     const locked = propertyMap.locked as GroupLocked | undefined
     group._sxLocked = locked && locked.value ? locked : undefined
     group._sxMembers = propertyMap.members as GroupMembers | undefined
@@ -108,6 +113,22 @@ export class Group extends SxClass {
     return this._sxUuid
   }
 
+  get id(): string | undefined {
+    return this._sxId?.value
+  }
+
+  set id(value: string | GroupId | undefined) {
+    if (value === undefined) {
+      this._sxId = undefined
+      return
+    }
+    this._sxId = value instanceof GroupId ? value : new GroupId(value)
+  }
+
+  get idClass(): GroupId | undefined {
+    return this._sxId
+  }
+
   get locked(): boolean {
     return this._sxLocked?.value ?? false
   }
@@ -131,6 +152,7 @@ export class Group extends SxClass {
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxId) children.push(this._sxId)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxMembers) children.push(this._sxMembers)
     return children
@@ -144,6 +166,7 @@ export class Group extends SxClass {
     }
 
     push(this._sxUuid)
+    push(this._sxId)
     push(this._sxLocked)
     push(this._sxMembers)
 

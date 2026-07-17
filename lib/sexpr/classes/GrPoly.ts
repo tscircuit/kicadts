@@ -3,6 +3,7 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Layer } from "./Layer"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
+import { Tstamp } from "./Tstamp"
 import { Width } from "./Width"
 import { Pts } from "./Pts"
 import { Xy } from "./Xy"
@@ -43,6 +44,7 @@ const SUPPORTED_TOKENS = new Set([
   "fill",
   "net",
   "uuid",
+  "tstamp",
 ])
 
 export interface GrPolyConstructorParams {
@@ -53,6 +55,7 @@ export interface GrPolyConstructorParams {
   fill?: GrPolyFill | boolean
   net?: GrPolyNet | number
   uuid?: Uuid | string
+  tstamp?: Tstamp | string
 }
 
 export class GrPoly extends SxClass {
@@ -66,6 +69,7 @@ export class GrPoly extends SxClass {
   private _sxFill?: GrPolyFill
   private _sxNet?: GrPolyNet
   private _sxUuid?: Uuid
+  private _sxTstamp?: Tstamp
 
   constructor(params: GrPolyConstructorParams = {}) {
     super()
@@ -76,6 +80,7 @@ export class GrPoly extends SxClass {
     if (params.fill !== undefined) this.fill = params.fill
     if (params.net !== undefined) this.net = params.net
     if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.tstamp !== undefined) this.tstamp = params.tstamp
   }
 
   static override fromSexprPrimitives(
@@ -134,6 +139,7 @@ export class GrPoly extends SxClass {
     grPoly._sxFill = propertyMap.fill as GrPolyFill | undefined
     grPoly._sxNet = propertyMap.net as GrPolyNet | undefined
     grPoly._sxUuid = propertyMap.uuid as Uuid | undefined
+    grPoly._sxTstamp = propertyMap.tstamp as Tstamp | undefined
 
     for (const primitive of primitiveSexprs) {
       if (!Array.isArray(primitive) || primitive.length === 0) {
@@ -283,6 +289,18 @@ export class GrPoly extends SxClass {
     return this._sxUuid
   }
 
+  get tstamp(): Tstamp | undefined {
+    return this._sxTstamp
+  }
+
+  set tstamp(value: Tstamp | string | undefined) {
+    if (value === undefined) {
+      this._sxTstamp = undefined
+      return
+    }
+    this._sxTstamp = value instanceof Tstamp ? value : new Tstamp(value)
+  }
+
   get net(): number | undefined {
     return this._sxNet?.id
   }
@@ -304,6 +322,7 @@ export class GrPoly extends SxClass {
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxNet) children.push(this._sxNet)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxTstamp) children.push(this._sxTstamp)
     return children
   }
 }
