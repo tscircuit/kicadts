@@ -6,11 +6,13 @@ import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
 import { toNumberValue } from "../utils/toNumberValue"
+import { FpArcAngle } from "./FpArcAngle"
 
 export interface FpArcConstructorParams {
   start?: FpArcStart | { x: number; y: number }
   mid?: FpArcMid | { x: number; y: number }
   end?: FpArcEnd | { x: number; y: number }
+  angle?: FpArcAngle | number
   layer?: Layer | string | string[]
   width?: number | Width
   stroke?: Stroke
@@ -26,6 +28,7 @@ export class FpArc extends SxClass {
   private _sxStart?: FpArcStart
   private _sxMid?: FpArcMid
   private _sxEnd?: FpArcEnd
+  private _sxAngle?: FpArcAngle
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
@@ -38,6 +41,7 @@ export class FpArc extends SxClass {
     if (params.start !== undefined) this.start = params.start
     if (params.mid !== undefined) this.mid = params.mid
     if (params.end !== undefined) this.end = params.end
+    if (params.angle !== undefined) this.angle = params.angle
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
@@ -59,6 +63,7 @@ export class FpArc extends SxClass {
     arc._sxStart = propertyMap.start as FpArcStart | undefined
     arc._sxMid = propertyMap.mid as FpArcMid | undefined
     arc._sxEnd = propertyMap.end as FpArcEnd | undefined
+    arc._sxAngle = propertyMap.angle as FpArcAngle | undefined
     arc._sxLayer = propertyMap.layer as Layer | undefined
     arc._sxWidth = propertyMap.width as Width | undefined
     arc._sxStroke = propertyMap.stroke as Stroke | undefined
@@ -120,6 +125,22 @@ export class FpArc extends SxClass {
       return
     }
     this._sxEnd = new FpArcEnd(value.x, value.y)
+  }
+
+  get angle(): number | undefined {
+    return this._sxAngle?.value
+  }
+
+  set angle(value: FpArcAngle | number | undefined) {
+    if (value === undefined) {
+      this._sxAngle = undefined
+      return
+    }
+    this._sxAngle = value instanceof FpArcAngle ? value : new FpArcAngle(value)
+  }
+
+  get angleClass(): FpArcAngle | undefined {
+    return this._sxAngle
   }
 
   get layer(): Layer | undefined {
@@ -212,6 +233,7 @@ export class FpArc extends SxClass {
     if (this._sxStart) children.push(this._sxStart)
     if (this._sxMid) children.push(this._sxMid)
     if (this._sxEnd) children.push(this._sxEnd)
+    if (this._sxAngle) children.push(this._sxAngle)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxStroke) children.push(this._sxStroke)
@@ -230,6 +252,7 @@ export class FpArc extends SxClass {
     push(this._sxStart)
     push(this._sxMid)
     push(this._sxEnd)
+    push(this._sxAngle)
     push(this._sxLayer)
     push(this._sxWidth)
     push(this._sxStroke)
