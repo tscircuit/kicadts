@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { PcbHost, parseKicadPcb } from "lib/sexpr"
 
-test("PcbHost parses legacy KiCad 5 host metadata", () => {
+test("PcbHost parses legacy KiCad host metadata", () => {
   const pcb = parseKicadPcb(`
     (kicad_pcb
       (version 20171130)
