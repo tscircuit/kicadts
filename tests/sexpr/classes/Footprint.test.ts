@@ -303,3 +303,26 @@ test("Footprint", () => {
     )"
   `)
 })
+
+test("KiCad 10.99 footprint transform provides legacy position semantics", () => {
+  const [parsed] = SxClass.parse(`
+    (footprint "Connector:Example"
+      (layer "F.Cu")
+      (uuid "12345678-1234-1234-1234-123456789abc")
+      (transform
+        (translate 146 73)
+        (rotate 90)
+        (scale 1 1)
+      )
+    )
+  `)
+
+  const footprint = parsed as Footprint
+  expect(footprint.position).toBeInstanceOf(At)
+  expect(footprint.position).toMatchObject({ x: 146, y: 73, angle: 90 })
+  expect(footprint.getString()).toContain(`(transform
+    (translate 146 73)
+    (rotate 90)
+    (scale 1 1)
+  )`)
+})

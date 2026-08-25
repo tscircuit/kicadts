@@ -11,6 +11,7 @@ export class PadDrill extends SxClass {
 
   private _oval = false
   private _diameter: number
+  private _diameterSpecified: boolean
   private _width?: number
   private _sxOffset?: PadDrillOffset
 
@@ -21,13 +22,14 @@ export class PadDrill extends SxClass {
     offset,
   }: {
     oval?: boolean
-    diameter: number
+    diameter?: number
     width?: number
     offset?: PadDrillOffset | { x: number; y: number }
   }) {
     super()
     this._oval = oval
-    this._diameter = diameter
+    this._diameter = diameter ?? 0
+    this._diameterSpecified = diameter !== undefined
     this._width = width
     if (offset instanceof PadDrillOffset) {
       this._sxOffset = offset
@@ -46,10 +48,8 @@ export class PadDrill extends SxClass {
       remaining.shift()
     }
 
-    const diameter = toNumberValue(remaining.shift())
-    if (diameter === undefined) {
-      throw new Error("drill requires a diameter value")
-    }
+    const diameter = toNumberValue(remaining[0])
+    if (diameter !== undefined) remaining.shift()
 
     let width: number | undefined
     const potentialWidth = toNumberValue(remaining[0])
@@ -80,6 +80,10 @@ export class PadDrill extends SxClass {
       drill._sxOffset = parsed
     }
 
+    if (diameter === undefined && !drill._sxOffset) {
+      throw new Error("drill requires a diameter value or offset child")
+    }
+
     return drill
   }
 
@@ -97,6 +101,7 @@ export class PadDrill extends SxClass {
 
   set diameter(value: number) {
     this._diameter = value
+    this._diameterSpecified = true
   }
 
   get width(): number | undefined {
@@ -129,14 +134,14 @@ export class PadDrill extends SxClass {
   override getString(): string {
     const tokens: string[] = []
     if (this._oval) tokens.push("oval")
-    tokens.push(String(this._diameter))
+    if (this._diameterSpecified) tokens.push(String(this._diameter))
     if (this._width !== undefined) tokens.push(String(this._width))
 
     if (!this._sxOffset) {
       return `(drill ${tokens.join(" ")})`
     }
 
-    const lines = [`(drill ${tokens.join(" ")}`]
+    const lines = [`(drill${tokens.length > 0 ? ` ${tokens.join(" ")}` : ""}`]
     lines.push(this._sxOffset.getStringIndented())
     lines.push(")")
     return lines.join("\n")

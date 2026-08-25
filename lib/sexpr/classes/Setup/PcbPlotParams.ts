@@ -14,6 +14,7 @@ import {
   PlotParamMode,
   PlotParamOutputFormat,
   PlotParamPlotOnAllLayersSelection,
+  PlotParamPngDpi,
   PlotParamScaleSelection,
   PlotParamSvgPrecision,
 } from "./PcbPlotParamsNumericProperties"
@@ -30,6 +31,7 @@ import {
   PlotParamPdfFrontFpPropertyPopups,
   PlotParamPdfMetadata,
   PlotParamPdfSingleDocument,
+  PlotParamPngAntialias,
   PlotParamPlotFrameRef,
   PlotParamPsNegative,
   PlotParamSvgUseInch,
@@ -72,6 +74,8 @@ const TOKEN_TO_KEY = {
   dashed_line_gap_ratio: "dashed_line_gap_ratio",
   svguseinch: "svguseinch",
   svgprecision: "svgprecision",
+  pngdpi: "pngdpi",
+  pngantialias: "pngantialias",
   linewidth: "linewidth",
   plotframeref: "plotframeref",
   plotreference: "plotreference",
@@ -129,6 +133,8 @@ const PCB_PLOT_PARAM_CHILD_ORDER: PlotParamKey[] = [
   "dashed_line_gap_ratio",
   "svguseinch",
   "svgprecision",
+  "pngdpi",
+  "pngantialias",
   "linewidth",
   "plotframeref",
   "plotreference",
@@ -374,6 +380,22 @@ export class PcbPlotParams extends SxClass {
 
   set svgprecision(value: number | undefined) {
     this.setNumberProperty("svgprecision", value, PlotParamSvgPrecision)
+  }
+
+  get pngdpi(): number | undefined {
+    return this._properties.pngdpi?.value
+  }
+
+  set pngdpi(value: number | undefined) {
+    this.setNumberProperty("pngdpi", value, PlotParamPngDpi)
+  }
+
+  get pngantialias(): string | undefined {
+    return this._properties.pngantialias?.value
+  }
+
+  set pngantialias(value: string | undefined) {
+    this.setStringProperty("pngantialias", value, PlotParamPngAntialias)
   }
 
   get linewidth(): number | undefined {

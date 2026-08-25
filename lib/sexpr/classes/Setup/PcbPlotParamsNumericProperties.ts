@@ -50,6 +50,12 @@ export class PlotParamSvgPrecision extends PlotParamNumberProperty {
 }
 SxClass.register(PlotParamSvgPrecision)
 
+export class PlotParamPngDpi extends PlotParamNumberProperty {
+  static override token = "pngdpi"
+  token = "pngdpi"
+}
+SxClass.register(PlotParamPngDpi)
+
 export class PlotParamLineWidth extends PlotParamNumberProperty {
   static override token = "linewidth"
   token = "linewidth"

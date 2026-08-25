@@ -12,6 +12,8 @@ import {
   StackupLayerThickness,
   StackupLayerType,
 } from "./StackupLayerProperties"
+import { StackupLayerDielectricModel } from "./StackupLayerDielectricModel"
+import { StackupLayerSpecFrequency } from "./StackupLayerSpecFrequency"
 
 export class StackupLayer extends SxClass {
   static override token = "layer"
@@ -27,6 +29,8 @@ export class StackupLayer extends SxClass {
   private _sxMaterial?: StackupLayerMaterial
   private _sxEpsilonR?: StackupLayerEpsilonR
   private _sxLossTangent?: StackupLayerLossTangent
+  private _sxSpecFrequency?: StackupLayerSpecFrequency
+  private _sxDielectricModel?: StackupLayerDielectricModel
 
   constructor(
     name: string,
@@ -38,6 +42,8 @@ export class StackupLayer extends SxClass {
       material?: StackupLayerMaterial
       epsilonR?: StackupLayerEpsilonR
       lossTangent?: StackupLayerLossTangent
+      specFrequency?: StackupLayerSpecFrequency
+      dielectricModel?: StackupLayerDielectricModel
     } = {},
   ) {
     super()
@@ -49,6 +55,8 @@ export class StackupLayer extends SxClass {
     this._sxMaterial = opts.material
     this._sxEpsilonR = opts.epsilonR
     this._sxLossTangent = opts.lossTangent
+    this._sxSpecFrequency = opts.specFrequency
+    this._sxDielectricModel = opts.dielectricModel
   }
 
   static override fromSexprPrimitives(
@@ -86,6 +94,9 @@ export class StackupLayer extends SxClass {
       material: propertyMap.material as StackupLayerMaterial,
       epsilonR: propertyMap.epsilon_r as StackupLayerEpsilonR,
       lossTangent: propertyMap.loss_tangent as StackupLayerLossTangent,
+      specFrequency: propertyMap.spec_frequency as StackupLayerSpecFrequency,
+      dielectricModel:
+        propertyMap.dielectric_model as StackupLayerDielectricModel,
     })
   }
 
@@ -203,6 +214,39 @@ export class StackupLayer extends SxClass {
         : new StackupLayerLossTangent(value)
   }
 
+  get specFrequency(): number | undefined {
+    return this._sxSpecFrequency?.value
+  }
+
+  set specFrequency(value: number | StackupLayerSpecFrequency | undefined) {
+    if (value === undefined) {
+      this._sxSpecFrequency = undefined
+      return
+    }
+    this._sxSpecFrequency =
+      value instanceof StackupLayerSpecFrequency
+        ? value
+        : new StackupLayerSpecFrequency(value)
+  }
+
+  get dielectricModel(): string | undefined {
+    return this._sxDielectricModel?.value
+  }
+
+  set dielectricModel(value:
+    | string
+    | StackupLayerDielectricModel
+    | undefined,) {
+    if (value === undefined) {
+      this._sxDielectricModel = undefined
+      return
+    }
+    this._sxDielectricModel =
+      value instanceof StackupLayerDielectricModel
+        ? value
+        : new StackupLayerDielectricModel(value)
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxType) children.push(this._sxType)
@@ -211,6 +255,8 @@ export class StackupLayer extends SxClass {
     if (this._sxMaterial) children.push(this._sxMaterial)
     if (this._sxEpsilonR) children.push(this._sxEpsilonR)
     if (this._sxLossTangent) children.push(this._sxLossTangent)
+    if (this._sxSpecFrequency) children.push(this._sxSpecFrequency)
+    if (this._sxDielectricModel) children.push(this._sxDielectricModel)
     return children
   }
 
