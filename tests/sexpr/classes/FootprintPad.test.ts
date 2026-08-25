@@ -76,3 +76,23 @@ test("FootprintPad", () => {
     )"
   `)
 })
+
+test("KiCad 10.99 offset-only drill child", () => {
+  const [parsed] = SxClass.parse(`
+    (pad "41" smd rect
+      (at -8.75 2.889996 -90)
+      (size 0.4 1.8)
+      (drill
+        (offset 0 -0.4)
+      )
+      (layers "F.Cu" "F.Mask" "F.Paste")
+    )
+  `)
+
+  const pad = parsed as FootprintPad
+  expect(pad.drill?.diameter).toBe(0)
+  expect(pad.drill?.offset).toMatchObject({ x: 0, y: -0.4 })
+  expect(pad.getString()).toContain(`(drill
+    (offset 0 -0.4)
+  )`)
+})

@@ -45,6 +45,7 @@ import { EmbeddedFonts } from "./EmbeddedFonts"
 import { FootprintLocked } from "./FootprintLocked"
 import { FootprintPlaced } from "./FootprintPlaced"
 import { FootprintDuplicatePadNumbersAreJumpers } from "./FootprintDuplicatePadNumbersAreJumpers"
+import { FootprintTransform } from "./FootprintTransform"
 import { FootprintPoint } from "./FootprintPoint"
 import { FootprintUnits } from "./FootprintUnits"
 import { Zone } from "./Zone"
@@ -61,6 +62,7 @@ const SINGLE_TOKENS = new Set([
   "uuid",
   "at",
   "xy",
+  "transform",
   "descr",
   "tags",
   "path",
@@ -115,6 +117,7 @@ export interface FootprintConstructorParams {
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   at?: AtInput | Xy
+  transform?: FootprintTransform
   descr?: string | FootprintDescr
   tags?: string | string[] | FootprintTags
   path?: string | FootprintPath
@@ -172,6 +175,7 @@ export class Footprint extends SxClass {
   private _sxUuid?: Uuid
   private _sxAt?: At
   private _sxXy?: Xy
+  private _sxTransform?: FootprintTransform
   private _sxDescr?: FootprintDescr
   private _sxTags?: FootprintTags
   private _sxPath?: FootprintPath
@@ -222,6 +226,7 @@ export class Footprint extends SxClass {
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.at !== undefined) this.position = params.at
+    if (params.transform !== undefined) this.transform = params.transform
     if (params.descr !== undefined) this.descr = params.descr
     if (params.tags !== undefined) this.tags = params.tags
     if (params.path !== undefined) this.path = params.path
@@ -346,8 +351,14 @@ export class Footprint extends SxClass {
     footprint._sxUuid = propertyMap.uuid as Uuid | undefined
     footprint._sxAt = propertyMap.at as At | undefined
     footprint._sxXy = propertyMap.xy as Xy | undefined
-    if (footprint._sxAt && footprint._sxXy) {
-      throw new Error("footprint cannot include both at and xy children")
+    footprint._sxTransform = propertyMap.transform as
+      | FootprintTransform
+      | undefined
+    if (
+      [footprint._sxAt, footprint._sxXy, footprint._sxTransform].filter(Boolean)
+        .length > 1
+    ) {
+      throw new Error("footprint cannot include more than one placement child")
     }
     footprint._sxDescr = propertyMap.descr as FootprintDescr | undefined
     footprint._sxTags = propertyMap.tags as FootprintTags | undefined
@@ -588,23 +599,34 @@ export class Footprint extends SxClass {
   }
 
   get position(): At | Xy | undefined {
-    return this._sxAt ?? this._sxXy
+    return this._sxAt ?? this._sxXy ?? this._sxTransform?.toAt()
   }
 
   set position(value: AtInput | Xy | undefined) {
     if (value === undefined) {
       this._sxAt = undefined
       this._sxXy = undefined
+      this._sxTransform = undefined
       return
     }
     if (value instanceof Xy) {
       this._sxXy = value
       this._sxAt = undefined
+      this._sxTransform = undefined
       return
     }
     // Handle AtInput (At, array, or object)
     this._sxAt = At.from(value as AtInput)
     this._sxXy = undefined
+    this._sxTransform = undefined
+  }
+
+  get transform(): FootprintTransform | undefined {
+    return this._sxTransform
+  }
+
+  set transform(value: FootprintTransform | undefined) {
+    this._sxTransform = value
   }
 
   get descr(): FootprintDescr | undefined {
@@ -1043,6 +1065,7 @@ export class Footprint extends SxClass {
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxXy) children.push(this._sxXy)
+    if (this._sxTransform) children.push(this._sxTransform)
     if (this._sxDescr) children.push(this._sxDescr)
     if (this._sxTags) children.push(this._sxTags)
     if (this._sxPath) children.push(this._sxPath)

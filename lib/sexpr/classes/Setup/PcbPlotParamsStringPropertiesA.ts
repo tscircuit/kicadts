@@ -49,6 +49,12 @@ export class PlotParamPlotFrameRef extends PlotParamProperty<string> {
 }
 SxClass.register(PlotParamPlotFrameRef)
 
+export class PlotParamPngAntialias extends PlotParamProperty<string> {
+  static override token = "pngantialias"
+  token = "pngantialias"
+}
+SxClass.register(PlotParamPngAntialias)
+
 export class PlotParamViaOnMask extends PlotParamProperty<string> {
   static override token = "viasonmask"
   token = "viasonmask"
