@@ -2,6 +2,7 @@ import {
   At,
   SxClass,
   SchematicSymbol,
+  SymbolCircleFill,
   SymbolProperty,
   SymbolPin,
   TextEffects,
@@ -90,6 +91,30 @@ test("Symbol parse", () => {
           )
         )
       )
+    )"
+  `)
+})
+
+test("Symbol fill color accessors", () => {
+  const fill = new SymbolCircleFill()
+
+  fill.type = "color"
+  fill.color = { r: 255, g: 85, b: 0, a: 1 }
+
+  expect(fill.color).toEqual({ r: 255, g: 85, b: 0, a: 1 })
+  expect(fill.getString()).toMatchInlineSnapshot(`
+    "(fill
+      (type color)
+      (color 255 85 0 1)
+    )"
+  `)
+
+  fill.color = undefined
+
+  expect(fill.color).toBeUndefined()
+  expect(fill.getString()).toMatchInlineSnapshot(`
+    "(fill
+      (type color)
     )"
   `)
 })
