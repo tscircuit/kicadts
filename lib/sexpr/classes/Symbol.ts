@@ -23,7 +23,7 @@ import { SymbolBodyStyles } from "./SymbolBodyStyles"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
-import { Color } from "./Color"
+import { Color, type RGBAColor } from "./Color"
 import { SymbolLibName } from "./SymbolLibName"
 import { SymbolTextBox } from "./SymbolTextBox"
 import { SymbolPolyline } from "./Polyline"
@@ -414,6 +414,17 @@ abstract class SymbolFillBase extends SxClass {
       return
     }
     this._sxType = new SymbolFillType(value)
+  }
+
+  get color(): RGBAColor | undefined {
+    return this._sxColor?.color
+  }
+
+  set color(value: RGBAColor | undefined) {
+    this._sxColor =
+      value === undefined
+        ? undefined
+        : new Color([value.r, value.g, value.b, value.a])
   }
 
   override getChildren(): SxClass[] {
