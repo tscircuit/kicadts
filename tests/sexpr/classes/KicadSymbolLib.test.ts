@@ -66,7 +66,8 @@ test("KicadSymbolLib parses generator_version", () => {
   expect(parsed).toBeInstanceOf(KicadSymbolLib)
   const lib = parsed as KicadSymbolLib
   expect(lib.generatorVersion).toBe("8.0")
-  expect(lib.getString()).toContain("(generator_version 8.0)")
+  // "8.0" must stay quoted: a bare 8.0 reads back as the number 8, not the string.
+  expect(lib.getString()).toContain('(generator_version "8.0")')
 })
 
 test("KicadSymbolLib construct and getString", () => {

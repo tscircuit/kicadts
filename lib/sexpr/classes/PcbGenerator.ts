@@ -1,8 +1,6 @@
 import { SxPrimitiveString } from "../base-classes/SxPrimitiveString"
 import { SxClass } from "../base-classes/SxClass"
-import { quoteSExprString } from "../utils/quoteSExprString"
-
-const isSymbol = (value: string) => /^[A-Za-z0-9._-]+$/.test(value)
+import { quoteIfNeeded } from "../utils/quoteSExprString"
 
 export class PcbGenerator extends SxPrimitiveString {
   static override token = "generator"
@@ -10,7 +8,7 @@ export class PcbGenerator extends SxPrimitiveString {
   token = "generator"
 
   override getString(): string {
-    return `(generator ${isSymbol(this.value) ? this.value : quoteSExprString(this.value)})`
+    return `(generator ${quoteIfNeeded(this.value)})`
   }
 }
 SxClass.register(PcbGenerator)

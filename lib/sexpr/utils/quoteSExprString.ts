@@ -7,7 +7,11 @@ export const needsQuoting = (value: string): boolean => {
   if (value.length === 0) return true
 
   // Check for special characters that require quoting
-  return /[\s()"\\]/.test(value)
+  if (/[\s()"\\]/.test(value)) return true
+
+  // A bare token that reads back as a number is a different value on the next parse:
+  // (generator_version 10.99) round-trips into the number 10.99, not the string "10.99".
+  return /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(value)
 }
 
 /**
