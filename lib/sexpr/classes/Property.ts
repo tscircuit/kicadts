@@ -5,9 +5,11 @@ import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 import { At, type AtInput } from "./At"
 import { Layer } from "./Layer"
+import { PropertyDoNotAutoplace } from "./PropertyDoNotAutoplace"
 import { PropertyHide } from "./PropertyHide"
+import { PropertyShowName } from "./PropertyShowName"
 import { PropertyUnlocked } from "./PropertyUnlocked"
-import { TextEffects } from "./TextEffects"
+import type { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Xy } from "./Xy"
 
@@ -18,6 +20,8 @@ const SUPPORTED_SINGLE_CHILDREN = new Set([
   "uuid",
   "effects",
   "unlocked",
+  "show_name",
+  "do_not_autoplace",
   "hide",
 ])
 
@@ -52,6 +56,8 @@ export interface PropertyConstructorParams {
   uuid?: string | Uuid
   effects?: TextEffects
   unlocked?: boolean | PropertyUnlocked
+  showName?: boolean | PropertyShowName
+  doNotAutoplace?: boolean | PropertyDoNotAutoplace
   hidden?: boolean | PropertyHide
 }
 
@@ -67,6 +73,8 @@ export class Property extends SxClass {
   private _sxUuid?: Uuid
   private _sxEffects?: TextEffects
   private _sxUnlocked?: PropertyUnlocked
+  private _sxShowName?: PropertyShowName
+  private _sxDoNotAutoplace?: PropertyDoNotAutoplace
   private _sxHide?: PropertyHide
 
   constructor(
@@ -105,6 +113,12 @@ export class Property extends SxClass {
         } else {
           this.unlocked = params.unlocked
         }
+      }
+      if (params.showName !== undefined) {
+        this.showName = params.showName
+      }
+      if (params.doNotAutoplace !== undefined) {
+        this.doNotAutoplace = params.doNotAutoplace
       }
       if (params.hidden !== undefined) {
         if (params.hidden instanceof PropertyHide) {
@@ -181,6 +195,10 @@ export class Property extends SxClass {
     property._sxUuid = propertyMap.uuid as Uuid | undefined
     property._sxEffects = propertyMap.effects as TextEffects | undefined
     property._sxUnlocked = propertyMap.unlocked as PropertyUnlocked | undefined
+    property._sxShowName = propertyMap.show_name as PropertyShowName | undefined
+    property._sxDoNotAutoplace = propertyMap.do_not_autoplace as
+      | PropertyDoNotAutoplace
+      | undefined
     property._sxHide = propertyMap.hide as PropertyHide | undefined
 
     return property
@@ -267,6 +285,26 @@ export class Property extends SxClass {
     this._sxUnlocked = new PropertyUnlocked(value)
   }
 
+  get showName(): boolean {
+    return this._sxShowName?.value ?? false
+  }
+
+  set showName(value: boolean | PropertyShowName) {
+    this._sxShowName =
+      value instanceof PropertyShowName ? value : new PropertyShowName(value)
+  }
+
+  get doNotAutoplace(): boolean {
+    return this._sxDoNotAutoplace?.value ?? false
+  }
+
+  set doNotAutoplace(value: boolean | PropertyDoNotAutoplace) {
+    this._sxDoNotAutoplace =
+      value instanceof PropertyDoNotAutoplace
+        ? value
+        : new PropertyDoNotAutoplace(value)
+  }
+
   get hidden(): boolean {
     return this._sxHide?.value ?? false
   }
@@ -280,6 +318,8 @@ export class Property extends SxClass {
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxXy) children.push(this._sxXy)
     if (this._sxUnlocked) children.push(this._sxUnlocked)
+    if (this._sxShowName) children.push(this._sxShowName)
+    if (this._sxDoNotAutoplace) children.push(this._sxDoNotAutoplace)
     if (this._sxLayer) children.push(this._sxLayer)
     if (this._sxHide) children.push(this._sxHide)
     if (this._sxUuid) children.push(this._sxUuid)

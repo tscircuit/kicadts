@@ -8,6 +8,8 @@ test("Property preserves extended attributes", () => {
     (property "Reference" "R1"
       (at 1 2 90)
       (unlocked yes)
+      (show_name yes)
+      (do_not_autoplace yes)
       (layer "F.SilkS")
       (hide yes)
       (uuid 12345678-1234-1234-1234-123456789abc)
@@ -34,6 +36,8 @@ test("Property preserves extended attributes", () => {
     expect(position.angle).toBe(90)
   }
   expect(property.unlocked).toBe(true)
+  expect(property.showName).toBe(true)
+  expect(property.doNotAutoplace).toBe(true)
   expect(property.layer?.names).toEqual(["F.SilkS"])
   expect(property.hidden).toBe(true)
   expect(property.uuid?.value).toBe("12345678-1234-1234-1234-123456789abc")
