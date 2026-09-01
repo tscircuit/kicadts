@@ -9,7 +9,15 @@ export const needsQuoting = (value: string): boolean => {
   // Check for special characters that require quoting
   if (/[\s()"\\]/.test(value)) return true
 
-  // A bare token that reads back as a number is a different value on the next parse:
+  // A leading ";" starts a comment, so a bare token beginning with one swallows the rest
+  // of the line and the document no longer parses.
+  if (value.startsWith(";")) return true
+
+  // The lexer reads these bare tokens as literals rather than strings, so emitting them
+  // bare changes the value's type on the next parse.
+  if (value === "nil" || value === "#t" || value === "#f") return true
+
+  // A bare token that reads back as a number is likewise a different value:
   // (generator_version 10.99) round-trips into the number 10.99, not the string "10.99".
   return /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/.test(value)
 }

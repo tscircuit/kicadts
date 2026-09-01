@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { parseKicadPcb, parseKicadMod } from "../../../lib"
+import { parseKicadPcb, parseKicadMod, KicadPcb } from "../../../lib"
 import { needsQuoting } from "../../../lib/sexpr/utils/quoteSExprString"
 
 // KiCad writes (generator_version "10.99"). Emitted bare, it reads back as the
@@ -45,5 +45,25 @@ test("needsQuoting treats number-like tokens as requiring quotes", () => {
   for (const v of ["10.99", "8.0", "-3", "1e5", ".5", "20260728"])
     expect(needsQuoting(v)).toBe(true)
   for (const v of ["pcbnew", "kicad_symbol_editor", "F.Cu", "10.99.1", "abc"])
+    expect(needsQuoting(v)).toBe(false)
+})
+
+// The lexer reads nil, #t and #f as literals and treats a leading ";" as a comment,
+// so a bare token of that shape changes type or breaks the document on reparse.
+test("reserved literals and comment-prefixed tokens stay quoted", () => {
+  for (const g of ["#t", "#f", "nil", ";evil"]) {
+    const pcb = new KicadPcb({ version: 20260728, generator: g })
+    const out = pcb.getStringIndented()
+    expect(out).toContain(`(generator "${g}")`)
+    const back = parseKicadPcb(out).generator
+    expect(back).toBe(g)
+    expect(typeof back).toBe("string")
+  }
+})
+
+test("needsQuoting covers reserved literals and comment prefixes", () => {
+  for (const v of ["nil", "#t", "#f", ";x", ";"])
+    expect(needsQuoting(v)).toBe(true)
+  for (const v of ["pcbnew", "nils", "#tt", "a;b"])
     expect(needsQuoting(v)).toBe(false)
 })
