@@ -23,6 +23,7 @@ import { Polyline } from "./Polyline"
 import { SchematicArc } from "./SchematicArc"
 import { SchematicRectangle } from "./SchematicRectangle"
 import { SchematicTextBox } from "./SchematicTextBox"
+import { LegacySymbolInstances } from "./LegacySymbolInstances"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -33,6 +34,7 @@ const SINGLE_CHILD_TOKENS = new Set([
   "title_block",
   "lib_symbols",
   "embedded_fonts",
+  "symbol_instances",
 ])
 
 const MULTI_CHILD_TOKENS = new Set([
@@ -68,6 +70,7 @@ export interface KicadSchConstructorParams {
   libSymbols?: LibSymbols
   sheetInstances?: SheetInstances | SheetInstances[]
   embeddedFonts?: EmbeddedFonts
+  symbolInstances?: LegacySymbolInstances
   properties?: Property[]
   images?: Image[]
   sheets?: Sheet[]
@@ -97,6 +100,7 @@ export class KicadSch extends SxClass {
   private _sxLibSymbols?: LibSymbols
   private _sheetInstances: SheetInstances[] = []
   private _sxEmbeddedFonts?: EmbeddedFonts
+  private _sxSymbolInstances?: LegacySymbolInstances
   private _properties: Property[] = []
   private _images: Image[] = []
   private _sheets: Sheet[] = []
@@ -155,6 +159,10 @@ export class KicadSch extends SxClass {
 
     if (params.embeddedFonts !== undefined) {
       this.embeddedFonts = params.embeddedFonts
+    }
+
+    if (params.symbolInstances !== undefined) {
+      this.symbolInstances = params.symbolInstances
     }
 
     if (params.properties !== undefined) {
@@ -268,6 +276,9 @@ export class KicadSch extends SxClass {
         | SheetInstances[]
         | undefined,
       embeddedFonts: propertyMap.embedded_fonts as EmbeddedFonts | undefined,
+      symbolInstances: propertyMap.symbol_instances as
+        | LegacySymbolInstances
+        | undefined,
       properties: (arrayPropertyMap.property as Property[]) ?? [],
       images: (arrayPropertyMap.image as Image[]) ?? [],
       sheets: (arrayPropertyMap.sheet as Sheet[]) ?? [],
@@ -362,6 +373,14 @@ export class KicadSch extends SxClass {
 
   get embeddedFonts(): EmbeddedFonts | undefined {
     return this._sxEmbeddedFonts
+  }
+
+  get symbolInstances(): LegacySymbolInstances | undefined {
+    return this._sxSymbolInstances
+  }
+
+  set symbolInstances(value: LegacySymbolInstances | undefined) {
+    this._sxSymbolInstances = value
   }
 
   set embeddedFonts(value: EmbeddedFonts | undefined) {
@@ -490,6 +509,7 @@ export class KicadSch extends SxClass {
     if (this._sxTitleBlock) children.push(this._sxTitleBlock)
     if (this._sxLibSymbols) children.push(this._sxLibSymbols)
     children.push(...this._sheetInstances)
+    if (this._sxSymbolInstances) children.push(this._sxSymbolInstances)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
     children.push(...this._properties)
     children.push(...this._images)

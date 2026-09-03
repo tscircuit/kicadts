@@ -27,6 +27,7 @@ import { Color, type RGBAColor } from "./Color"
 import { SymbolLibName } from "./SymbolLibName"
 import { SymbolTextBox } from "./SymbolTextBox"
 import { SymbolPolyline } from "./Polyline"
+import { SymbolArcRadius } from "./SymbolArcRadius"
 
 export class SymbolUnit extends SxPrimitiveNumber {
   static override token = "unit"
@@ -580,6 +581,7 @@ export class SymbolArc extends SxClass {
   private _sxStart?: SymbolArcStart
   private _sxMid?: SymbolArcMid
   private _sxEnd?: SymbolArcEnd
+  private _sxRadius?: SymbolArcRadius
   private _sxStroke?: Stroke
   private _sxFill?: SymbolArcFill
 
@@ -595,6 +597,7 @@ export class SymbolArc extends SxClass {
     arc._sxStart = propertyMap.start as SymbolArcStart
     arc._sxMid = propertyMap.mid as SymbolArcMid
     arc._sxEnd = propertyMap.end as SymbolArcEnd
+    arc._sxRadius = propertyMap.radius as SymbolArcRadius
     arc._sxStroke = propertyMap.stroke as Stroke
     arc._sxFill = propertyMap.fill as SymbolArcFill
 
@@ -606,9 +609,18 @@ export class SymbolArc extends SxClass {
     if (this._sxStart) children.push(this._sxStart)
     if (this._sxMid) children.push(this._sxMid)
     if (this._sxEnd) children.push(this._sxEnd)
+    if (this._sxRadius) children.push(this._sxRadius)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxFill) children.push(this._sxFill)
     return children
+  }
+
+  get radius(): SymbolArcRadius | undefined {
+    return this._sxRadius
+  }
+
+  set radius(value: SymbolArcRadius | undefined) {
+    this._sxRadius = value
   }
 }
 SxClass.register(SymbolArc)

@@ -9,6 +9,7 @@ import { PropertyDoNotAutoplace } from "./PropertyDoNotAutoplace"
 import { PropertyHide } from "./PropertyHide"
 import { PropertyShowName } from "./PropertyShowName"
 import { PropertyUnlocked } from "./PropertyUnlocked"
+import { SymbolPropertyId } from "./Symbol"
 import type { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Xy } from "./Xy"
@@ -23,6 +24,7 @@ const SUPPORTED_SINGLE_CHILDREN = new Set([
   "show_name",
   "do_not_autoplace",
   "hide",
+  "id",
 ])
 
 const ensureSingleChild = (
@@ -59,6 +61,7 @@ export interface PropertyConstructorParams {
   showName?: boolean | PropertyShowName
   doNotAutoplace?: boolean | PropertyDoNotAutoplace
   hidden?: boolean | PropertyHide
+  id?: number | SymbolPropertyId
 }
 
 export class Property extends SxClass {
@@ -76,6 +79,7 @@ export class Property extends SxClass {
   private _sxShowName?: PropertyShowName
   private _sxDoNotAutoplace?: PropertyDoNotAutoplace
   private _sxHide?: PropertyHide
+  private _sxId?: SymbolPropertyId
 
   constructor(
     keyOrParams: string | PropertyConstructorParams = {},
@@ -126,6 +130,10 @@ export class Property extends SxClass {
         } else {
           this.hidden = params.hidden
         }
+      }
+      if (params.id !== undefined) {
+        this.id =
+          params.id instanceof SymbolPropertyId ? params.id.value : params.id
       }
     }
   }
@@ -200,6 +208,7 @@ export class Property extends SxClass {
       | PropertyDoNotAutoplace
       | undefined
     property._sxHide = propertyMap.hide as PropertyHide | undefined
+    property._sxId = propertyMap.id as SymbolPropertyId | undefined
 
     return property
   }
@@ -218,6 +227,14 @@ export class Property extends SxClass {
 
   set value(value: string) {
     this._value = value
+  }
+
+  get id(): number | undefined {
+    return this._sxId?.value
+  }
+
+  set id(value: number | undefined) {
+    this._sxId = value === undefined ? undefined : new SymbolPropertyId(value)
   }
 
   get position(): At | Xy | undefined {
@@ -315,6 +332,7 @@ export class Property extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxId) children.push(this._sxId)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxXy) children.push(this._sxXy)
     if (this._sxUnlocked) children.push(this._sxUnlocked)
