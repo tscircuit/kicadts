@@ -16,7 +16,8 @@
     "download-demos": "git clone --depth 1 --filter=blob:none --sparse https://gitlab.com/kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos",
     "typecheck": "bunx tsc --noEmit",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "prepare": "bun run scripts/prepare-git-dependency.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
