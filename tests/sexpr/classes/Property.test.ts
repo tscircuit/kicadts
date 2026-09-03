@@ -6,6 +6,7 @@ import { expectEqualPrimitiveSExpr } from "../../fixtures/expectEqualPrimitiveSE
 test("Property preserves extended attributes", () => {
   const input = `
     (property "Reference" "R1"
+      (id 0)
       (at 1 2 90)
       (unlocked yes)
       (show_name yes)
@@ -28,6 +29,7 @@ test("Property preserves extended attributes", () => {
   const property = parsed as Property
   expect(property.key).toBe("Reference")
   expect(property.value).toBe("R1")
+  expect(property.id).toBe(0)
   const position = property.position
   expect(position).toBeInstanceOf(At)
   if (position instanceof At) {
