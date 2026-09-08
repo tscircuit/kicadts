@@ -1,5 +1,5 @@
-import { KicadSymbolLib, SchematicSymbol, SxClass } from "lib/sexpr"
 import { expect, test } from "bun:test"
+import { KicadSymbolLib, SchematicSymbol, SxClass } from "lib/sexpr"
 
 test("KicadSymbolLib parse with symbols", () => {
   const [parsed] = SxClass.parse(`
@@ -67,6 +67,32 @@ test("KicadSymbolLib parses generator_version", () => {
   const lib = parsed as KicadSymbolLib
   expect(lib.generatorVersion).toBe("8.0")
   expect(lib.getString()).toContain("(generator_version 8.0)")
+})
+
+test("KicadSymbolLib preserves inline hidden pin names", () => {
+  const [parsed] = SxClass.parse(`
+    (kicad_symbol_lib
+      (version 20231120)
+      (generator kicad_symbol_editor)
+      (symbol "Connector_Generic:Conn_01x04"
+        (pin_names (offset 1.016) hide)
+      )
+    )
+  `)
+
+  expect(parsed).toBeInstanceOf(KicadSymbolLib)
+  const lib = parsed as KicadSymbolLib
+  expect(lib.symbols[0]?.pinNames?.offset).toBe(1.016)
+  expect(lib.symbols[0]?.pinNames?.hide).toBe(true)
+
+  const output = lib.getString()
+  expect(output).toContain(
+    "(pin_names\n      (offset 1.016)\n      hide\n    )",
+  )
+
+  const [reparsed] = SxClass.parse(output)
+  expect(reparsed).toBeInstanceOf(KicadSymbolLib)
+  expect((reparsed as KicadSymbolLib).symbols[0]?.pinNames?.hide).toBe(true)
 })
 
 test("KicadSymbolLib construct and getString", () => {

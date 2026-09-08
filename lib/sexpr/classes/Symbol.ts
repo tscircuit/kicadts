@@ -203,13 +203,31 @@ export class SymbolPinNames extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SymbolPinNames {
     const pinNames = new SymbolPinNames()
+    const primitiveStrings: string[] = []
+    const primitiveNodes: PrimitiveSExpr[] = []
+    for (const primitive of primitiveSexprs) {
+      if (typeof primitive === "string") {
+        primitiveStrings.push(primitive)
+        continue
+      }
+      primitiveNodes.push(primitive)
+    }
+
     const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
-      primitiveSexprs,
+      primitiveNodes,
       this.token,
     )
 
     pinNames._sxOffset = propertyMap.offset as SymbolPinNamesOffset
     pinNames._sxHide = propertyMap.hide as SymbolPinNamesHide
+
+    for (const flag of primitiveStrings) {
+      if (flag === "hide") {
+        pinNames._sxHide = new SymbolPinNamesHide(true, { inline: true })
+        continue
+      }
+      throw new Error(`symbol pin_names encountered unsupported flag "${flag}"`)
+    }
 
     return pinNames
   }
@@ -280,6 +298,20 @@ export class SymbolPinNamesHide extends SxPrimitiveBoolean {
   static override token = "hide"
   static override parentToken = "pin_names"
   token = "hide"
+
+  private inline = false
+
+  constructor(value?: boolean, options: { inline?: boolean } = {}) {
+    super(value ?? true)
+    this.inline = options.inline ?? false
+  }
+
+  override getString(): string {
+    if (this.inline) {
+      return this.value ? "hide" : "(hide no)"
+    }
+    return super.getString()
+  }
 }
 SxClass.register(SymbolPinNamesHide)
 
