@@ -1,6 +1,6 @@
 import {
-  parseToPrimitiveSExpr,
   type PrimitiveSExpr,
+  parseToPrimitiveSExpr,
 } from "../parseToPrimitiveSExpr"
 
 const DEFAULT_PARENT_TOKEN = "__default__"
@@ -8,6 +8,7 @@ const DEFAULT_PARENT_TOKEN = "__default__"
 export abstract class SxClass {
   abstract token: string
   static token: string
+  static childPropertyOrder?: readonly string[]
 
   /**
    * Token strings are sometimes re-used (e.g. a "type" token) but the class
@@ -18,11 +19,36 @@ export abstract class SxClass {
   isSxClass = true
 
   getChildren(): SxClass[] {
+    const childPropertyOrder = (this.constructor as typeof SxClass)
+      .childPropertyOrder
+    if (childPropertyOrder) {
+      return this.getChildrenByPropertyOrder(childPropertyOrder)
+    }
+
     // By default, return any properties found in this instance that have the _sx* prefix
     return Object.keys(this)
       .filter((k) => k.startsWith("_sx"))
       .map((k) => (this as any)[k])
       .filter((v) => v && typeof v === "object" && v.isSxClass)
+  }
+
+  protected getChildrenByPropertyOrder(
+    childPropertyOrder: readonly string[],
+  ): SxClass[] {
+    const children: SxClass[] = []
+    for (const propertyName of childPropertyOrder) {
+      const value = (this as any)[propertyName]
+      if (Array.isArray(value)) {
+        children.push(
+          ...value.filter(
+            (child) => child && typeof child === "object" && child.isSxClass,
+          ),
+        )
+      } else if (value && typeof value === "object" && value.isSxClass) {
+        children.push(value)
+      }
+    }
+    return children
   }
 
   getStringIndented(): string {
@@ -78,8 +104,9 @@ export abstract class SxClass {
     return SxClass.parsePrimitiveSexpr(primitiveSexpr) as any
   }
 
-  static fromSexprPrimitives(primitiveSexprs: PrimitiveSExpr[]): SxClass {
+  static fromSexprPrimitives(_primitiveSexprs: PrimitiveSExpr[]): SxClass {
     throw new Error(
+      // biome-ignore lint/complexity/noThisInStatic: this reports the subclass that missed the override.
       `"${this.name}" class has not implemented fromSexprPrimitives`,
     )
   }
