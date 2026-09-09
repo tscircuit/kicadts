@@ -1,28 +1,30 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { Image } from "./Image"
+import type { Bus } from "./Bus"
+import type { BusEntry } from "./BusEntry"
+import type { EmbeddedFonts } from "./EmbeddedFonts"
+import type { GlobalLabel } from "./GlobalLabel"
+import type { Image } from "./Image"
+import type { Junction } from "./Junction"
 import { KicadSchGenerator } from "./KicadSchGenerator"
 import { KicadSchGeneratorVersion } from "./KicadSchGeneratorVersion"
 import { KicadSchVersion } from "./KicadSchVersion"
-import { LibSymbols } from "./LibSymbols"
-import { Paper } from "./Paper"
-import { Property } from "./Property"
-import { Label } from "./Label"
-import { GlobalLabel } from "./GlobalLabel"
-import { SchematicSymbol } from "./Symbol"
-import { SchematicText } from "./SchematicText"
-import { Sheet } from "./Sheet"
-import { EmbeddedFonts } from "./EmbeddedFonts"
-import { SheetInstances } from "./SheetInstances"
-import { TitleBlock } from "./TitleBlock"
+import type { Label } from "./Label"
+import type { LibSymbols } from "./LibSymbols"
+import type { NoConnect } from "./NoConnect"
+import type { Paper } from "./Paper"
+import type { Polyline } from "./Polyline"
+import type { Property } from "./Property"
+import type { SchematicArc } from "./SchematicArc"
+import type { SchematicRectangle } from "./SchematicRectangle"
+import type { SchematicText } from "./SchematicText"
+import type { SchematicTextBox } from "./SchematicTextBox"
+import type { Sheet } from "./Sheet"
+import type { SheetInstances } from "./SheetInstances"
+import type { SchematicSymbol } from "./Symbol"
+import type { TitleBlock } from "./TitleBlock"
 import { Uuid } from "./Uuid"
-import { Wire } from "./Wire"
-import { Junction } from "./Junction"
-import { NoConnect } from "./NoConnect"
-import { Polyline } from "./Polyline"
-import { SchematicArc } from "./SchematicArc"
-import { SchematicRectangle } from "./SchematicRectangle"
-import { SchematicTextBox } from "./SchematicTextBox"
+import type { Wire } from "./Wire"
 
 const SINGLE_CHILD_TOKENS = new Set([
   "version",
@@ -45,6 +47,8 @@ const MULTI_CHILD_TOKENS = new Set([
   "global_label",
   "junction",
   "wire",
+  "bus",
+  "bus_entry",
   "no_connect",
   "sheet_instances",
   "arc",
@@ -76,6 +80,8 @@ export interface KicadSchConstructorParams {
   labels?: Label[]
   globalLabels?: GlobalLabel[]
   wires?: Wire[]
+  buses?: Bus[]
+  busEntries?: BusEntry[]
   junctions?: Junction[]
   noConnects?: NoConnect[]
   arcs?: SchematicArc[]
@@ -105,6 +111,8 @@ export class KicadSch extends SxClass {
   private _labels: Label[] = []
   private _globalLabels: GlobalLabel[] = []
   private _wires: Wire[] = []
+  private _buses: Bus[] = []
+  private _busEntries: BusEntry[] = []
   private _junctions: Junction[] = []
   private _noConnects: NoConnect[] = []
   private _arcs: SchematicArc[] = []
@@ -187,6 +195,14 @@ export class KicadSch extends SxClass {
 
     if (params.wires !== undefined) {
       this.wires = params.wires
+    }
+
+    if (params.buses !== undefined) {
+      this.buses = params.buses
+    }
+
+    if (params.busEntries !== undefined) {
+      this.busEntries = params.busEntries
     }
 
     if (params.junctions !== undefined) {
@@ -277,6 +293,8 @@ export class KicadSch extends SxClass {
       globalLabels: (arrayPropertyMap.global_label as GlobalLabel[]) ?? [],
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
+      buses: (arrayPropertyMap.bus as Bus[]) ?? [],
+      busEntries: (arrayPropertyMap.bus_entry as BusEntry[]) ?? [],
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
       arcs: (arrayPropertyMap.arc as SchematicArc[]) ?? [],
       polylines: (arrayPropertyMap.polyline as Polyline[]) ?? [],
@@ -440,6 +458,22 @@ export class KicadSch extends SxClass {
     this._wires = [...value]
   }
 
+  get buses(): Bus[] {
+    return [...this._buses]
+  }
+
+  set buses(value: Bus[]) {
+    this._buses = [...value]
+  }
+
+  get busEntries(): BusEntry[] {
+    return [...this._busEntries]
+  }
+
+  set busEntries(value: BusEntry[]) {
+    this._busEntries = [...value]
+  }
+
   get noConnects(): NoConnect[] {
     return [...this._noConnects]
   }
@@ -500,6 +534,8 @@ export class KicadSch extends SxClass {
     children.push(...this._globalLabels)
     children.push(...this._junctions)
     children.push(...this._wires)
+    children.push(...this._buses)
+    children.push(...this._busEntries)
     children.push(...this._noConnects)
     children.push(...this._arcs)
     children.push(...this._polylines)

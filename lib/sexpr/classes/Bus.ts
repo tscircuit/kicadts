@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { Pts } from "./Pts"
-import { Stroke } from "./Stroke"
+import type { Pts } from "./Pts"
+import type { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["pts", "stroke", "uuid"])
@@ -43,9 +43,15 @@ export class Bus extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(`bus does not support repeated child tokens: ${tokens}`)
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside bus expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(`bus does not support repeated child tokens: ${token}`)
+      }
     }
 
     const unsupportedTokens = Object.keys(propertyMap).filter(
@@ -57,9 +63,15 @@ export class Bus extends SxClass {
       )
     }
 
-    bus._sxPts = propertyMap.pts as Pts | undefined
-    bus._sxStroke = propertyMap.stroke as Stroke | undefined
-    bus._sxUuid = propertyMap.uuid as Uuid | undefined
+    bus._sxPts =
+      (arrayPropertyMap.pts?.[0] as Pts | undefined) ??
+      (propertyMap.pts as Pts | undefined)
+    bus._sxStroke =
+      (arrayPropertyMap.stroke?.[0] as Stroke | undefined) ??
+      (propertyMap.stroke as Stroke | undefined)
+    bus._sxUuid =
+      (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
+      (propertyMap.uuid as Uuid | undefined)
 
     return bus
   }
