@@ -24,7 +24,7 @@ test("Paper standard size", () => {
 
   expect(page.getString()).toMatchInlineSnapshot(`
     "(paper
-      210 297
+      "User" 210 297
     )"
   `)
 })
