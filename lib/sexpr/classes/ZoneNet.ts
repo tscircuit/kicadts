@@ -1,7 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { quoteIfNeeded } from "../utils/quoteSExprString"
-import { toNumberValue } from "../utils/toNumberValue"
+import { quoteSExprString } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 
 export class ZoneNet extends SxClass {
@@ -16,8 +15,8 @@ export class ZoneNet extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): ZoneNet {
-    const numberValue = toNumberValue(primitiveSexprs[0])
-    if (numberValue !== undefined) return new ZoneNet(numberValue)
+    const value = primitiveSexprs[0]
+    if (typeof value === "number") return new ZoneNet(value)
 
     const stringValue = toStringValue(primitiveSexprs[0])
     if (stringValue === undefined) {
@@ -27,7 +26,7 @@ export class ZoneNet extends SxClass {
   }
 
   override getString(): string {
-    return `(net ${typeof this.value === "number" ? this.value : quoteIfNeeded(this.value)})`
+    return `(net ${typeof this.value === "number" ? this.value : quoteSExprString(this.value)})`
   }
 }
 SxClass.register(ZoneNet)
