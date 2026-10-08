@@ -11,6 +11,7 @@
     "dist"
   ],
   "scripts": {
+    "test:schematic-snapshots": "bun test ./tests/schematic-snapshot.visual.ts",
     "build": "tsup-node lib/index.ts --format esm --dts",
     "download-references": "bun run scripts/download-references.ts",
     "download-demos": "git clone --depth 1 --filter=blob:none --sparse https://gitlab.com/kicad/code/kicad.git kicad-demos && cd kicad-demos && git sparse-checkout set demos",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
+    "@resvg/resvg-js": "2.6.2",
     "@types/bun": "latest",
     "looks-same": "^10.0.1",
     "tsup": "^8.5.0"
