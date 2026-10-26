@@ -1,10 +1,8 @@
 import { SxClass } from "../base-classes/SxClass"
 import { SxPrimitiveString } from "../base-classes/SxPrimitiveString"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { quoteSExprString } from "../utils/quoteSExprString"
+import { quoteIfNeeded } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
-
-const isSymbolToken = (value: string) => /^[A-Za-z0-9._-]+$/.test(value)
 
 export class KicadSymbolLibGenerator extends SxPrimitiveString {
   static override token = "generator"
@@ -23,9 +21,7 @@ export class KicadSymbolLibGenerator extends SxPrimitiveString {
   }
 
   override getString(): string {
-    const serialized = isSymbolToken(this.value)
-      ? this.value
-      : quoteSExprString(this.value)
+    const serialized = quoteIfNeeded(this.value)
     return `(generator ${serialized})`
   }
 }
