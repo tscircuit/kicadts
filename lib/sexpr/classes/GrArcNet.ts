@@ -1,7 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
 export class GrArcNet extends SxClass {
@@ -17,9 +16,8 @@ export class GrArcNet extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): GrArcNet {
     const value = primitiveSexprs[0]
-    const id = toNumberValue(value)
-    if (id !== undefined) {
-      return new GrArcNet(id)
+    if (typeof value === "number") {
+      return new GrArcNet(value)
     }
 
     const name = toStringValue(value)

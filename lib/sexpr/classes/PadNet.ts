@@ -1,7 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
 export class PadNet extends SxClass {
@@ -25,8 +24,8 @@ export class PadNet extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): PadNet {
-    const id = toNumberValue(primitiveSexprs[0])
-    if (id !== undefined) {
+    const id = primitiveSexprs[0]
+    if (typeof id === "number") {
       const name = toStringValue(primitiveSexprs[1])
       if (name === undefined) {
         throw new Error("pad net requires a string name with numeric id")
