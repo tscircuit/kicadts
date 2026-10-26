@@ -36,38 +36,38 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
 
-      # - name: Create Pull Request
-      #   id: create-pr
-      #   uses: peter-evans/create-pull-request@v5
-      #   with:
-      #     commit-message: "chore: bump version"
-      #     title: "chore: bump version"
-      #     body: "Automated package update"
-      #     branch: bump-version-${{ github.run_number }}
-      #     base: main
-      #     token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
-      #     committer: tscircuitbot <githubbot@tscircuit.com>
-      #     author: tscircuitbot <githubbot@tscircuit.com>
+          # - name: Create Pull Request
+          #   id: create-pr
+          #   uses: peter-evans/create-pull-request@v5
+          #   with:
+          #     commit-message: "chore: bump version"
+          #     title: "chore: bump version"
+          #     body: "Automated package update"
+          #     branch: bump-version-${{ github.run_number }}
+          #     base: main
+          #     token: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
+          #     committer: tscircuitbot <githubbot@tscircuit.com>
+          #     author: tscircuitbot <githubbot@tscircuit.com>
 
-      # - name: Enable auto-merge
-      #   if: steps.create-pr.outputs.pull-request-number != ''
-      #   run: |
-      #     gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --rebase --delete-branch
-      #   env:
-      #     GH_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
+          # - name: Enable auto-merge
+          #   if: steps.create-pr.outputs.pull-request-number != ''
+          #   run: |
+          #     gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --rebase --delete-branch
+          #   env:
+          #     GH_TOKEN: ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}
 
-      # - name: Trigger upstream repo updates
-      #   if: env.UPSTREAM_REPOS && env.UPSTREAM_PACKAGES_TO_UPDATE
-      #   run: |
-      #     IFS=',' read -ra REPOS <<< "${{ env.UPSTREAM_REPOS }}"
-      #     for repo in "${REPOS[@]}"; do
-      #       if [[ -n "$repo" ]]; then
-      #         echo "Triggering update for repo: $repo"
-      #         curl -X POST \
-      #           -H "Accept: application/vnd.github.v3+json" \
-      #           -H "Authorization: token ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}" \
-      #           -H "Content-Type: application/json" \
-      #           "https://api.github.com/repos/tscircuit/$repo/actions/workflows/update-package.yml/dispatches" \
-      #           -d "{\"ref\":\"main\",\"inputs\":{\"package_names\":\"${{ env.UPSTREAM_PACKAGES_TO_UPDATE }}\"}}"
-      #       fi
-      #     done
+          # - name: Trigger upstream repo updates
+          #   if: env.UPSTREAM_REPOS && env.UPSTREAM_PACKAGES_TO_UPDATE
+          #   run: |
+          #     IFS=',' read -ra REPOS <<< "${{ env.UPSTREAM_REPOS }}"
+          #     for repo in "${REPOS[@]}"; do
+          #       if [[ -n "$repo" ]]; then
+          #         echo "Triggering update for repo: $repo"
+          #         curl -X POST \
+          #           -H "Accept: application/vnd.github.v3+json" \
+          #           -H "Authorization: token ${{ secrets.TSCIRCUIT_BOT_GITHUB_TOKEN }}" \
+          #           -H "Content-Type: application/json" \
+          #           "https://api.github.com/repos/tscircuit/$repo/actions/workflows/update-package.yml/dispatches" \
+          #           -d "{\"ref\":\"main\",\"inputs\":{\"package_names\":\"${{ env.UPSTREAM_PACKAGES_TO_UPDATE }}\"}}"
+          #       fi
+          #     done

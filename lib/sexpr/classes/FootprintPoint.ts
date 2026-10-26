@@ -7,7 +7,6 @@ import { Uuid } from "./Uuid"
 
 export class FootprintPoint extends SxClass {
   static override token = "point"
-  static override parentToken = "footprint"
   override token = "point"
 
   private _sxAt?: At

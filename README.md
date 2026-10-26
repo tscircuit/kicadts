@@ -88,7 +88,7 @@ const makeText = (
   text: string,
   x: number,
   y: number,
-  layer: string
+  layer: string,
 ) =>
   new FpText({
     type,
@@ -200,7 +200,9 @@ pcb.generatorVersion = "(generated programmatically)"
 await fs.writeFile("existing.kicad_pcb", pcb.getString())
 
 // Load and modify a footprint
-const footprint = parseKicadMod(await fs.readFile("Demo_TestPad.kicad_mod", "utf8"))
+const footprint = parseKicadMod(
+  await fs.readFile("Demo_TestPad.kicad_mod", "utf8"),
+)
 footprint.descr = "Imported with kicadts"
 await fs.writeFile("Demo_TestPad.kicad_mod", footprint.getString())
 ```
