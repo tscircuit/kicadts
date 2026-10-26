@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { At, type AtInput } from "./At"
-import { Stroke } from "./Stroke"
+import type { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["at", "size", "stroke", "uuid"])
@@ -51,11 +51,17 @@ export class BusEntry extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `bus_entry does not support repeated child tokens: ${tokens}`,
-      )
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (!SUPPORTED_TOKENS.has(token)) {
+        throw new Error(
+          `Unsupported child tokens inside bus_entry expression: ${token}`,
+        )
+      }
+      if (entries.length > 1) {
+        throw new Error(
+          `bus_entry does not support repeated child tokens: ${token}`,
+        )
+      }
     }
 
     const unsupportedTokens = Object.keys(propertyMap).filter(
@@ -67,10 +73,18 @@ export class BusEntry extends SxClass {
       )
     }
 
-    entry._sxAt = propertyMap.at as At | undefined
-    entry._sxSize = propertyMap.size as BusEntrySize | undefined
-    entry._sxStroke = propertyMap.stroke as Stroke | undefined
-    entry._sxUuid = propertyMap.uuid as Uuid | undefined
+    entry._sxAt =
+      (arrayPropertyMap.at?.[0] as At | undefined) ??
+      (propertyMap.at as At | undefined)
+    entry._sxSize =
+      (arrayPropertyMap.size?.[0] as BusEntrySize | undefined) ??
+      (propertyMap.size as BusEntrySize | undefined)
+    entry._sxStroke =
+      (arrayPropertyMap.stroke?.[0] as Stroke | undefined) ??
+      (propertyMap.stroke as Stroke | undefined)
+    entry._sxUuid =
+      (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
+      (propertyMap.uuid as Uuid | undefined)
 
     return entry
   }
