@@ -22,7 +22,7 @@ const SUPPORTED_TOKENS = new Set([
   "units_format",
   "precision",
   "override_value",
-  "suppress_zeros",
+  "suppress_zeroes",
 ])
 
 export class DimensionFormat extends SxClass {
@@ -77,7 +77,7 @@ export class DimensionFormat extends SxClass {
     format._sxOverrideValue = propertyMap.override_value as
       | DimensionFormatOverrideValue
       | undefined
-    format._sxSuppressZeros = propertyMap.suppress_zeros as
+    format._sxSuppressZeros = propertyMap.suppress_zeroes as
       | DimensionFormatSuppressZeros
       | undefined
 
