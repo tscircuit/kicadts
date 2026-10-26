@@ -1,0 +1,64 @@
+name: Schematic snapshots
+
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "tests/fixtures/**"
+      - "tests/__snapshots__/**"
+      - "tests/schematic-snapshot.visual.ts"
+      - "package.json"
+      - "bunfig.toml"
+      - "tsconfig.json"
+      - ".github/workflows/schematic-snapshots.yml"
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "tests/fixtures/**"
+      - "tests/__snapshots__/**"
+      - "tests/schematic-snapshot.visual.ts"
+      - "package.json"
+      - "bunfig.toml"
+      - "tsconfig.json"
+      - ".github/workflows/schematic-snapshots.yml"
+
+jobs:
+  schematic-snapshots:
+    # Match the official renderer used to produce the committed PNG baseline.
+    runs-on: macos-14
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - name: Mount checksum-pinned KiCad 10.0.6
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/kicad-native/mount"
+          cd "$RUNNER_TEMP/kicad-native"
+          # Official universal macOS release, approximately 1.4 GB.
+          curl --fail --location --retry 2 --connect-timeout 15 --max-time 180 \
+            https://github.com/KiCad/kicad-source-mirror/releases/download/10.0.6/kicad-unified-universal-10.0.6.dmg \
+            --output KiCad.dmg
+          echo 'ef4dcd4278c46d3efcd28c8db273d5957d68efda028f6bf79b4811fc5302dc68  KiCad.dmg' | shasum -a 256 -c -
+          hdiutil attach KiCad.dmg -readonly -nobrowse -mountpoint "$RUNNER_TEMP/kicad-native/mount"
+          echo "KICAD_CLI=$RUNNER_TEMP/kicad-native/mount/KiCad/KiCad.app/Contents/MacOS/kicad-cli" >> "$GITHUB_ENV"
+      - name: Verify native schematic snapshots
+        run: bun run test:schematic-snapshots
+      - name: Upload visual differences
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schematic-snapshot-diff
+          path: tests/__snapshots__/*.png
+          if-no-files-found: ignore
+      - name: Unmount KiCad
+        if: always()
+        shell: bash
+        run: |
+          if mount | grep -F "$RUNNER_TEMP/kicad-native/mount"; then
+            hdiutil detach "$RUNNER_TEMP/kicad-native/mount"
+          fi
