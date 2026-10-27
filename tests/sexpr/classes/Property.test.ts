@@ -6,6 +6,7 @@ import { expectEqualPrimitiveSExpr } from "../../fixtures/expectEqualPrimitiveSE
 test("Property preserves extended attributes", () => {
   const input = `
     (property "Reference" "R1"
+      (id 0)
       (at 1 2 90)
       (unlocked yes)
       (show_name yes)
@@ -28,6 +29,7 @@ test("Property preserves extended attributes", () => {
   const property = parsed as Property
   expect(property.key).toBe("Reference")
   expect(property.value).toBe("R1")
+  expect(property.id).toBe(0)
   const position = property.position
   expect(position).toBeInstanceOf(At)
   if (position instanceof At) {
@@ -49,4 +51,16 @@ test("Property preserves extended attributes", () => {
   const roundTripPrimitive = parseToPrimitiveSExpr(roundTrip)
 
   expectEqualPrimitiveSExpr(roundTripPrimitive, originalPrimitive)
+})
+
+test("Property can update and remove legacy IDs without changing its value", () => {
+  const property = new Property({ key: "Reference", value: "R1", id: 0 })
+  expect(property.id).toBe(0)
+  property.id = 3
+  const [reparsed] = SxClass.parse(property.getString())
+  expect((reparsed as Property).id).toBe(3)
+  expect((reparsed as Property).value).toBe("R1")
+  property.id = undefined
+  expect(property.id).toBeUndefined()
+  expect(property.getString()).not.toContain("(id ")
 })
