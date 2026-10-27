@@ -52,3 +52,15 @@ test("Property preserves extended attributes", () => {
 
   expectEqualPrimitiveSExpr(roundTripPrimitive, originalPrimitive)
 })
+
+test("Property can update and remove legacy IDs without changing its value", () => {
+  const property = new Property({ key: "Reference", value: "R1", id: 0 })
+  expect(property.id).toBe(0)
+  property.id = 3
+  const [reparsed] = SxClass.parse(property.getString())
+  expect((reparsed as Property).id).toBe(3)
+  expect((reparsed as Property).value).toBe("R1")
+  property.id = undefined
+  expect(property.id).toBeUndefined()
+  expect(property.getString()).not.toContain("(id ")
+})

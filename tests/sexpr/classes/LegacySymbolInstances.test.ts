@@ -19,10 +19,19 @@ test("parses legacy top-level symbol instances", () => {
 
   expect(schematic.symbolInstances?.paths).toHaveLength(1)
   expect(schematic.symbolInstances?.paths[0]).toMatchObject({
+    value: "/sheet/symbol",
     reference: "U31",
     unit: 8,
     symbolValue: "XC7Z010-1CLG400I",
     footprint: "Package_BGA:Xilinx_CSG324",
   })
   expect(schematic.getString()).toContain("(symbol_instances")
+  const reparsed = parseKicadSch(schematic.getString())
+  expect(reparsed.symbolInstances?.paths[0]).toMatchObject({
+    value: "/sheet/symbol",
+    reference: "U31",
+    unit: 8,
+    symbolValue: "XC7Z010-1CLG400I",
+    footprint: "Package_BGA:Xilinx_CSG324",
+  })
 })

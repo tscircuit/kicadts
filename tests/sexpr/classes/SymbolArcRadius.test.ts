@@ -22,6 +22,11 @@ test("parses legacy symbol arcs with radius geometry", () => {
   expect(arc.radius?.at).toMatchObject({ x: 5, y: 6 })
   expect(arc.radius?.length).toBe(7)
   expect(arc.radius?.angles).toMatchObject({ start: -89.9, end: 89.9 })
+  const [reparsed] = SxClass.parse(symbol.getString())
+  const reparsedArc = (reparsed as SchematicSymbol).arcs[0] as SymbolArc
+  expect(reparsedArc.radius?.at).toMatchObject({ x: 5, y: 6 })
+  expect(reparsedArc.radius?.length).toBe(7)
+  expect(reparsedArc.radius?.angles).toMatchObject({ start: -89.9, end: 89.9 })
   expect(symbol.getString()).toMatchInlineSnapshot(`
     "(symbol "Legacy:Arc"
       (arc
