@@ -20,6 +20,7 @@ import { Wire } from "./Wire"
 import { Junction } from "./Junction"
 import { NoConnect } from "./NoConnect"
 import { Polyline } from "./Polyline"
+import { Bezier } from "./Bezier"
 import { SchematicArc } from "./SchematicArc"
 import { SchematicRectangle } from "./SchematicRectangle"
 import { SchematicTextBox } from "./SchematicTextBox"
@@ -51,6 +52,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "sheet_instances",
   "arc",
   "polyline",
+  "bezier",
   "rectangle",
   "text_box",
 ])
@@ -83,6 +85,7 @@ export interface KicadSchConstructorParams {
   noConnects?: NoConnect[]
   arcs?: SchematicArc[]
   polylines?: Polyline[]
+  beziers?: Bezier[]
   rectangles?: SchematicRectangle[]
   textBoxes?: SchematicTextBox[]
 }
@@ -113,6 +116,7 @@ export class KicadSch extends SxClass {
   private _noConnects: NoConnect[] = []
   private _arcs: SchematicArc[] = []
   private _polylines: Polyline[] = []
+  private _beziers: Bezier[] = []
   private _rectangles: SchematicRectangle[] = []
   private _textBoxes: SchematicTextBox[] = []
 
@@ -213,6 +217,10 @@ export class KicadSch extends SxClass {
       this.polylines = params.polylines
     }
 
+    if (params.beziers !== undefined) {
+      this.beziers = params.beziers
+    }
+
     if (params.rectangles !== undefined) {
       this.rectangles = params.rectangles
     }
@@ -291,6 +299,7 @@ export class KicadSch extends SxClass {
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
       arcs: (arrayPropertyMap.arc as SchematicArc[]) ?? [],
       polylines: (arrayPropertyMap.polyline as Polyline[]) ?? [],
+      beziers: (arrayPropertyMap.bezier as Bezier[]) ?? [],
       rectangles: (arrayPropertyMap.rectangle as SchematicRectangle[]) ?? [],
       textBoxes: (arrayPropertyMap.text_box as SchematicTextBox[]) ?? [],
     })
@@ -483,6 +492,14 @@ export class KicadSch extends SxClass {
     this._polylines = [...value]
   }
 
+  get beziers(): Bezier[] {
+    return [...this._beziers]
+  }
+
+  set beziers(value: Bezier[]) {
+    this._beziers = [...value]
+  }
+
   get rectangles(): SchematicRectangle[] {
     return [...this._rectangles]
   }
@@ -523,6 +540,7 @@ export class KicadSch extends SxClass {
     children.push(...this._noConnects)
     children.push(...this._arcs)
     children.push(...this._polylines)
+    children.push(...this._beziers)
     children.push(...this._rectangles)
     children.push(...this._textBoxes)
     return children

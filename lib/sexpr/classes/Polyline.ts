@@ -4,7 +4,7 @@ import { Pts } from "./Pts"
 import { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 
-const SUPPORTED_TOKENS_KICAD_SCH = new Set(["pts", "stroke", "uuid"])
+const SUPPORTED_TOKENS_KICAD_SCH = new Set(["pts", "stroke", "fill", "uuid"])
 const SUPPORTED_TOKENS_SYMBOL = new Set(["pts", "stroke", "fill"])
 
 // Forward declaration for SymbolPolylineFill to avoid circular dependency

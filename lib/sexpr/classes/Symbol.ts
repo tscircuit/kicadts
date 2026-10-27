@@ -27,6 +27,7 @@ import { Color, type RGBAColor } from "./Color"
 import { SymbolLibName } from "./SymbolLibName"
 import { SymbolTextBox } from "./SymbolTextBox"
 import { SymbolPolyline } from "./Polyline"
+import { SymbolBezier } from "./Bezier"
 import { SymbolArcRadius } from "./SymbolArcRadius"
 
 export class SymbolUnit extends SxPrimitiveNumber {
@@ -475,6 +476,13 @@ export class SymbolPolylineFill extends SymbolFillBase {
 }
 SxClass.register(SymbolPolylineFill)
 
+export class SymbolBezierFill extends SymbolFillBase {
+  static override token = "fill"
+  static override parentToken = "bezier"
+  token = "fill"
+}
+SxClass.register(SymbolBezierFill)
+
 export class SymbolRectangleFill extends SymbolFillBase {
   static override token = "fill"
   static override parentToken = "rectangle"
@@ -786,6 +794,7 @@ export interface SchematicSymbolConstructorParams {
   pins?: SymbolPin[]
   subSymbols?: SchematicSymbol[]
   polylines?: SymbolPolyline[]
+  beziers?: SymbolBezier[]
   rectangles?: SymbolRectangle[]
   circles?: SymbolCircle[]
   arcs?: SymbolArc[]
@@ -820,6 +829,7 @@ export class SchematicSymbol extends SxClass {
   pins: SymbolPin[] = []
   subSymbols: SchematicSymbol[] = []
   polylines: SymbolPolyline[] = []
+  beziers: SymbolBezier[] = []
   rectangles: SymbolRectangle[] = []
   circles: SymbolCircle[] = []
   arcs: SymbolArc[] = []
@@ -859,6 +869,7 @@ export class SchematicSymbol extends SxClass {
     if (params.pins !== undefined) this.pins = params.pins
     if (params.subSymbols !== undefined) this.subSymbols = params.subSymbols
     if (params.polylines !== undefined) this.polylines = params.polylines
+    if (params.beziers !== undefined) this.beziers = params.beziers
     if (params.rectangles !== undefined) this.rectangles = params.rectangles
     if (params.circles !== undefined) this.circles = params.circles
     if (params.arcs !== undefined) this.arcs = params.arcs
@@ -1099,6 +1110,7 @@ export class SchematicSymbol extends SxClass {
     symbol.pins = (arrayPropertyMap.pin as SymbolPin[]) ?? []
     symbol.subSymbols = (arrayPropertyMap.symbol as SchematicSymbol[]) ?? []
     symbol.polylines = (arrayPropertyMap.polyline as SymbolPolyline[]) ?? []
+    symbol.beziers = (arrayPropertyMap.bezier as SymbolBezier[]) ?? []
     symbol.rectangles = (arrayPropertyMap.rectangle as SymbolRectangle[]) ?? []
     symbol.circles = (arrayPropertyMap.circle as SymbolCircle[]) ?? []
     symbol.arcs = (arrayPropertyMap.arc as SymbolArc[]) ?? []
@@ -1134,6 +1146,7 @@ export class SchematicSymbol extends SxClass {
     children.push(...this.pins)
     children.push(...this.subSymbols)
     children.push(...this.polylines)
+    children.push(...this.beziers)
     children.push(...this.rectangles)
     children.push(...this.circles)
     children.push(...this.arcs)
