@@ -125,7 +125,7 @@ export class Via extends SxClass {
   }
 
   private consumeBareToken(token: string) {
-    if (token === "blind" || token === "micro") {
+    if (token === "blind" || token === "buried" || token === "micro") {
       this._type = token
       return
     }
