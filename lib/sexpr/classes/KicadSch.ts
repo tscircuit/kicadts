@@ -9,6 +9,7 @@ import { Paper } from "./Paper"
 import { Property } from "./Property"
 import { Label } from "./Label"
 import { GlobalLabel } from "./GlobalLabel"
+import { HierarchicalLabel } from "./HierarchicalLabel"
 import { SchematicSymbol } from "./Symbol"
 import { SchematicText } from "./SchematicText"
 import { Sheet } from "./Sheet"
@@ -45,6 +46,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "text",
   "label",
   "global_label",
+  "hierarchical_label",
   "junction",
   "wire",
   "no_connect",
@@ -78,6 +80,7 @@ export interface KicadSchConstructorParams {
   texts?: SchematicText[]
   labels?: Label[]
   globalLabels?: GlobalLabel[]
+  hierarchicalLabels?: HierarchicalLabel[]
   wires?: Wire[]
   junctions?: Junction[]
   noConnects?: NoConnect[]
@@ -108,6 +111,7 @@ export class KicadSch extends SxClass {
   private _texts: SchematicText[] = []
   private _labels: Label[] = []
   private _globalLabels: GlobalLabel[] = []
+  private _hierarchicalLabels: HierarchicalLabel[] = []
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
   private _noConnects: NoConnect[] = []
@@ -191,6 +195,10 @@ export class KicadSch extends SxClass {
 
     if (params.globalLabels !== undefined) {
       this.globalLabels = params.globalLabels
+    }
+
+    if (params.hierarchicalLabels !== undefined) {
+      this.hierarchicalLabels = params.hierarchicalLabels
     }
 
     if (params.wires !== undefined) {
@@ -286,6 +294,8 @@ export class KicadSch extends SxClass {
       texts: (arrayPropertyMap.text as SchematicText[]) ?? [],
       labels: (arrayPropertyMap.label as Label[]) ?? [],
       globalLabels: (arrayPropertyMap.global_label as GlobalLabel[]) ?? [],
+      hierarchicalLabels:
+        (arrayPropertyMap.hierarchical_label as HierarchicalLabel[]) ?? [],
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
@@ -443,6 +453,14 @@ export class KicadSch extends SxClass {
     this._globalLabels = [...value]
   }
 
+  get hierarchicalLabels(): HierarchicalLabel[] {
+    return [...this._hierarchicalLabels]
+  }
+
+  set hierarchicalLabels(value: HierarchicalLabel[]) {
+    this._hierarchicalLabels = [...value]
+  }
+
   get junctions(): Junction[] {
     return [...this._junctions]
   }
@@ -518,6 +536,7 @@ export class KicadSch extends SxClass {
     children.push(...this._texts)
     children.push(...this._labels)
     children.push(...this._globalLabels)
+    children.push(...this._hierarchicalLabels)
     children.push(...this._junctions)
     children.push(...this._wires)
     children.push(...this._noConnects)
