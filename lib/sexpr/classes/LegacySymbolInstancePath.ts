@@ -37,13 +37,6 @@ export class LegacySymbolInstancePath extends SxClass {
     path._value = value
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(rest, this.token)
-    for (const token of Object.keys(propertyMap)) {
-      if (!SUPPORTED_CHILD_TOKENS.has(token)) {
-        throw new Error(
-          `symbol_instances path encountered unsupported child token "${token}"`,
-        )
-      }
-    }
     for (const [token, entries] of Object.entries(arrayPropertyMap)) {
       if (!SUPPORTED_CHILD_TOKENS.has(token)) {
         throw new Error(

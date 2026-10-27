@@ -35,3 +35,26 @@ test("parses legacy top-level symbol instances", () => {
     footprint: "Package_BGA:Xilinx_CSG324",
   })
 })
+
+test("preserves multiple legacy instance paths and empty optional strings", () => {
+  const schematic = parseKicadSch(`(kicad_sch
+    (symbol_instances
+      (path "/sheet/R1" (reference "R1") (unit 1) (value "10k") (footprint ""))
+      (path "/sheet/R2" (reference "R2") (unit 1) (value "") (footprint "Resistor_SMD:R_0402"))
+    )
+  )`)
+  const reparsed = parseKicadSch(schematic.getString())
+  expect(reparsed.symbolInstances?.paths).toHaveLength(2)
+  expect(reparsed.symbolInstances?.paths[0]).toMatchObject({
+    value: "/sheet/R1",
+    reference: "R1",
+    symbolValue: "10k",
+    footprint: "",
+  })
+  expect(reparsed.symbolInstances?.paths[1]).toMatchObject({
+    value: "/sheet/R2",
+    reference: "R2",
+    symbolValue: "",
+    footprint: "Resistor_SMD:R_0402",
+  })
+})
