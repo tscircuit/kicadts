@@ -49,6 +49,7 @@ import { FootprintTransform } from "./FootprintTransform"
 import { FootprintPoint } from "./FootprintPoint"
 import { FootprintUnits } from "./FootprintUnits"
 import { Zone } from "./Zone"
+import { Dimension } from "./Dimension"
 
 const SINGLE_TOKENS = new Set([
   "version",
@@ -102,6 +103,7 @@ const MULTI_TOKENS = new Set([
   "model",
   "zone",
   "group",
+  "dimension",
 ])
 
 const SUPPORTED_TOKENS = new Set([...SINGLE_TOKENS, ...MULTI_TOKENS])
@@ -156,6 +158,7 @@ export interface FootprintConstructorParams {
   models?: FootprintModel[]
   zones?: Zone[]
   groups?: Group[]
+  dimensions?: Dimension[]
 }
 
 export class Footprint extends SxClass {
@@ -212,6 +215,7 @@ export class Footprint extends SxClass {
   private _models: FootprintModel[] = []
   private _zones: Zone[] = []
   private _groups: Group[] = []
+  private _dimensions: Dimension[] = []
 
   constructor(params: FootprintConstructorParams = {}) {
     super()
@@ -276,6 +280,7 @@ export class Footprint extends SxClass {
     if (params.models !== undefined) this.models = params.models
     if (params.zones !== undefined) this.zones = params.zones
     if (params.groups !== undefined) this.groups = params.groups
+    if (params.dimensions !== undefined) this.dimensions = params.dimensions
   }
 
   static override fromSexprPrimitives(
@@ -439,6 +444,7 @@ export class Footprint extends SxClass {
     footprint._models = (arrayPropertyMap.model as FootprintModel[]) ?? []
     footprint._zones = (arrayPropertyMap.zone as Zone[]) ?? []
     footprint._groups = (arrayPropertyMap.group as Group[]) ?? []
+    footprint._dimensions = (arrayPropertyMap.dimension as Dimension[]) ?? []
 
     for (const flag of pendingFlags) {
       if (flag === "locked") {
@@ -1052,6 +1058,14 @@ export class Footprint extends SxClass {
     this._groups = [...value]
   }
 
+  get dimensions(): Dimension[] {
+    return [...this._dimensions]
+  }
+
+  set dimensions(value: Dimension[]) {
+    this._dimensions = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -1103,6 +1117,7 @@ export class Footprint extends SxClass {
     children.push(...this._models)
     children.push(...this._zones)
     children.push(...this._groups)
+    children.push(...this._dimensions)
     return children
   }
 

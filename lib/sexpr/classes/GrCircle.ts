@@ -6,6 +6,7 @@ import { Stroke } from "./Stroke"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { GrCircleNet } from "./GrCircleNet"
 
 export interface GrCirclePoint {
   x: number
@@ -19,6 +20,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "width",
   "stroke",
   "fill",
+  "net",
   "locked",
   "tstamp",
   "uuid",
@@ -31,6 +33,7 @@ export interface GrCircleConstructorParams {
   width?: Width | number
   stroke?: Stroke
   fill?: PadPrimitiveGrCircleFill | string
+  net?: GrCircleNet | number | string
   locked?: boolean
   tstamp?: Tstamp | string
   uuid?: Uuid | string
@@ -46,6 +49,7 @@ export class GrCircle extends SxClass {
   private _sxWidth?: Width
   private _sxStroke?: Stroke
   private _sxFill?: PadPrimitiveGrCircleFill
+  private _sxNet?: GrCircleNet
   private _sxLocked?: GrCircleLocked
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
@@ -58,6 +62,7 @@ export class GrCircle extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
+    if (params.net !== undefined) this.net = params.net
     if (params.locked !== undefined) this.locked = params.locked
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
@@ -108,6 +113,7 @@ export class GrCircle extends SxClass {
     grCircle._sxWidth = propertyMap.width as Width | undefined
     grCircle._sxStroke = propertyMap.stroke as Stroke | undefined
     grCircle._sxFill = propertyMap.fill as PadPrimitiveGrCircleFill | undefined
+    grCircle._sxNet = propertyMap.net as GrCircleNet | undefined
     const locked = propertyMap.locked as GrCircleLocked | undefined
     grCircle._sxLocked = locked && locked.value ? locked : undefined
     grCircle._sxTstamp = propertyMap.tstamp as Tstamp | undefined
@@ -224,6 +230,18 @@ export class GrCircle extends SxClass {
     }
   }
 
+  get net(): number | string | undefined {
+    return this._sxNet?.value
+  }
+
+  set net(value: GrCircleNet | number | string | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof GrCircleNet ? value : new GrCircleNet(value)
+  }
+
   get tstamp(): Tstamp | undefined {
     return this._sxTstamp
   }
@@ -269,6 +287,7 @@ export class GrCircle extends SxClass {
     if (this._sxFill) children.push(this._sxFill)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children

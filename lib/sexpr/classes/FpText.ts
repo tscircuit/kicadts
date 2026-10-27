@@ -5,6 +5,7 @@ import { toStringValue } from "../utils/toStringValue"
 import { At, type AtInput } from "./At"
 import { Layer } from "./Layer"
 import { TextEffects } from "./TextEffects"
+import { RenderCache } from "./RenderCache"
 import { Uuid } from "./Uuid"
 import { Tstamp } from "./Tstamp"
 import { Xy } from "./Xy"
@@ -21,6 +22,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "locked",
   "unlocked",
   "hide",
+  "render_cache",
 ])
 
 const SUPPORTED_MULTI_TOKENS = new Set<string>()
@@ -36,6 +38,7 @@ export interface FpTextConstructorParams {
   effects?: TextEffects
   tstamp?: Tstamp | string
   uuid?: Uuid | string
+  renderCache?: RenderCache
 }
 
 export class FpText extends SxClass {
@@ -52,6 +55,7 @@ export class FpText extends SxClass {
   private _sxEffects?: TextEffects
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
+  private _sxRenderCache?: RenderCache
 
   constructor(params: FpTextConstructorParams = {}) {
     super()
@@ -65,6 +69,7 @@ export class FpText extends SxClass {
     if (params.effects !== undefined) this.effects = params.effects
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
+    if (params.renderCache !== undefined) this.renderCache = params.renderCache
   }
 
   static override fromSexprPrimitives(
@@ -155,6 +160,7 @@ export class FpText extends SxClass {
     fpText._sxEffects = propertyMap.effects as TextEffects | undefined
     fpText._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     fpText._sxUuid = propertyMap.uuid as Uuid | undefined
+    fpText._sxRenderCache = propertyMap.render_cache as RenderCache | undefined
     fpText._sxLocked = propertyMap.locked as FpTextLocked | undefined
 
     const unlockedEntry = propertyMap.unlocked as FpTextUnlocked | undefined
@@ -294,6 +300,14 @@ export class FpText extends SxClass {
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
   }
 
+  get renderCache(): RenderCache | undefined {
+    return this._sxRenderCache
+  }
+
+  set renderCache(value: RenderCache | undefined) {
+    this._sxRenderCache = value
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxLocked) children.push(this._sxLocked)
@@ -304,6 +318,7 @@ export class FpText extends SxClass {
     if (this._sxEffects) children.push(this._sxEffects)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
+    if (this._sxRenderCache) children.push(this._sxRenderCache)
     return children
   }
 

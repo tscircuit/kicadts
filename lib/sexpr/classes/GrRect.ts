@@ -5,6 +5,7 @@ import { Stroke } from "./Stroke"
 import { Tstamp } from "./Tstamp"
 import { Uuid } from "./Uuid"
 import { Width } from "./Width"
+import { GrRectNet } from "./GrRectNet"
 import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
@@ -15,6 +16,7 @@ export interface GrRectConstructorParams {
   width?: number | Width
   stroke?: Stroke
   fill?: boolean | GrRectFill
+  net?: GrRectNet | number | string
   tstamp?: string | Tstamp
   uuid?: string | Uuid
   locked?: boolean
@@ -27,6 +29,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "width",
   "stroke",
   "fill",
+  "net",
   "tstamp",
   "uuid",
   "locked",
@@ -42,6 +45,7 @@ export class GrRect extends SxClass {
   private _sxWidth?: Width
   private _sxStroke?: Stroke
   private _sxFill?: GrRectFill
+  private _sxNet?: GrRectNet
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxLocked?: GrRectLocked
@@ -54,6 +58,7 @@ export class GrRect extends SxClass {
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
     if (params.fill !== undefined) this.fill = params.fill
+    if (params.net !== undefined) this.net = params.net
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
@@ -104,6 +109,7 @@ export class GrRect extends SxClass {
     grRect._sxWidth = propertyMap.width as Width | undefined
     grRect._sxStroke = propertyMap.stroke as Stroke | undefined
     grRect._sxFill = propertyMap.fill as GrRectFill | undefined
+    grRect._sxNet = propertyMap.net as GrRectNet | undefined
     grRect._sxTstamp = propertyMap.tstamp as Tstamp | undefined
     const locked = propertyMap.locked as GrRectLocked | undefined
     grRect._sxLocked = locked && locked.value ? locked : undefined
@@ -233,6 +239,18 @@ export class GrRect extends SxClass {
     return this._sxFill
   }
 
+  get net(): number | string | undefined {
+    return this._sxNet?.value
+  }
+
+  set net(value: GrRectNet | number | string | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof GrRectNet ? value : new GrRectNet(value)
+  }
+
   get uuid(): string | undefined {
     return this._sxUuid?.value
   }
@@ -282,6 +300,7 @@ export class GrRect extends SxClass {
     if (this._sxFill) children.push(this._sxFill)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children

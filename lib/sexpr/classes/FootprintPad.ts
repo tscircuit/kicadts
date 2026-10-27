@@ -24,6 +24,8 @@ import { PadSolderPasteMarginRatio } from "./PadSolderPasteMarginRatio"
 import { PadThermalGap } from "./PadThermalGap"
 import { PadThermalWidth } from "./PadThermalWidth"
 import { PadThermalBridgeAngle } from "./PadThermalBridgeAngle"
+import { PadThermalBridgeWidth } from "./PadThermalBridgeWidth"
+import { PadTenting, type PadTentingConstructorParams } from "./PadTenting"
 import { PadZoneConnect } from "./PadZoneConnect"
 import { PadZoneLayerConnections } from "./PadZoneLayerConnections"
 import { PadProperty } from "./PadProperty"
@@ -60,6 +62,8 @@ const SINGLE_TOKENS = new Set([
   "thermal_width",
   "thermal_gap",
   "thermal_bridge_angle",
+  "thermal_bridge_width",
+  "tenting",
   "options",
   "primitives",
   "remove_unused_layers",
@@ -114,6 +118,8 @@ export interface FootprintPadConstructorParams {
   thermalWidth?: number | PadThermalWidth
   thermalGap?: number | PadThermalGap
   thermalBridgeAngle?: number | PadThermalBridgeAngle
+  thermalBridgeWidth?: number | PadThermalBridgeWidth
+  tenting?: PadTenting | PadTentingConstructorParams | string[]
   options?: PadOptions
   primitives?: PadPrimitives
   teardrops?: PadTeardrops
@@ -156,6 +162,8 @@ export class FootprintPad extends SxClass {
   private _sxThermalWidth?: PadThermalWidth
   private _sxThermalGap?: PadThermalGap
   private _sxThermalBridgeAngle?: PadThermalBridgeAngle
+  private _sxThermalBridgeWidth?: PadThermalBridgeWidth
+  private _sxTenting?: PadTenting
   private _sxOptions?: PadOptions
   private _sxPrimitives?: PadPrimitives
   private _sxTeardrops?: PadTeardrops
@@ -215,6 +223,9 @@ export class FootprintPad extends SxClass {
     if (p.thermalGap !== undefined) this.thermalGap = p.thermalGap
     if (p.thermalBridgeAngle !== undefined)
       this.thermalBridgeAngle = p.thermalBridgeAngle
+    if (p.thermalBridgeWidth !== undefined)
+      this.thermalBridgeWidth = p.thermalBridgeWidth
+    if (p.tenting !== undefined) this.tenting = p.tenting
     if (p.options !== undefined) this.options = p.options
     if (p.primitives !== undefined) this.primitives = p.primitives
     if (p.teardrops !== undefined) this.teardrops = p.teardrops
@@ -316,6 +327,8 @@ export class FootprintPad extends SxClass {
     ensureSingle(arrayPropertyMap, "thermal_width")
     ensureSingle(arrayPropertyMap, "thermal_gap")
     ensureSingle(arrayPropertyMap, "thermal_bridge_angle")
+    ensureSingle(arrayPropertyMap, "thermal_bridge_width")
+    ensureSingle(arrayPropertyMap, "tenting")
     ensureSingle(arrayPropertyMap, "options")
     ensureSingle(arrayPropertyMap, "primitives")
 
@@ -363,6 +376,10 @@ export class FootprintPad extends SxClass {
     pad._sxThermalBridgeAngle = propertyMap.thermal_bridge_angle as
       | PadThermalBridgeAngle
       | undefined
+    pad._sxThermalBridgeWidth = propertyMap.thermal_bridge_width as
+      | PadThermalBridgeWidth
+      | undefined
+    pad._sxTenting = propertyMap.tenting as PadTenting | undefined
     pad._sxOptions = propertyMap.options as PadOptions | undefined
     pad._sxPrimitives = propertyMap.primitives as PadPrimitives | undefined
     pad._sxRemoveUnusedLayers =
@@ -719,6 +736,36 @@ export class FootprintPad extends SxClass {
       typeof value === "number" ? new PadThermalBridgeAngle(value) : value
   }
 
+  get thermalBridgeWidth(): number | undefined {
+    return this._sxThermalBridgeWidth?.value
+  }
+
+  set thermalBridgeWidth(value: number | PadThermalBridgeWidth | undefined) {
+    if (value === undefined) {
+      this._sxThermalBridgeWidth = undefined
+      return
+    }
+    this._sxThermalBridgeWidth =
+      typeof value === "number" ? new PadThermalBridgeWidth(value) : value
+  }
+
+  get tenting(): PadTenting | undefined {
+    return this._sxTenting
+  }
+
+  set tenting(value:
+    | PadTenting
+    | PadTentingConstructorParams
+    | string[]
+    | undefined,) {
+    if (value === undefined) {
+      this._sxTenting = undefined
+      return
+    }
+    this._sxTenting =
+      value instanceof PadTenting ? value : new PadTenting(value)
+  }
+
   get options(): PadOptions | undefined {
     return this._sxOptions
   }
@@ -778,7 +825,9 @@ export class FootprintPad extends SxClass {
       children.push(this._sxZoneLayerConnections)
     if (this._sxThermalWidth) children.push(this._sxThermalWidth)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
+    if (this._sxThermalBridgeWidth) children.push(this._sxThermalBridgeWidth)
     if (this._sxThermalBridgeAngle) children.push(this._sxThermalBridgeAngle)
+    if (this._sxTenting) children.push(this._sxTenting)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     if (this._sxRemoveUnusedLayers) children.push(this._sxRemoveUnusedLayers)

@@ -43,6 +43,12 @@ export class RenderCache extends SxClass {
 
     for (const primitive of rest) {
       if (Array.isArray(primitive)) {
+        if (primitive[0] === "polygon") {
+          renderCache._elements.push(
+            RenderCachePolygon.fromSexprPrimitives(primitive.slice(1)),
+          )
+          continue
+        }
         const parsed = SxClass.parsePrimitiveSexpr(primitive, {
           parentToken: this.token,
         })

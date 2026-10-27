@@ -9,6 +9,7 @@ import { GrLineStart } from "./GrLineStart"
 import { GrLineEnd } from "./GrLineEnd"
 import { GrLineAngle } from "./GrLineAngle"
 import { GrLineLocked } from "./GrLineLocked"
+import { GrLineNet } from "./GrLineNet"
 
 export interface GrLinePoint {
   x: number
@@ -22,6 +23,7 @@ const SUPPORTED_SINGLE_TOKENS = new Set([
   "layer",
   "width",
   "stroke",
+  "net",
   "tstamp",
   "uuid",
   "locked",
@@ -34,6 +36,7 @@ export interface GrLineConstructorParams {
   layer?: Layer | string | Array<string | number>
   width?: Width | number
   stroke?: Stroke
+  net?: GrLineNet | number | string
   tstamp?: Tstamp | string
   uuid?: Uuid | string
   locked?: boolean
@@ -49,6 +52,7 @@ export class GrLine extends SxClass {
   private _sxLayer?: Layer
   private _sxWidth?: Width
   private _sxStroke?: Stroke
+  private _sxNet?: GrLineNet
   private _sxTstamp?: Tstamp
   private _sxUuid?: Uuid
   private _sxLocked?: GrLineLocked
@@ -61,6 +65,7 @@ export class GrLine extends SxClass {
     if (params.layer !== undefined) this.layer = params.layer
     if (params.width !== undefined) this.width = params.width
     if (params.stroke !== undefined) this.stroke = params.stroke
+    if (params.net !== undefined) this.net = params.net
     if (params.tstamp !== undefined) this.tstamp = params.tstamp
     if (params.uuid !== undefined) this.uuid = params.uuid
     if (params.locked !== undefined) this.locked = params.locked
@@ -111,6 +116,7 @@ export class GrLine extends SxClass {
     grLine._sxLayer = propertyMap.layer as Layer | undefined
     grLine._sxWidth = propertyMap.width as Width | undefined
     grLine._sxStroke = propertyMap.stroke as Stroke | undefined
+    grLine._sxNet = propertyMap.net as GrLineNet | undefined
     const locked = propertyMap.locked as GrLineLocked | undefined
     grLine._sxLocked = locked && locked.value ? locked : undefined
     grLine._sxTstamp = propertyMap.tstamp as Tstamp | undefined
@@ -210,6 +216,18 @@ export class GrLine extends SxClass {
     this._sxStroke = value
   }
 
+  get net(): number | string | undefined {
+    return this._sxNet?.value
+  }
+
+  set net(value: GrLineNet | number | string | undefined) {
+    if (value === undefined) {
+      this._sxNet = undefined
+      return
+    }
+    this._sxNet = value instanceof GrLineNet ? value : new GrLineNet(value)
+  }
+
   get tstamp(): Tstamp | undefined {
     return this._sxTstamp
   }
@@ -251,6 +269,7 @@ export class GrLine extends SxClass {
     if (this._sxWidth) children.push(this._sxWidth)
     if (this._sxLocked) children.push(this._sxLocked)
     if (this._sxLayer) children.push(this._sxLayer)
+    if (this._sxNet) children.push(this._sxNet)
     if (this._sxTstamp) children.push(this._sxTstamp)
     if (this._sxUuid) children.push(this._sxUuid)
     return children

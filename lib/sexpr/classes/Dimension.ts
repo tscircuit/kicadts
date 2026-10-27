@@ -37,7 +37,6 @@ const SUPPORTED_TOKENS = new Set([
 
 export class Dimension extends SxClass {
   static override token = "dimension"
-  static override parentToken = "kicad_pcb"
   token = "dimension"
 
   private _sxLocked?: DimensionLocked
