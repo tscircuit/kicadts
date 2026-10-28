@@ -89,11 +89,15 @@ export class GlobalLabel extends SxClass {
     const [textPrimitive, ...rest] = primitiveSexprs
     const value = toStringValue(textPrimitive)
     if (value === undefined) {
-      throw new Error("global_label expects a string value")
+      throw new Error(`${this.token} expects a string value`)
     }
 
-    const globalLabel = new GlobalLabel()
-    globalLabel._value = value
+    const label = new (
+      this as unknown as new (
+        params?: GlobalLabelConstructorParams,
+      ) => GlobalLabel
+    )()
+    label._value = value
 
     // Extract shape before parsing to class properties
     let shapeIndex = -1
@@ -103,7 +107,7 @@ export class GlobalLabel extends SxClass {
         shapeIndex = i
         const shapeValue = toStringValue(item[1])
         if (shapeValue) {
-          globalLabel._shape = shapeValue as GlobalLabelShape
+          label._shape = shapeValue as GlobalLabelShape
         }
         break
       }
@@ -121,41 +125,41 @@ export class GlobalLabel extends SxClass {
     )
     if (unsupportedTokens.length > 0) {
       throw new Error(
-        `Unsupported child tokens inside global_label expression: ${unsupportedTokens.join(", ")}`,
+        `Unsupported child tokens inside ${this.token} expression: ${unsupportedTokens.join(", ")}`,
       )
     }
 
     for (const [token, entries] of Object.entries(arrayPropertyMap)) {
       if (!SUPPORTED_TOKENS.has(token)) {
         throw new Error(
-          `Unsupported child tokens inside global_label expression: ${token}`,
+          `Unsupported child tokens inside ${this.token} expression: ${token}`,
         )
       }
       if (token !== "property" && entries.length > 1) {
         throw new Error(
-          `global_label does not support repeated child tokens: ${token}`,
+          `${this.token} does not support repeated child tokens: ${token}`,
         )
       }
     }
 
-    globalLabel._sxAt =
+    label._sxAt =
       (arrayPropertyMap.at?.[0] as At | undefined) ??
       (propertyMap.at as At | undefined)
-    globalLabel._sxEffects =
+    label._sxEffects =
       (arrayPropertyMap.effects?.[0] as TextEffects | undefined) ??
       (propertyMap.effects as TextEffects | undefined)
-    globalLabel._sxUuid =
+    label._sxUuid =
       (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
       (propertyMap.uuid as Uuid | undefined)
-    globalLabel._sxFieldsAutoplaced =
+    label._sxFieldsAutoplaced =
       (arrayPropertyMap.fields_autoplaced?.[0] as
         | FieldsAutoplaced
         | undefined) ??
       (propertyMap.fields_autoplaced as FieldsAutoplaced | undefined)
-    globalLabel._properties =
+    label._properties =
       (arrayPropertyMap.property as Property[] | undefined) ?? []
 
-    return globalLabel
+    return label
   }
 
   get value(): string {
@@ -229,7 +233,7 @@ export class GlobalLabel extends SxClass {
   }
 
   override getString(): string {
-    const lines = [`(global_label ${quoteSExprString(this._value)}`]
+    const lines = [`(${this.token} ${quoteSExprString(this._value)}`]
     lines.push(`  (shape ${this._shape})`)
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())

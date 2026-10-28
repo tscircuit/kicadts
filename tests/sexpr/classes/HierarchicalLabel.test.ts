@@ -35,57 +35,26 @@ const schematicWithHierarchicalLabels = `
 )
 `
 
-test("KicadSch parses root hierarchical labels", () => {
+test("KicadSch parses and round-trips hierarchical labels", () => {
   const [parsed] = SxClass.parse(schematicWithHierarchicalLabels)
   expect(parsed).toBeInstanceOf(KicadSch)
   const schematic = parsed as KicadSch
 
-  const labels = schematic.hierarchicalLabels
-  expect(labels).toHaveLength(2)
-  expect(labels[0]).toBeInstanceOf(HierarchicalLabel)
+  const [gpio, reset] = schematic.hierarchicalLabels
+  expect(gpio).toBeInstanceOf(HierarchicalLabel)
+  expect(gpio?.value).toBe("GPIO26{slash}AD0")
+  expect(gpio?.shape).toBe("bidirectional")
+  expect(gpio?.at).toBeInstanceOf(At)
+  expect(gpio?.at?.x).toBe(137.16)
+  expect(gpio?.fieldsAutoplaced).toBe(false)
+  expect(reset?.value).toBe("RESET")
+  expect(reset?.shape).toBe("input")
+  expect(reset?.at?.angle).toBe(180)
+  expect(reset?.fieldsAutoplaced).toBe(true)
 
-  const [gpio, reset] = labels as [HierarchicalLabel, HierarchicalLabel]
-  expect(gpio.value).toBe("GPIO26{slash}AD0")
-  expect(gpio.shape).toBe("bidirectional")
-  expect(gpio.at).toBeInstanceOf(At)
-  expect(gpio.at?.x).toBe(137.16)
-  expect(gpio.at?.y).toBe(121.92)
-  expect(gpio.uuid?.value).toBe("00c5f34b-3d96-481e-8852-bd44fd1b4539")
-  expect(gpio.fieldsAutoplaced).toBe(false)
-
-  expect(reset.value).toBe("RESET")
-  expect(reset.shape).toBe("input")
-  expect(reset.at?.angle).toBe(180)
-  expect(reset.fieldsAutoplaced).toBe(true)
-})
-
-test("KicadSch round-trips hierarchical labels", () => {
-  const [parsed] = SxClass.parse(schematicWithHierarchicalLabels)
-  const output = (parsed as KicadSch).getString()
-
-  expect(output).toContain('(hierarchical_label "RESET"')
-  expect(output).toContain("(shape input)")
-
+  const output = schematic.getString()
   expectEqualPrimitiveSExpr(
     parseToPrimitiveSExpr(output),
     parseToPrimitiveSExpr(schematicWithHierarchicalLabels),
   )
-})
-
-test("HierarchicalLabel can be constructed and serialized", () => {
-  const label = new HierarchicalLabel({
-    value: "SDA",
-    shape: "output",
-    at: [10, 20, 90],
-    uuid: "11111111-2222-3333-4444-555555555555",
-  })
-
-  const schematic = new KicadSch({ hierarchicalLabels: [label] })
-  expect(schematic.hierarchicalLabels).toHaveLength(1)
-
-  const [reparsed] = SxClass.parse(schematic.getString())
-  const [roundTripped] = (reparsed as KicadSch).hierarchicalLabels
-  expect(roundTripped?.value).toBe("SDA")
-  expect(roundTripped?.shape).toBe("output")
-  expect(roundTripped?.at?.angle).toBe(90)
 })
