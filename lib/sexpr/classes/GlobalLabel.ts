@@ -92,12 +92,8 @@ export class GlobalLabel extends SxClass {
       throw new Error(`${this.token} expects a string value`)
     }
 
-    const label = new (
-      this as unknown as new (
-        params?: GlobalLabelConstructorParams,
-      ) => GlobalLabel
-    )()
-    label._value = value
+    const globalLabel = new (this as unknown as new () => GlobalLabel)()
+    globalLabel._value = value
 
     // Extract shape before parsing to class properties
     let shapeIndex = -1
@@ -107,7 +103,7 @@ export class GlobalLabel extends SxClass {
         shapeIndex = i
         const shapeValue = toStringValue(item[1])
         if (shapeValue) {
-          label._shape = shapeValue as GlobalLabelShape
+          globalLabel._shape = shapeValue as GlobalLabelShape
         }
         break
       }
@@ -142,24 +138,24 @@ export class GlobalLabel extends SxClass {
       }
     }
 
-    label._sxAt =
+    globalLabel._sxAt =
       (arrayPropertyMap.at?.[0] as At | undefined) ??
       (propertyMap.at as At | undefined)
-    label._sxEffects =
+    globalLabel._sxEffects =
       (arrayPropertyMap.effects?.[0] as TextEffects | undefined) ??
       (propertyMap.effects as TextEffects | undefined)
-    label._sxUuid =
+    globalLabel._sxUuid =
       (arrayPropertyMap.uuid?.[0] as Uuid | undefined) ??
       (propertyMap.uuid as Uuid | undefined)
-    label._sxFieldsAutoplaced =
+    globalLabel._sxFieldsAutoplaced =
       (arrayPropertyMap.fields_autoplaced?.[0] as
         | FieldsAutoplaced
         | undefined) ??
       (propertyMap.fields_autoplaced as FieldsAutoplaced | undefined)
-    label._properties =
+    globalLabel._properties =
       (arrayPropertyMap.property as Property[] | undefined) ?? []
 
-    return label
+    return globalLabel
   }
 
   get value(): string {
