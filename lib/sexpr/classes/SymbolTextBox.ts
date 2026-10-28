@@ -6,6 +6,7 @@ import { At } from "./At"
 import { ExcludeFromSim } from "./ExcludeFromSim"
 import { Stroke } from "./Stroke"
 import { TextBoxFill } from "./TextBoxFill"
+import { TextBoxMargins } from "./TextBoxMargins"
 import { TextBoxSize } from "./TextBoxSize"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
@@ -14,6 +15,7 @@ const SUPPORTED_TOKENS = new Set([
   "exclude_from_sim",
   "at",
   "size",
+  "margins",
   "stroke",
   "fill",
   "effects",
@@ -29,6 +31,7 @@ export class SymbolTextBox extends SxClass {
   private _sxExcludeFromSim?: ExcludeFromSim
   private _sxAt?: At
   private _sxSize?: TextBoxSize
+  private _sxMargins?: TextBoxMargins
   private _sxStroke?: Stroke
   private _sxFill?: TextBoxFill
   private _sxEffects?: TextEffects
@@ -67,6 +70,7 @@ export class SymbolTextBox extends SxClass {
       | undefined
     textBox._sxAt = propertyMap.at as At | undefined
     textBox._sxSize = propertyMap.size as TextBoxSize | undefined
+    textBox._sxMargins = propertyMap.margins as TextBoxMargins | undefined
     textBox._sxStroke = propertyMap.stroke as Stroke | undefined
     textBox._sxFill = propertyMap.fill as TextBoxFill | undefined
     textBox._sxEffects = propertyMap.effects as TextEffects | undefined
@@ -83,11 +87,16 @@ export class SymbolTextBox extends SxClass {
     this._text = value
   }
 
+  get margins(): TextBoxMargins | undefined {
+    return this._sxMargins
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxExcludeFromSim) children.push(this._sxExcludeFromSim)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxSize) children.push(this._sxSize)
+    if (this._sxMargins) children.push(this._sxMargins)
     if (this._sxStroke) children.push(this._sxStroke)
     if (this._sxFill) children.push(this._sxFill)
     if (this._sxEffects) children.push(this._sxEffects)
