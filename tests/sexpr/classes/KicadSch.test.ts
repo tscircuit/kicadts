@@ -115,6 +115,7 @@ test("KicadSch parses root rectangles and text boxes", () => {
         (exclude_from_sim no)
         (at 177.8 81.534 0)
         (size 10.16 10.16)
+        (margins 0.9525 0.9525 0.9525 0.9525)
         (stroke (width 0) (type default) (color 0 0 0 1))
         (fill (type none))
         (effects (font (size 2.54 2.54) (thickness 0.508) (bold yes)))
@@ -129,6 +130,10 @@ test("KicadSch parses root rectangles and text boxes", () => {
   expect(schematic.rectangles[0]).toBeInstanceOf(SchematicRectangle)
   expect(schematic.textBoxes).toHaveLength(1)
   expect(schematic.textBoxes[0]).toBeInstanceOf(SchematicTextBox)
+  expect(schematic.textBoxes[0]?.margins?.left).toBe(0.9525)
+  expect(schematic.getString()).toContain(
+    "(margins 0.9525 0.9525 0.9525 0.9525)",
+  )
   expect(schematic.getString()).toContain('(text_box "75"')
 })
 
