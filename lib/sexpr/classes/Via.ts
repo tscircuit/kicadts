@@ -125,7 +125,7 @@ export class Via extends SxClass {
   }
 
   private consumeBareToken(token: string) {
-    if (token === "blind" || token === "micro") {
+    if (token === "blind" || token === "buried" || token === "micro") {
       this._type = token
       return
     }
@@ -501,7 +501,7 @@ export class Via extends SxClass {
     const lines = ["(via"]
 
     if (this._type !== undefined) {
-      lines.push(`  (type ${this._type})`)
+      lines[0] += ` ${this._type}`
     }
     if (this._locked) lines.push("  (locked)")
     if (this._free) lines.push("  (free)")
