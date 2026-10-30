@@ -1,0 +1,175 @@
+(kicad_sch
+  (version 20250114)
+  (generator connectivity-test)
+  (uuid 85cf2753-6181-5f74-b525-c66aecc4c100)
+  (paper
+    A4
+  )
+  (lib_symbols
+    (symbol "Test:Terminal"
+      (pin_names
+        (offset 0)
+      )
+      (in_bom yes)
+      (on_board yes)
+      (property "Reference" "J"
+        (at 0 0 0)
+        (effects
+          (font
+            (size 1.27 1.27)
+          )
+        )
+      )
+      (property "Value" "Terminal"
+        (at 0 0 0)
+        (effects
+          (font
+            (size 1.27 1.27)
+          )
+        )
+      )
+      (symbol "Terminal_1_1"
+        (pin passive line
+          (at 0 0 0)
+          (length 2.54)
+          (name "1"
+            (effects
+              (font
+                (size 1.27 1.27)
+              )
+            )
+          )
+          (number "1"
+            (effects
+              (font
+                (size 1.27 1.27)
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "Test:Terminal")
+    (at 10 20 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (uuid b41f0e40-6e2d-5762-aae6-ebde6de0375a)
+    (property "Reference" "J1"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (property "Value" "Terminal"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (pin "1"
+      (uuid 7d952d23-490b-53b6-9b68-ddf95749b613)
+    )
+    (instances
+      (project "probe"
+        (path "/85cf2753-6181-5f74-b525-c66aecc4c100"
+          (reference "J1")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "Test:Terminal")
+    (at 30 20 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (uuid 751756ae-c34e-5f82-95ab-42dce199ee36)
+    (property "Reference" "J2"
+      (at 30 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (property "Value" "Terminal"
+      (at 30 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (pin "1"
+      (uuid 26181776-0fc3-5379-bd5c-354dbf2955bf)
+    )
+    (instances
+      (project "probe"
+        (path "/85cf2753-6181-5f74-b525-c66aecc4c100"
+          (reference "J2")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "Test:Terminal")
+    (at 20 20 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (uuid 30fabd47-b584-5ed1-94e4-f02878139ecb)
+    (property "Reference" "J3"
+      (at 20 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (property "Value" "Terminal"
+      (at 20 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (pin "1"
+      (uuid 777c1020-fa76-57c2-a323-7423ea5e2ce5)
+    )
+    (instances
+      (project "probe"
+        (path "/85cf2753-6181-5f74-b525-c66aecc4c100"
+          (reference "J3")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (junction
+    (at 20 20)
+    (diameter 0)
+    (color 0 0 0 0)
+    (uuid bd26d937-5d45-5141-b8cd-a4c9db519770)
+  )
+  (wire
+    (pts
+      (xy 10 20)
+      (xy 30 20)
+    )
+    (stroke
+      (width 0)
+      (type default)
+    )
+    (uuid a35e77af-cba6-5068-a6b4-d9c21ee247c0)
+  )
+)

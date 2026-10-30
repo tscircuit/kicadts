@@ -11,6 +11,50 @@ This repository uses [Bun](https://bun.sh) for scripts and testing.
 - `bun install`
 - `bun test` — optional, but handy to confirm we still round-trip the KiCad demo files
 
+## Resolve Schematic Nets
+
+`resolveSchematicNets` resolves scalar electrical connectivity on one parsed
+schematic sheet. It returns the original wire, junction, label, symbol, and pin
+objects grouped into nets, with pin positions in KiCad sheet coordinates.
+
+```ts
+import { parseKicadSch, resolveSchematicNets } from "kicadts"
+
+const schematic = parseKicadSch(schematicText)
+const { nets, warnings } = resolveSchematicNets(schematic)
+
+for (const net of nets) {
+  console.log(net.id, net.names)
+  console.log(net.wires.map((wire) => wire.uuid?.value))
+  console.log(net.pins.map(({ symbol, pin, position, isNoConnect }) => ({
+    symbolUuid: symbol.uuid,
+    pinNumber: pin.numberString,
+    position,
+    isNoConnect,
+  })))
+}
+```
+
+Wire endpoints and pin endpoints connect at the same source position. Junctions
+join crossing wires; a wire endpoint or pin merely touching another wire's
+interior does not connect without a junction. Labels may attach inside a wire
+and join distant paths with the same name. Power symbols and hidden power input
+pins provide implicit named connections; `PWR_FLAG` does not.
+
+Pin placement accounts for the selected symbol unit and body style, rotation,
+and mirroring. Coordinates are resolved on KiCad's nanometer grid. The utility
+does not mutate the parsed document or change S-expression serialization.
+
+The result includes isolated pins and dangling wires. `names` contains explicit
+labels and implicit power names; unnamed nets have an empty array. Result IDs
+are deterministic for the same input order, but are not persisted UUIDs or
+KiCad-exported net codes. No-connect flags annotate pins without running ERC.
+
+This utility does not resolve buses, traverse child sheets, generate KiCad's
+automatic net names, or select a canonical name when aliases conflict. Missing
+embedded pin definitions and child sheets are reported in `warnings`; callers
+should inspect these before treating the result as a complete design netlist.
+
 ## Build KiCad Schematics
 
 The high-level classes (`KicadSch`, `Sheet`, `SchematicSymbol`, `Wire`, …) expose setters and getters for their children. Populate the model, then call `getString()` to emit KiCad’s S-expression.

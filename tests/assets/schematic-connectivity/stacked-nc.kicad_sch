@@ -1,0 +1,127 @@
+(kicad_sch
+  (version 20250114)
+  (generator connectivity-test)
+  (uuid 85cf2753-6181-5f74-b525-c66aecc4c100)
+  (paper
+    A4
+  )
+  (lib_symbols
+    (symbol "Test:Terminal"
+      (pin_names
+        (offset 0)
+      )
+      (in_bom yes)
+      (on_board yes)
+      (property "Reference" "J"
+        (at 0 0 0)
+        (effects
+          (font
+            (size 1.27 1.27)
+          )
+        )
+      )
+      (property "Value" "Terminal"
+        (at 0 0 0)
+        (effects
+          (font
+            (size 1.27 1.27)
+          )
+        )
+      )
+      (symbol "Terminal_1_1"
+        (pin passive line
+          (at 0 0 0)
+          (length 2.54)
+          (name "1"
+            (effects
+              (font
+                (size 1.27 1.27)
+              )
+            )
+          )
+          (number "1"
+            (effects
+              (font
+                (size 1.27 1.27)
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "Test:Terminal")
+    (at 10 20 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (uuid b41f0e40-6e2d-5762-aae6-ebde6de0375a)
+    (property "Reference" "J1"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (property "Value" "Terminal"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (pin "1"
+      (uuid 7d952d23-490b-53b6-9b68-ddf95749b613)
+    )
+    (instances
+      (project "probe"
+        (path "/85cf2753-6181-5f74-b525-c66aecc4c100"
+          (reference "J1")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "Test:Terminal")
+    (at 10 20 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (uuid 751756ae-c34e-5f82-95ab-42dce199ee36)
+    (property "Reference" "J2"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (property "Value" "Terminal"
+      (at 10 20 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+      )
+    )
+    (pin "1"
+      (uuid 26181776-0fc3-5379-bd5c-354dbf2955bf)
+    )
+    (instances
+      (project "probe"
+        (path "/85cf2753-6181-5f74-b525-c66aecc4c100"
+          (reference "J2")
+          (unit 1)
+        )
+      )
+    )
+  )
+  (no_connect
+    (at 10 20)
+    (uuid ce63973e-6c37-5ea0-b021-0193ecbb5b35)
+  )
+)

@@ -1,0 +1,12 @@
+{
+  "crossing-junction.kicad_sch": [["J1.1", "J2.1", "J3.1", "J4.1"]],
+  "crossing-no-junction.kicad_sch": [["J1.1", "J2.1"], ["J3.1", "J4.1"]],
+  "label-at-crossing.kicad_sch": [["J1.1", "J2.1", "J3.1", "J4.1"]],
+  "label-mid-wire.kicad_sch": [["J1.1", "J2.1", "J3.1"]],
+  "overlapping-wires.kicad_sch": [["J1.1", "J2.1"], ["J3.1", "J4.1"]],
+  "pin-mid-wire.kicad_sch": [["J1.1", "J2.1"], ["J3.1"]],
+  "pin-on-junction.kicad_sch": [["J1.1", "J2.1", "J3.1"]],
+  "stacked-nc.kicad_sch": [["J1.1", "J2.1"]],
+  "t-no-junction.kicad_sch": [["J1.1", "J2.1"], ["J3.1"]],
+  "touching-pins.kicad_sch": [["J1.1", "J2.1"]]
+}
