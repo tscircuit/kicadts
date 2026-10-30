@@ -23,6 +23,7 @@ import { Polyline } from "./Polyline"
 import { SchematicArc } from "./SchematicArc"
 import { SchematicRectangle } from "./SchematicRectangle"
 import { SchematicTextBox } from "./SchematicTextBox"
+import { SchematicTable } from "./SchematicTable"
 import { LegacySymbolInstances } from "./LegacySymbolInstances"
 
 const SINGLE_CHILD_TOKENS = new Set([
@@ -53,6 +54,7 @@ const MULTI_CHILD_TOKENS = new Set([
   "polyline",
   "rectangle",
   "text_box",
+  "table",
 ])
 
 const SUPPORTED_CHILD_TOKENS = new Set([
@@ -85,6 +87,7 @@ export interface KicadSchConstructorParams {
   polylines?: Polyline[]
   rectangles?: SchematicRectangle[]
   textBoxes?: SchematicTextBox[]
+  tables?: SchematicTable[]
 }
 
 export class KicadSch extends SxClass {
@@ -115,6 +118,7 @@ export class KicadSch extends SxClass {
   private _polylines: Polyline[] = []
   private _rectangles: SchematicRectangle[] = []
   private _textBoxes: SchematicTextBox[] = []
+  private _tables: SchematicTable[] = []
 
   constructor(params: KicadSchConstructorParams = {}) {
     super()
@@ -220,6 +224,9 @@ export class KicadSch extends SxClass {
     if (params.textBoxes !== undefined) {
       this.textBoxes = params.textBoxes
     }
+    if (params.tables !== undefined) {
+      this.tables = params.tables
+    }
   }
 
   static override fromSexprPrimitives(
@@ -293,6 +300,7 @@ export class KicadSch extends SxClass {
       polylines: (arrayPropertyMap.polyline as Polyline[]) ?? [],
       rectangles: (arrayPropertyMap.rectangle as SchematicRectangle[]) ?? [],
       textBoxes: (arrayPropertyMap.text_box as SchematicTextBox[]) ?? [],
+      tables: (arrayPropertyMap.table as SchematicTable[]) ?? [],
     })
   }
 
@@ -499,6 +507,14 @@ export class KicadSch extends SxClass {
     this._textBoxes = [...value]
   }
 
+  get tables(): SchematicTable[] {
+    return [...this._tables]
+  }
+
+  set tables(value: SchematicTable[]) {
+    this._tables = [...value]
+  }
+
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxVersion) children.push(this._sxVersion)
@@ -525,6 +541,7 @@ export class KicadSch extends SxClass {
     children.push(...this._polylines)
     children.push(...this._rectangles)
     children.push(...this._textBoxes)
+    children.push(...this._tables)
     return children
   }
 }

@@ -22,7 +22,7 @@ export class TextBoxSize extends SxClass {
     if (width === undefined || height === undefined) {
       throw new Error("text_box size requires numeric width and height")
     }
-    return new TextBoxSize(width, height)
+    return new this(width, height)
   }
 
   override getString(): string {

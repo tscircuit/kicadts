@@ -3,7 +3,7 @@ import { parseKicadSch } from "lib/sexpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 
 // Source: https://github.com/sparkfun/SparkFun_Qwiic_Current_Sensor_INA2XX/blob/313d3e2c03218f00eb5fb051d5594f05c95abecf/Hardware/SparkFun_Qwiic_Current_Sensor_INA2XX.kicad_sch
-test.failing("SparkFun INA2XX schematic parses and round-trips its address table", async () => {
+test("SparkFun INA2XX schematic parses and round-trips its address table", async () => {
   const original = await Bun.file(
     "tests/assets/SparkFun_Qwiic_Current_Sensor_INA2XX.kicad_sch",
   ).text()
