@@ -1,0 +1,284 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`SparkFun INA2XX schematic parses and round-trips its address table 1`] = `
+"(table
+  (column_count 3)
+  (border
+    (external yes)
+    (header yes)
+    (stroke
+      (width 0)
+      (type solid)
+      (color 72 72 72 1)
+    )
+  )
+  (separators
+    (rows yes)
+    (cols yes)
+    (stroke
+      (width 0)
+      (type solid)
+      (color 72 72 72 1)
+    )
+  )
+  (column_widths 9.144 9.398 7.366)
+  (row_heights 2.794 2.794 2.794 2.794 2.794)
+  (cells
+    (table_cell "A1"
+      (exclude_from_sim no)
+      (at 204.724 109.474 0)
+      (size 9.144 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 7a591b8b-5537-4a04-93da-473dc62ec0eb)
+    )
+    (table_cell "A0"
+      (exclude_from_sim no)
+      (at 213.868 109.474 0)
+      (size 9.398 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 7196bde8-9173-46e9-92fa-997f24866353)
+    )
+    (table_cell "ADDR"
+      (exclude_from_sim no)
+      (at 223.266 109.474 0)
+      (size 7.366 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 9cdbb558-a985-4de5-83ed-0ae406683de1)
+    )
+    (table_cell "CLOSED"
+      (exclude_from_sim no)
+      (at 204.724 112.268 0)
+      (size 9.144 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid b44cbf44-c06f-47af-88b1-32a79532641e)
+    )
+    (table_cell "CLOSED"
+      (exclude_from_sim no)
+      (at 213.868 112.268 0)
+      (size 9.398 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 6d824d8c-93ea-4426-a71f-f728f9684dec)
+    )
+    (table_cell "0x40"
+      (exclude_from_sim no)
+      (at 223.266 112.268 0)
+      (size 7.366 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid b840e55f-d96f-4529-9261-b4013a5dc839)
+    )
+    (table_cell "CLOSED"
+      (exclude_from_sim no)
+      (at 204.724 115.062 0)
+      (size 9.144 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid e54ed7b7-fd0c-4f1c-96e7-3a7a062a9058)
+    )
+    (table_cell "OPEN"
+      (exclude_from_sim no)
+      (at 213.868 115.062 0)
+      (size 9.398 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 28f48383-0e29-45af-a0f2-1631906eaf76)
+    )
+    (table_cell "0x41"
+      (exclude_from_sim no)
+      (at 223.266 115.062 0)
+      (size 7.366 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid a5dc1a77-3abd-4888-b3a7-26cf219f3757)
+    )
+    (table_cell "OPEN"
+      (exclude_from_sim no)
+      (at 204.724 117.856 0)
+      (size 9.144 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 308b528e-4811-4004-9d3a-fbded4af2ae3)
+    )
+    (table_cell "CLOSED"
+      (exclude_from_sim no)
+      (at 213.868 117.856 0)
+      (size 9.398 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 3d194614-4ea3-4f12-a0f8-d0b2d50b01dd)
+    )
+    (table_cell "0x44"
+      (exclude_from_sim no)
+      (at 223.266 117.856 0)
+      (size 7.366 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid b05f1333-5dd8-4f6a-85bb-b28f2028fa85)
+    )
+    (table_cell "OPEN"
+      (exclude_from_sim no)
+      (at 204.724 120.65 0)
+      (size 9.144 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid f02f6d8c-ba3e-4c6c-b3eb-77b753ea9350)
+    )
+    (table_cell "OPEN"
+      (exclude_from_sim no)
+      (at 213.868 120.65 0)
+      (size 9.398 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid 430ca7b1-af79-4b4e-ad3b-478353a06c8f)
+    )
+    (table_cell "0x45"
+      (exclude_from_sim no)
+      (at 223.266 120.65 0)
+      (size 7.366 2.794)
+      (margins 0.9525 0.9525 0.9525 0.9525)
+      (span 1 1)
+      (fill
+        (type none)
+      )
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (justify left top)
+      )
+      (uuid b53b8fcd-1800-4ab4-a6a9-dd31c1115ee4)
+    )
+  )
+)"
+`;
