@@ -1,6 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Image } from "./Image"
+import { BusAlias } from "./BusAlias"
 import { KicadSchGenerator } from "./KicadSchGenerator"
 import { KicadSchGeneratorVersion } from "./KicadSchGeneratorVersion"
 import { KicadSchVersion } from "./KicadSchVersion"
@@ -39,6 +40,7 @@ const SINGLE_CHILD_TOKENS = new Set([
 ])
 
 const MULTI_CHILD_TOKENS = new Set([
+  "bus_alias",
   "property",
   "image",
   "sheet",
@@ -63,6 +65,7 @@ const SUPPORTED_CHILD_TOKENS = new Set([
 ])
 
 export interface KicadSchConstructorParams {
+  busAliases?: BusAlias[]
   version?: number | KicadSchVersion
   generator?: string | KicadSchGenerator
   generatorVersion?: string | KicadSchGeneratorVersion
@@ -101,6 +104,7 @@ export class KicadSch extends SxClass {
   private _sxPaper?: Paper
   private _sxTitleBlock?: TitleBlock
   private _sxLibSymbols?: LibSymbols
+  private _busAliases: BusAlias[] = []
   private _sheetInstances: SheetInstances[] = []
   private _sxEmbeddedFonts?: EmbeddedFonts
   private _sxSymbolInstances?: LegacySymbolInstances
@@ -122,6 +126,10 @@ export class KicadSch extends SxClass {
 
   constructor(params: KicadSchConstructorParams = {}) {
     super()
+
+    if (params.busAliases !== undefined) {
+      this.busAliases = params.busAliases
+    }
 
     if (params.version instanceof KicadSchVersion) {
       this._sxVersion = params.version
@@ -270,6 +278,7 @@ export class KicadSch extends SxClass {
     }
 
     return new KicadSch({
+      busAliases: (arrayPropertyMap.bus_alias as BusAlias[]) ?? [],
       version: propertyMap.version as KicadSchVersion | undefined,
       generator: propertyMap.generator as KicadSchGenerator | undefined,
       generatorVersion: propertyMap.generator_version as
@@ -302,6 +311,14 @@ export class KicadSch extends SxClass {
       textBoxes: (arrayPropertyMap.text_box as SchematicTextBox[]) ?? [],
       tables: (arrayPropertyMap.table as SchematicTable[]) ?? [],
     })
+  }
+
+  get busAliases(): BusAlias[] {
+    return [...this._busAliases]
+  }
+
+  set busAliases(value: BusAlias[]) {
+    this._busAliases = [...value]
   }
 
   get version(): number | undefined {
@@ -524,6 +541,7 @@ export class KicadSch extends SxClass {
     if (this._sxPaper) children.push(this._sxPaper)
     if (this._sxTitleBlock) children.push(this._sxTitleBlock)
     if (this._sxLibSymbols) children.push(this._sxLibSymbols)
+    children.push(...this._busAliases)
     children.push(...this._sheetInstances)
     if (this._sxSymbolInstances) children.push(this._sxSymbolInstances)
     if (this._sxEmbeddedFonts) children.push(this._sxEmbeddedFonts)
