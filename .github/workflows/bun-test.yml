@@ -10,10 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    container:
-      image: ghcr.io/kicad/kicad:10.0.0
-      options: --user root
+    timeout-minutes: 5
 
     # Skip test for PRs that not chore: bump version
     if: "${{ github.event_name != 'pull_request' || github.event.pull_request.title != 'chore: bump version' }}"
@@ -21,9 +18,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install unzip
-        run: apt-get update && apt-get install -y unzip
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v2

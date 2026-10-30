@@ -9,6 +9,7 @@ import { renderSchematicToPng } from "../../fixtures/render-schematic-to-png"
 const fixturePath =
   "tests/assets/SparkFun_Qwiic_Current_Sensor_INA2XX.kicad_sch"
 const snapshotName = "SparkFun_INA2XX-address-table"
+const hasKicadCli = Bun.which("kicad-cli") !== null
 const tableSchematic = (table: string) => `(kicad_sch
   (version 20250114)
   (generator "eeschema")
@@ -18,17 +19,21 @@ const tableSchematic = (table: string) => `(kicad_sch
   ${table}
 )`
 
-test("SparkFun INA2XX address table reference PNG", async () => {
-  const [root] = parseToPrimitiveSExpr(await Bun.file(fixturePath).text())
-  if (!Array.isArray(root)) throw new Error("Expected schematic expression")
-  const table = root.find(
-    (child) => Array.isArray(child) && child[0] === "table",
-  )
-  if (!table) throw new Error("Expected address table")
-  await expect(
-    renderSchematicToPng(tableSchematic(printSExpr(table))),
-  ).toMatchPngSnapshot(import.meta.path, snapshotName)
-}, 20_000)
+test.skipIf(!hasKicadCli)(
+  "SparkFun INA2XX address table reference PNG",
+  async () => {
+    const [root] = parseToPrimitiveSExpr(await Bun.file(fixturePath).text())
+    if (!Array.isArray(root)) throw new Error("Expected schematic expression")
+    const table = root.find(
+      (child) => Array.isArray(child) && child[0] === "table",
+    )
+    if (!table) throw new Error("Expected address table")
+    await expect(
+      renderSchematicToPng(tableSchematic(printSExpr(table))),
+    ).toMatchPngSnapshot(import.meta.path, snapshotName)
+  },
+  20_000,
+)
 
 // https://github.com/sparkfun/SparkFun_Qwiic_Current_Sensor_INA2XX/blob/313d3e2c03218f00eb5fb051d5594f05c95abecf/Hardware/SparkFun_Qwiic_Current_Sensor_INA2XX.kicad_sch
 test.failing("SparkFun INA2XX schematic parses and round-trips its address table", async () => {
@@ -39,9 +44,11 @@ test.failing("SparkFun INA2XX schematic parses and round-trips its address table
     .filter((child) => child.token === "table")
   expect(tables).toHaveLength(1)
   const table = tables[0]!
-  await expect(
-    renderSchematicToPng(tableSchematic(table.getString())),
-  ).toMatchPngSnapshot(import.meta.path, snapshotName)
+  if (hasKicadCli) {
+    await expect(
+      renderSchematicToPng(tableSchematic(table.getString())),
+    ).toMatchPngSnapshot(import.meta.path, snapshotName)
+  }
 
   const [root] = parseToPrimitiveSExpr(original)
   if (!Array.isArray(root)) throw new Error("Expected schematic expression")
