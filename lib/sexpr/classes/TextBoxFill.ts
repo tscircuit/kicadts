@@ -13,7 +13,7 @@ export class TextBoxFill extends SxClass {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): TextBoxFill {
-    const fill = new TextBoxFill()
+    const fill = new this()
     const { propertyMap } = SxClass.parsePrimitivesToClassProperties(
       primitiveSexprs,
       "fill",
