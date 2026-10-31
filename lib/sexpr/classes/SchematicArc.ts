@@ -1,5 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import { parseYesNo } from "../utils/parseYesNo"
 import { Stroke } from "./Stroke"
 import {
   SymbolArcEnd,
@@ -50,10 +51,11 @@ export class SchematicArcLocked extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SchematicArcLocked {
     const [valuePrimitive] = primitiveSexprs
-    if (typeof valuePrimitive !== "boolean") {
+    const value = parseYesNo(valuePrimitive)
+    if (value === undefined) {
       throw new Error("locked expects a boolean value")
     }
-    return new SchematicArcLocked(valuePrimitive)
+    return new SchematicArcLocked(value)
   }
 
   override getChildren(): SxClass[] {
@@ -61,7 +63,7 @@ export class SchematicArcLocked extends SxClass {
   }
 
   override getString(): string {
-    return `(locked ${this.value})`
+    return `(locked ${this.value ? "yes" : "no"})`
   }
 }
 SxClass.register(SchematicArcLocked)
