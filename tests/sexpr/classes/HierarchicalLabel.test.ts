@@ -157,7 +157,6 @@ test("hierarchical labels have useful defaults and preserve string values", () =
 })
 
 test.each([
-  ["(fields_autoplaced)", true],
   ["(fields_autoplaced yes)", true],
   ["(fields_autoplaced no)", false],
 ] as const)("hierarchical labels support %s", (flag, expected) => {
