@@ -3,7 +3,7 @@ import { KicadSch, parseKicadSch } from "lib/sexpr"
 import { parseToPrimitiveSExpr } from "lib/sexpr/parseToPrimitiveSExpr"
 
 // https://github.com/sparkfun/SparkFun_IoT_RedBoard-RP2350/blob/46926c417395f6b195cc8077b2b0012884b60475/Hardware/peripherals.kicad_sch#L2697
-test.failing("SparkFun RedBoard RP2350 bus aliases parse and round-trip", async () => {
+test("SparkFun RedBoard RP2350 bus aliases parse and round-trip", async () => {
   const original = await Bun.file(
     "tests/assets/SparkFun_IoT_RedBoard_RP2350-peripherals.kicad_sch",
   ).text()
