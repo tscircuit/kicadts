@@ -36,6 +36,8 @@ export * from "./classes/Polyline" // Exports Polyline, SchematicPolyline, Symbo
 export * from "./classes/BusEntry"
 export * from "./classes/Label"
 export * from "./classes/GlobalLabel"
+export * from "./classes/HierarchicalLabel"
+export * from "./classes/HierarchicalLabelShape"
 export * from "./classes/SchematicText"
 export * from "./classes/SchematicTextBox"
 export * from "./classes/SchematicRectangle"
