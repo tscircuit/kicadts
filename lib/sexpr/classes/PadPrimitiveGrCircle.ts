@@ -262,7 +262,7 @@ class PadPrimitiveGrCircleEnd extends PadPrimitiveGrCirclePoint {
 }
 SxClass.register(PadPrimitiveGrCircleEnd)
 
-const truthyFillStrings = new Set(["yes", "true"])
+const truthyFillStrings = new Set(["yes", "true", "solid"])
 const falsyFillStrings = new Set(["no", "false", "none"])
 
 export class PadPrimitiveGrCircleFill extends SxClass {
@@ -303,7 +303,7 @@ export class PadPrimitiveGrCircleFill extends SxClass {
       }
     }
     throw new Error(
-      `pad primitive gr_circle fill expects yes/no/none or boolean, received ${JSON.stringify(raw)}`,
+      `pad primitive gr_circle fill expects yes/no/solid/none or boolean, received ${JSON.stringify(raw)}`,
     )
   }
 
