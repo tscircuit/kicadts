@@ -11,6 +11,35 @@ This repository uses [Bun](https://bun.sh) for scripts and testing.
 - `bun install`
 - `bun test` — optional, but handy to confirm we still round-trip the KiCad demo files
 
+### Native schematic snapshots
+
+`bun run test:schematic-snapshots` renders a self-contained schematic with the
+native KiCad CLI and checks its PNG after parsing and serializing it with
+`kicadts`. It also verifies that editing a component value changes the image.
+The fixture embeds its symbol definition and uses KiCad's stroke font, so no
+external symbol libraries or system fonts are needed.
+
+Install [KiCad 10.0.6](https://github.com/KiCad/kicad-source-mirror/releases/tag/10.0.6)
+and put `kicad-cli` on `PATH`, or set `KICAD_CLI` to the executable's full path.
+For example, on macOS:
+
+```sh
+KICAD_CLI=/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli bun run test:schematic-snapshots
+```
+
+This native suite is separate from `bun test`. Its CI workflow runs for source,
+test, and configuration changes using the official, checksum-pinned macOS
+10.0.6 release (a roughly 1.4 GB download), matching the committed baseline.
+Missing or different KiCad versions fail the native command. Rendering uses a
+temporary configuration, a white background, monochrome output without the
+drawing sheet, and a fixed 1200-pixel width. No project or user settings change.
+
+To intentionally regenerate the baseline, run
+`BUN_UPDATE_SNAPSHOTS=1 bun run test:schematic-snapshots`, inspect
+`tests/__snapshots__/schematic.snap.png`, and commit it. CI never updates
+baselines. A mismatch writes `schematic.diff.png` beside the baseline and CI
+uploads it for review.
+
 ## Build KiCad Schematics
 
 The high-level classes (`KicadSch`, `Sheet`, `SchematicSymbol`, `Wire`, …) expose setters and getters for their children. Populate the model, then call `getString()` to emit KiCad’s S-expression.
