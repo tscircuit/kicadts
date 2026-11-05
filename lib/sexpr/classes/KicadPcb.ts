@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { EmbeddedFonts } from "./EmbeddedFonts"
 import { EmbeddedFiles } from "./EmbeddedFiles"
+import { EmbeddedFonts } from "./EmbeddedFonts"
 import { Footprint } from "./Footprint"
 import { GrArc } from "./GrArc"
 import { GrCircle } from "./GrCircle"
@@ -12,12 +12,13 @@ import { GrRect } from "./GrRect"
 import { GrText } from "./GrText"
 import { Image } from "./Image"
 import { Paper } from "./Paper"
+import { PcbArc } from "./PcbArc"
 import { PcbGeneral } from "./PcbGeneral"
 import { PcbGenerator } from "./PcbGenerator"
 import { PcbGeneratorVersion } from "./PcbGeneratorVersion"
+import { PcbHost } from "./PcbHost"
 import { PcbLayers } from "./PcbLayers"
 import { PcbNet } from "./PcbNet"
-import { PcbArc } from "./PcbArc"
 import { PcbVersion } from "./PcbVersion"
 import { Property } from "./Property"
 import { Segment } from "./Segment"
@@ -30,6 +31,7 @@ export interface KicadPcbConstructorParams {
   version?: number
   generator?: string
   generatorVersion?: string
+  host?: PcbHost
   general?: PcbGeneral
   paper?: Paper
   titleBlock?: TitleBlock
@@ -62,6 +64,7 @@ export class KicadPcb extends SxClass {
   private _sxVersion?: PcbVersion
   private _sxGenerator?: PcbGenerator
   private _sxGeneratorVersion?: PcbGeneratorVersion
+  private _sxHost?: PcbHost
   private _sxGeneral?: PcbGeneral
   private _sxPaper?: Paper
   private _sxTitleBlock?: TitleBlock
@@ -92,6 +95,7 @@ export class KicadPcb extends SxClass {
     if (params.generator !== undefined) this.generator = params.generator
     if (params.generatorVersion !== undefined)
       this.generatorVersion = params.generatorVersion
+    if (params.host !== undefined) this.host = params.host
     if (params.general !== undefined) this.general = params.general
     if (params.paper !== undefined) this.paper = params.paper
     if (params.titleBlock !== undefined) this.titleBlock = params.titleBlock
@@ -165,6 +169,10 @@ export class KicadPcb extends SxClass {
     }
     if (child instanceof PcbGeneratorVersion) {
       this._sxGeneratorVersion = child
+      return
+    }
+    if (child instanceof PcbHost) {
+      this._sxHost = child
       return
     }
     if (child instanceof PcbGeneral) {
@@ -283,6 +291,14 @@ export class KicadPcb extends SxClass {
   set generatorVersion(value: string | undefined) {
     this._sxGeneratorVersion =
       value === undefined ? undefined : new PcbGeneratorVersion(value)
+  }
+
+  get host(): PcbHost | undefined {
+    return this._sxHost
+  }
+
+  set host(value: PcbHost | undefined) {
+    this._sxHost = value
   }
 
   get general(): PcbGeneral | undefined {
@@ -474,6 +490,7 @@ export class KicadPcb extends SxClass {
     if (this._sxVersion) children.push(this._sxVersion)
     if (this._sxGenerator) children.push(this._sxGenerator)
     if (this._sxGeneratorVersion) children.push(this._sxGeneratorVersion)
+    if (this._sxHost) children.push(this._sxHost)
     if (this._sxGeneral) children.push(this._sxGeneral)
     if (this._sxPaper) children.push(this._sxPaper)
     if (this._sxTitleBlock) children.push(this._sxTitleBlock)
