@@ -1,14 +1,26 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { parseYesNo } from "../utils/parseYesNo"
+import { ZoneFillHatchBorderAlgorithm } from "./ZoneFillHatchBorderAlgorithm"
+import { ZoneFillHatchGap } from "./ZoneFillHatchGap"
+import { ZoneFillHatchMinHoleArea } from "./ZoneFillHatchMinHoleArea"
+import { ZoneFillHatchOrientation } from "./ZoneFillHatchOrientation"
+import { ZoneFillHatchThickness } from "./ZoneFillHatchThickness"
 import { ZoneFillIslandAreaMin } from "./ZoneFillIslandAreaMin"
 import { ZoneFillIslandRemovalMode } from "./ZoneFillIslandRemovalMode"
+import { ZoneFillMode } from "./ZoneFillMode"
 import { ZoneFillRadius } from "./ZoneFillRadius"
 import { ZoneFillSmoothing } from "./ZoneFillSmoothing"
 import { ZoneFillThermalBridgeWidth } from "./ZoneFillThermalBridgeWidth"
 import { ZoneFillThermalGap } from "./ZoneFillThermalGap"
 
 const SINGLE_TOKENS = new Set([
+  "mode",
+  "hatch_thickness",
+  "hatch_gap",
+  "hatch_orientation",
+  "hatch_border_algorithm",
+  "hatch_min_hole_area",
   "thermal_gap",
   "thermal_bridge_width",
   "smoothing",
@@ -23,6 +35,12 @@ export class ZoneFill extends SxClass {
   override token = "fill"
 
   private _filled?: boolean
+  private _sxMode?: ZoneFillMode
+  private _sxHatchThickness?: ZoneFillHatchThickness
+  private _sxHatchGap?: ZoneFillHatchGap
+  private _sxHatchOrientation?: ZoneFillHatchOrientation
+  private _sxHatchBorderAlgorithm?: ZoneFillHatchBorderAlgorithm
+  private _sxHatchMinHoleArea?: ZoneFillHatchMinHoleArea
   private _sxThermalGap?: ZoneFillThermalGap
   private _sxThermalBridgeWidth?: ZoneFillThermalBridgeWidth
   private _sxSmoothing?: ZoneFillSmoothing
@@ -33,6 +51,12 @@ export class ZoneFill extends SxClass {
   constructor(
     params: {
       filled?: boolean
+      mode?: string
+      hatchThickness?: number
+      hatchGap?: number
+      hatchOrientation?: number
+      hatchBorderAlgorithm?: string
+      hatchMinHoleArea?: number
       thermalGap?: number
       thermalBridgeWidth?: number
       smoothing?: string
@@ -43,6 +67,16 @@ export class ZoneFill extends SxClass {
   ) {
     super()
     if (params.filled !== undefined) this.filled = params.filled
+    if (params.mode !== undefined) this.mode = params.mode
+    if (params.hatchThickness !== undefined)
+      this.hatchThickness = params.hatchThickness
+    if (params.hatchGap !== undefined) this.hatchGap = params.hatchGap
+    if (params.hatchOrientation !== undefined)
+      this.hatchOrientation = params.hatchOrientation
+    if (params.hatchBorderAlgorithm !== undefined)
+      this.hatchBorderAlgorithm = params.hatchBorderAlgorithm
+    if (params.hatchMinHoleArea !== undefined)
+      this.hatchMinHoleArea = params.hatchMinHoleArea
     if (params.thermalGap !== undefined) this.thermalGap = params.thermalGap
     if (params.thermalBridgeWidth !== undefined)
       this.thermalBridgeWidth = params.thermalBridgeWidth
@@ -86,6 +120,21 @@ export class ZoneFill extends SxClass {
       }
     }
 
+    fill._sxMode = propertyMap.mode as ZoneFillMode | undefined
+    fill._sxHatchThickness = propertyMap.hatch_thickness as
+      | ZoneFillHatchThickness
+      | undefined
+    fill._sxHatchGap = propertyMap.hatch_gap as ZoneFillHatchGap | undefined
+    fill._sxHatchOrientation = propertyMap.hatch_orientation as
+      | ZoneFillHatchOrientation
+      | undefined
+    fill._sxHatchBorderAlgorithm = propertyMap.hatch_border_algorithm as
+      | ZoneFillHatchBorderAlgorithm
+      | undefined
+    fill._sxHatchMinHoleArea = propertyMap.hatch_min_hole_area as
+      | ZoneFillHatchMinHoleArea
+      | undefined
+
     fill._sxThermalGap = propertyMap.thermal_gap as
       | ZoneFillThermalGap
       | undefined
@@ -110,6 +159,93 @@ export class ZoneFill extends SxClass {
 
   set filled(value: boolean | undefined) {
     this._filled = value
+  }
+
+  get mode(): string | undefined {
+    return this._sxMode?.value
+  }
+
+  set mode(value: ZoneFillMode | string | undefined) {
+    if (value === undefined) {
+      this._sxMode = undefined
+    } else if (value instanceof ZoneFillMode) {
+      this._sxMode = value
+    } else {
+      this._sxMode = new ZoneFillMode(value)
+    }
+  }
+
+  get hatchThickness(): number | undefined {
+    return this._sxHatchThickness?.value
+  }
+
+  set hatchThickness(value: ZoneFillHatchThickness | number | undefined) {
+    if (value === undefined) {
+      this._sxHatchThickness = undefined
+    } else if (value instanceof ZoneFillHatchThickness) {
+      this._sxHatchThickness = value
+    } else {
+      this._sxHatchThickness = new ZoneFillHatchThickness(value)
+    }
+  }
+
+  get hatchGap(): number | undefined {
+    return this._sxHatchGap?.value
+  }
+
+  set hatchGap(value: ZoneFillHatchGap | number | undefined) {
+    if (value === undefined) {
+      this._sxHatchGap = undefined
+    } else if (value instanceof ZoneFillHatchGap) {
+      this._sxHatchGap = value
+    } else {
+      this._sxHatchGap = new ZoneFillHatchGap(value)
+    }
+  }
+
+  get hatchOrientation(): number | undefined {
+    return this._sxHatchOrientation?.value
+  }
+
+  set hatchOrientation(value: ZoneFillHatchOrientation | number | undefined) {
+    if (value === undefined) {
+      this._sxHatchOrientation = undefined
+    } else if (value instanceof ZoneFillHatchOrientation) {
+      this._sxHatchOrientation = value
+    } else {
+      this._sxHatchOrientation = new ZoneFillHatchOrientation(value)
+    }
+  }
+
+  get hatchBorderAlgorithm(): string | undefined {
+    return this._sxHatchBorderAlgorithm?.value
+  }
+
+  set hatchBorderAlgorithm(value:
+    | ZoneFillHatchBorderAlgorithm
+    | string
+    | undefined) {
+    if (value === undefined) {
+      this._sxHatchBorderAlgorithm = undefined
+    } else if (value instanceof ZoneFillHatchBorderAlgorithm) {
+      this._sxHatchBorderAlgorithm = value
+    } else {
+      this._sxHatchBorderAlgorithm = new ZoneFillHatchBorderAlgorithm(value)
+    }
+  }
+
+  get hatchMinHoleArea(): number | undefined {
+    return this._sxHatchMinHoleArea?.value
+  }
+
+  set hatchMinHoleArea(value: ZoneFillHatchMinHoleArea | number | undefined) {
+    if (value === undefined) {
+      this._sxHatchMinHoleArea = undefined
+    } else if (value instanceof ZoneFillHatchMinHoleArea) {
+      this._sxHatchMinHoleArea = value
+    } else {
+      this._sxHatchMinHoleArea = new ZoneFillHatchMinHoleArea(value)
+    }
   }
 
   get thermalGap(): number | undefined {
@@ -195,6 +331,13 @@ export class ZoneFill extends SxClass {
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
+    if (this._sxMode) children.push(this._sxMode)
+    if (this._sxHatchThickness) children.push(this._sxHatchThickness)
+    if (this._sxHatchGap) children.push(this._sxHatchGap)
+    if (this._sxHatchOrientation) children.push(this._sxHatchOrientation)
+    if (this._sxHatchBorderAlgorithm)
+      children.push(this._sxHatchBorderAlgorithm)
+    if (this._sxHatchMinHoleArea) children.push(this._sxHatchMinHoleArea)
     if (this._sxThermalGap) children.push(this._sxThermalGap)
     if (this._sxThermalBridgeWidth) children.push(this._sxThermalBridgeWidth)
     if (this._sxSmoothing) children.push(this._sxSmoothing)
