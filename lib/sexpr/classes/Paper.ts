@@ -99,13 +99,14 @@ export class Paper extends SxClass {
   override getString(): string {
     const lines = ["(paper"]
 
-    if (this._size) {
-      lines.push(`  ${this._size}`)
-    } else if (
+    if (
+      (this._size === undefined || this._size.toLowerCase() === "user") &&
       typeof this._width === "number" &&
       typeof this._height === "number"
     ) {
-      lines.push(`  ${this._width} ${this._height}`)
+      lines.push(`  "User" ${this._width} ${this._height}`)
+    } else if (this._size) {
+      lines.push(`  ${this._size}`)
     }
 
     if (this._portrait) {
