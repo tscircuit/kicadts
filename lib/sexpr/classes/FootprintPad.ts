@@ -822,7 +822,7 @@ class PadRemoveUnusedLayers extends SxPrimitiveBoolean {
   ): PadRemoveUnusedLayers {
     const [raw] = primitiveSexprs
     if (raw === undefined) {
-      return new PadRemoveUnusedLayers({ value: false })
+      return new PadRemoveUnusedLayers({ value: true })
     }
     if (typeof raw === "boolean") {
       return new PadRemoveUnusedLayers({ value: raw })
@@ -867,7 +867,7 @@ class PadKeepEndLayers extends SxPrimitiveBoolean {
   ): PadKeepEndLayers {
     const [raw] = primitiveSexprs
     if (raw === undefined) {
-      return new PadKeepEndLayers({ value: false })
+      return new PadKeepEndLayers({ value: true })
     }
     if (typeof raw === "boolean") {
       return new PadKeepEndLayers({ value: raw })
