@@ -198,24 +198,7 @@ export class GrText extends SxClass {
       this._sxPosition = value
       return
     }
-    // Check if it's GrTextPosition (plain object with x, y)
-    if (
-      typeof value === "object" &&
-      "x" in value &&
-      "y" in value &&
-      !Array.isArray(value) &&
-      !(value instanceof At)
-    ) {
-      const { x, y, angle } = value as GrTextPosition
-      if (angle !== undefined) {
-        this._sxPosition = new At([x, y, angle])
-      } else {
-        this._sxPosition = new Xy(x, y)
-      }
-      return
-    }
-    // Handle AtInput (At, array, or object with angle)
-    this._sxPosition = At.from(value as AtInput)
+    this._sxPosition = At.from(value)
   }
 
   get layer(): Layer | undefined {
