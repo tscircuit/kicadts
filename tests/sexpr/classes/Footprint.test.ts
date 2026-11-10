@@ -304,6 +304,26 @@ test("Footprint", () => {
   `)
 })
 
+test("Footprint generator_version serialization (#104)", () => {
+  const footprint = new Footprint({
+    libraryLink: "MyPart",
+    version: 20240108,
+    generator: "kicadts",
+    generatorVersion: "8.0",
+    layer: "F.Cu",
+  })
+
+  expect(footprint.getString()).toMatchInlineSnapshot(`
+    "(footprint
+      \"MyPart\"
+      (version 20240108)
+      (generator kicadts)
+      (generator_version 8.0)
+      (layer F.Cu)
+    )"
+  `)
+})
+
 test("KiCad 10.99 footprint transform provides legacy position semantics", () => {
   const [parsed] = SxClass.parse(`
     (footprint "Connector:Example"
