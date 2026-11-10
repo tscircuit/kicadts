@@ -38,6 +38,7 @@ The following classes need ergonomic constructors created (similar to the patter
 ## Pattern Requirements
 
 Each class needs:
+
 1. A TypeScript interface `{ClassName}ConstructorParams` with optional properties
 2. Properties should accept either primitive values (strings, numbers) OR SxClass wrapper objects
 3. Constructor that accepts the params interface and handles both cases
