@@ -160,15 +160,17 @@ export class GrArc extends SxClass {
   }
 
   get startPoint(): GrArcPoint | undefined {
-    return this._sxStart?.toObject()
+    return this._sxStart
+      ? { x: this._sxStart.x, y: this._sxStart.y }
+      : undefined
   }
 
   get midPoint(): GrArcPoint | undefined {
-    return this._sxMid?.toObject()
+    return this._sxMid ? { x: this._sxMid.x, y: this._sxMid.y } : undefined
   }
 
   get endPoint(): GrArcPoint | undefined {
-    return this._sxEnd?.toObject()
+    return this._sxEnd ? { x: this._sxEnd.x, y: this._sxEnd.y } : undefined
   }
 
   get layer(): Layer | undefined {
