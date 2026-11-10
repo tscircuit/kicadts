@@ -313,16 +313,30 @@ test("Footprint generator_version serialization (#104)", () => {
     layer: "F.Cu",
   })
 
-  expect(footprint.getString()).toMatchInlineSnapshot(`
+  const output = footprint.getString()
+  expect(output).toMatchInlineSnapshot(`
     "(footprint
       \"MyPart\"
       (version 20240108)
       (generator kicadts)
-      (generator_version 8.0)
+      (generator_version \"8.0\")
       (layer F.Cu)
     )"
   `)
+  const [parsed] = SxClass.parse(output)
+  expect((parsed as Footprint).generatorVersion).toBe("8.0")
 })
+
+test.each(["8", "8.0-tscircuit", '8.0 "dev"\\build'])(
+  "Footprint generator_version %s is a quoted string",
+  (generatorVersion) => {
+    const footprint = new Footprint({ generatorVersion })
+    const output = footprint.getString()
+    expect(output).toContain('(generator_version "')
+    const [parsed] = SxClass.parse(output)
+    expect((parsed as Footprint).generatorVersion).toBe(generatorVersion)
+  },
+)
 
 test("KiCad 10.99 footprint transform provides legacy position semantics", () => {
   const [parsed] = SxClass.parse(`
