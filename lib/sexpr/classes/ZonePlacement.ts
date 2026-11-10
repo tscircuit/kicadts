@@ -1,6 +1,8 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
+import { ZonePlacementComponentClass } from "./ZonePlacementComponentClass"
 import { ZonePlacementEnabled } from "./ZonePlacementEnabled"
+import { ZonePlacementGroup } from "./ZonePlacementGroup"
 import { ZonePlacementSheetname } from "./ZonePlacementSheetname"
 
 export class ZonePlacement extends SxClass {
@@ -9,32 +11,43 @@ export class ZonePlacement extends SxClass {
   override token = "placement"
 
   private _sxEnabled?: ZonePlacementEnabled
-  private _sxSheetname?: ZonePlacementSheetname
+  private _sxSource?:
+    | ZonePlacementSheetname
+    | ZonePlacementComponentClass
+    | ZonePlacementGroup
 
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): ZonePlacement {
     const placement = new ZonePlacement()
-    const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
-    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
-      if (token !== "enabled" && token !== "sheetname") {
+
+    for (const primitive of primitiveSexprs) {
+      if (!Array.isArray(primitive) || typeof primitive[0] !== "string") {
         throw new Error(
-          `zone placement encountered unsupported child "${token}"`,
+          `zone placement encountered invalid child ${JSON.stringify(primitive)}`,
         )
       }
-      if (entries.length > 1) {
-        throw new Error(
-          `zone placement does not support repeated child "${token}"`,
-        )
+
+      const child = SxClass.parsePrimitiveSexpr(primitive, {
+        parentToken: this.token,
+      })
+      if (child instanceof ZonePlacementEnabled) {
+        placement._sxEnabled = child
+        continue
       }
+      if (
+        child instanceof ZonePlacementSheetname ||
+        child instanceof ZonePlacementComponentClass ||
+        child instanceof ZonePlacementGroup
+      ) {
+        // KiCad stores one source type/value; the last source in input wins.
+        placement._sxSource = child
+        continue
+      }
+      throw new Error(
+        `zone placement encountered unsupported child "${primitive[0]}"`,
+      )
     }
-    placement._sxEnabled = propertyMap.enabled as
-      | ZonePlacementEnabled
-      | undefined
-    placement._sxSheetname = propertyMap.sheetname as
-      | ZonePlacementSheetname
-      | undefined
     return placement
   }
 
@@ -52,22 +65,66 @@ export class ZonePlacement extends SxClass {
   }
 
   get sheetname(): string | undefined {
-    return this._sxSheetname?.value
+    return this._sxSource instanceof ZonePlacementSheetname
+      ? this._sxSource.value
+      : undefined
   }
 
   set sheetname(value: ZonePlacementSheetname | string | undefined) {
-    this._sxSheetname =
-      value === undefined
-        ? undefined
-        : value instanceof ZonePlacementSheetname
-          ? value
-          : new ZonePlacementSheetname(value)
+    if (value === undefined) {
+      if (this._sxSource instanceof ZonePlacementSheetname) {
+        this._sxSource = undefined
+      }
+      return
+    }
+    this._sxSource =
+      value instanceof ZonePlacementSheetname
+        ? value
+        : new ZonePlacementSheetname(value)
+  }
+
+  get componentClass(): string | undefined {
+    return this._sxSource instanceof ZonePlacementComponentClass
+      ? this._sxSource.value
+      : undefined
+  }
+
+  set componentClass(value: ZonePlacementComponentClass | string | undefined) {
+    if (value === undefined) {
+      if (this._sxSource instanceof ZonePlacementComponentClass) {
+        this._sxSource = undefined
+      }
+      return
+    }
+    this._sxSource =
+      value instanceof ZonePlacementComponentClass
+        ? value
+        : new ZonePlacementComponentClass(value)
+  }
+
+  get group(): string | undefined {
+    return this._sxSource instanceof ZonePlacementGroup
+      ? this._sxSource.value
+      : undefined
+  }
+
+  set group(value: ZonePlacementGroup | string | undefined) {
+    if (value === undefined) {
+      if (this._sxSource instanceof ZonePlacementGroup) {
+        this._sxSource = undefined
+      }
+      return
+    }
+    this._sxSource =
+      value instanceof ZonePlacementGroup
+        ? value
+        : new ZonePlacementGroup(value)
   }
 
   override getChildren(): SxClass[] {
     const children: SxClass[] = []
     if (this._sxEnabled) children.push(this._sxEnabled)
-    if (this._sxSheetname) children.push(this._sxSheetname)
+    if (this._sxSource) children.push(this._sxSource)
     return children
   }
 }
