@@ -72,9 +72,13 @@ export class GrArc extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): GrArc {
     const grArc = new GrArc()
+    const children: PrimitiveSExpr[] =
+      primitiveSexprs[0] === "locked"
+        ? [["locked"], ...primitiveSexprs.slice(1)]
+        : primitiveSexprs
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+      SxClass.parsePrimitivesToClassProperties(children, this.token)
 
     const unexpectedTokens = new Set<string>()
     for (const token of Object.keys(propertyMap)) {
@@ -100,7 +104,7 @@ export class GrArc extends SxClass {
       )
     }
 
-    for (const primitive of primitiveSexprs) {
+    for (const primitive of children) {
       if (Array.isArray(primitive)) continue
       throw new Error(
         `gr_arc encountered unexpected primitive child: ${JSON.stringify(primitive)}`,
