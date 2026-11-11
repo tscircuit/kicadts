@@ -89,10 +89,10 @@ export class GlobalLabel extends SxClass {
     const [textPrimitive, ...rest] = primitiveSexprs
     const value = toStringValue(textPrimitive)
     if (value === undefined) {
-      throw new Error("global_label expects a string value")
+      throw new Error(`${this.token} expects a string value`)
     }
 
-    const globalLabel = new GlobalLabel()
+    const globalLabel = new (this as unknown as new () => GlobalLabel)()
     globalLabel._value = value
 
     // Extract shape before parsing to class properties
@@ -121,19 +121,19 @@ export class GlobalLabel extends SxClass {
     )
     if (unsupportedTokens.length > 0) {
       throw new Error(
-        `Unsupported child tokens inside global_label expression: ${unsupportedTokens.join(", ")}`,
+        `Unsupported child tokens inside ${this.token} expression: ${unsupportedTokens.join(", ")}`,
       )
     }
 
     for (const [token, entries] of Object.entries(arrayPropertyMap)) {
       if (!SUPPORTED_TOKENS.has(token)) {
         throw new Error(
-          `Unsupported child tokens inside global_label expression: ${token}`,
+          `Unsupported child tokens inside ${this.token} expression: ${token}`,
         )
       }
       if (token !== "property" && entries.length > 1) {
         throw new Error(
-          `global_label does not support repeated child tokens: ${token}`,
+          `${this.token} does not support repeated child tokens: ${token}`,
         )
       }
     }
@@ -229,7 +229,7 @@ export class GlobalLabel extends SxClass {
   }
 
   override getString(): string {
-    const lines = [`(global_label ${quoteSExprString(this._value)}`]
+    const lines = [`(${this.token} ${quoteSExprString(this._value)}`]
     lines.push(`  (shape ${this._shape})`)
     for (const child of this.getChildren()) {
       lines.push(child.getStringIndented())
