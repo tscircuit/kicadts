@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { Pts } from "./Pts"
-import { Stroke } from "./Stroke"
+import type { Pts } from "./Pts"
+import type { Stroke } from "./Stroke"
 import { Uuid } from "./Uuid"
 
 const SUPPORTED_TOKENS = new Set(["pts", "stroke", "uuid"])
@@ -15,6 +15,7 @@ export interface BusConstructorParams {
 export class Bus extends SxClass {
   static override token = "bus"
   static override parentToken = "kicad_sch"
+  static override childPropertyOrder = ["_sxPts", "_sxStroke", "_sxUuid"]
   override token = "bus"
 
   private _sxPts?: Pts
@@ -41,7 +42,7 @@ export class Bus extends SxClass {
     const bus = new Bus()
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, Bus.token)
 
     if (Object.keys(arrayPropertyMap).length > 0) {
       const tokens = Object.keys(arrayPropertyMap).join(", ")
@@ -90,14 +91,6 @@ export class Bus extends SxClass {
       return
     }
     this._sxUuid = value instanceof Uuid ? value : new Uuid(value)
-  }
-
-  override getChildren(): SxClass[] {
-    const children: SxClass[] = []
-    if (this._sxPts) children.push(this._sxPts)
-    if (this._sxStroke) children.push(this._sxStroke)
-    if (this._sxUuid) children.push(this._sxUuid)
-    return children
   }
 }
 SxClass.register(Bus)
