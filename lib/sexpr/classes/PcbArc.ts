@@ -259,8 +259,7 @@ function parseString(value: PrimitiveSExpr | undefined, label: string): string {
 }
 
 function parseNet(value: PrimitiveSExpr | undefined): number | string {
-  const numeric = toNumberValue(value)
-  if (numeric !== undefined) return numeric
+  if (typeof value === "number") return value
 
   const stringValue = toStringValue(value)
   if (stringValue !== undefined) return stringValue

@@ -1,7 +1,6 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { quoteSExprString } from "../utils/quoteSExprString"
-import { toNumberValue } from "../utils/toNumberValue"
 import { toStringValue } from "../utils/toStringValue"
 
 export class SegmentNet extends SxClass {
@@ -26,10 +25,9 @@ export class SegmentNet extends SxClass {
     primitiveSexprs: PrimitiveSExpr[],
   ): SegmentNet {
     const [rawId, rawName] = primitiveSexprs
-    const id = toNumberValue(rawId)
-    if (id !== undefined) {
+    if (typeof rawId === "number") {
       const name = rawName === undefined ? undefined : toStringValue(rawName)
-      return new SegmentNet(id, name ?? undefined)
+      return new SegmentNet(rawId, name ?? undefined)
     }
 
     const name = toStringValue(rawId)
