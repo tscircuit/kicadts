@@ -3,6 +3,7 @@ import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Uuid } from "./Uuid"
 import { GroupId } from "./GroupId"
 import { toStringValue } from "../utils/toStringValue"
+import { quoteSExprString } from "../utils/quoteSExprString"
 
 export interface GroupConstructorParams {
   name?: string
@@ -159,7 +160,7 @@ export class Group extends SxClass {
   }
 
   override getString(): string {
-    const lines = [`(group "${this._name}"`]
+    const lines = [`(group ${quoteSExprString(this._name)}`]
     const push = (value?: SxClass) => {
       if (!value) return
       lines.push(value.getStringIndented())
