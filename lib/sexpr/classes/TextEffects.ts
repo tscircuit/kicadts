@@ -376,6 +376,14 @@ export class TextEffectsFontBold extends SxPrimitiveBoolean {
     super(value ?? true)
   }
 
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): TextEffectsFontBold {
+    return super.fromSexprPrimitives(
+      primitiveSexprs.length === 0 ? [true] : primitiveSexprs,
+    ) as TextEffectsFontBold
+  }
+
   override getString(): string {
     return `(bold ${this.value ? "yes" : "no"})`
   }
@@ -391,6 +399,14 @@ export class TextEffectsFontItalic extends SxPrimitiveBoolean {
     super(value ?? true)
   }
 
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): TextEffectsFontItalic {
+    return super.fromSexprPrimitives(
+      primitiveSexprs.length === 0 ? [true] : primitiveSexprs,
+    ) as TextEffectsFontItalic
+  }
+
   override getString(): string {
     return `(italic ${this.value ? "yes" : "no"})`
   }
@@ -404,6 +420,14 @@ class TextEffectsHide extends SxPrimitiveBoolean {
 
   constructor(value?: boolean) {
     super(value ?? true)
+  }
+
+  static override fromSexprPrimitives(
+    primitiveSexprs: PrimitiveSExpr[],
+  ): TextEffectsHide {
+    return super.fromSexprPrimitives(
+      primitiveSexprs.length === 0 ? [true] : primitiveSexprs,
+    ) as TextEffectsHide
   }
 
   override getString(): string {
