@@ -62,7 +62,12 @@ export class Segment extends SxClass {
     const segment = new Segment()
 
     const { propertyMap, arrayPropertyMap } =
-      SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
+      SxClass.parsePrimitivesToClassProperties(
+        primitiveSexprs.map((primitive) =>
+          primitive === "locked" ? ["locked"] : primitive,
+        ),
+        this.token,
+      )
 
     const unexpectedSingleTokens = Object.keys(propertyMap).filter(
       (token) => !SUPPORTED_SINGLE_TOKENS.has(token),

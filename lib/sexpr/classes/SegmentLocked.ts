@@ -16,6 +16,9 @@ export class SegmentLocked extends SxPrimitiveBoolean {
   static override fromSexprPrimitives(
     primitiveSexprs: PrimitiveSExpr[],
   ): SegmentLocked {
+    if (primitiveSexprs.length === 0) {
+      return new SegmentLocked(true)
+    }
     const [rawValue] = primitiveSexprs
     if (typeof rawValue === "boolean") {
       return new SegmentLocked(rawValue)
