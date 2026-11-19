@@ -13,7 +13,7 @@ import { Covering } from "./Setup/Covering"
 import { Filling } from "./Setup/Filling"
 import { Plugging } from "./Setup/Plugging"
 import { ViaZoneLayerConnections } from "./ViaZoneLayerConnections"
-import { ViaTenting } from "./ViaTenting"
+import { ViaTenting, type ViaTentingInput } from "./ViaTenting"
 
 const BARE_FLAGS = new Set([
   "locked",
@@ -43,7 +43,7 @@ export interface ViaConstructorParams {
   plugging?: Plugging
   filling?: string | Filling
   zoneLayerConnections?: ViaZoneLayerConnectionsInput
-  tenting?: ViaTenting | string[]
+  tenting?: ViaTenting | ViaTentingInput
 }
 
 export class Via extends SxClass {
@@ -470,7 +470,7 @@ export class Via extends SxClass {
     return this._sxTenting
   }
 
-  set tenting(value: ViaTenting | string[] | undefined) {
+  set tenting(value: ViaTenting | ViaTentingInput | undefined) {
     if (value === undefined) {
       this._sxTenting = undefined
       return
