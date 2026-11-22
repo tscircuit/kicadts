@@ -32,7 +32,7 @@ const derivedSymbolLibrary = `
   )
 `
 
-test.failing("kicad_sym: derived symbols parse and keep their extends parent", () => {
+test("kicad_sym: derived symbols parse and keep their extends parent", () => {
   const library = parseKicadSym(derivedSymbolLibrary)
 
   expect(library.symbols.map((symbol) => symbol.libraryId)).toEqual([

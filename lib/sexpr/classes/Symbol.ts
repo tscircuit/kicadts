@@ -20,6 +20,7 @@ import { PropertyHide } from "./PropertyHide"
 import { PropertyShowName } from "./PropertyShowName"
 import { SymbolBodyStyle } from "./SymbolBodyStyle"
 import { SymbolBodyStyles } from "./SymbolBodyStyles"
+import { SymbolExtends } from "./SymbolExtends"
 import { TextEffects } from "./TextEffects"
 import { Uuid } from "./Uuid"
 import { Stroke } from "./Stroke"
@@ -767,6 +768,7 @@ SxClass.register(SymbolPower)
 export interface SchematicSymbolConstructorParams {
   libraryId?: string
   libraryName?: string | SymbolLibName
+  extends?: string | SymbolExtends
   at?: AtInput
   mirror?: string | Mirror
   unit?: number | SymbolUnit
@@ -801,6 +803,7 @@ export class SchematicSymbol extends SxClass {
 
   private _sxLibName?: SymbolLibName
   private _sxLibId?: SymbolLibId
+  private _sxExtends?: SymbolExtends
   _sxAt?: At
   _sxMirror?: Mirror
   _sxUnit?: SymbolUnit
@@ -835,6 +838,7 @@ export class SchematicSymbol extends SxClass {
 
     if (params.libraryId !== undefined) this.libraryId = params.libraryId
     if (params.libraryName !== undefined) this.libraryName = params.libraryName
+    if (params.extends !== undefined) this.extends = params.extends
     if (params.at !== undefined) this.at = params.at
     if (params.mirror !== undefined) this.mirror = params.mirror
     if (params.unit !== undefined)
@@ -901,6 +905,21 @@ export class SchematicSymbol extends SxClass {
     }
     this._sxLibName =
       value instanceof SymbolLibName ? value : new SymbolLibName(value)
+  }
+
+  get extends(): string | undefined {
+    return this._sxExtends?.value
+  }
+
+  set extends(parentSymbol: string | SymbolExtends | undefined) {
+    if (parentSymbol === undefined) {
+      this._sxExtends = undefined
+      return
+    }
+    this._sxExtends =
+      parentSymbol instanceof SymbolExtends
+        ? parentSymbol
+        : new SymbolExtends(parentSymbol)
   }
 
   get at(): At | undefined {
@@ -1076,6 +1095,7 @@ export class SchematicSymbol extends SxClass {
     } else if (inlineId !== undefined) {
       symbol._inlineLibId = inlineId
     }
+    symbol._sxExtends = propertyMap.extends as SymbolExtends | undefined
     symbol._sxAt = propertyMap.at as At
     symbol._sxMirror = propertyMap.mirror as Mirror
     symbol._sxUnit = propertyMap.unit as SymbolUnit
@@ -1113,6 +1133,7 @@ export class SchematicSymbol extends SxClass {
     const children: SxClass[] = []
     if (this._sxLibName) children.push(this._sxLibName)
     if (this._sxLibId) children.push(this._sxLibId)
+    if (this._sxExtends) children.push(this._sxExtends)
     if (this._sxAt) children.push(this._sxAt)
     if (this._sxMirror) children.push(this._sxMirror)
     if (this._sxUnit) children.push(this._sxUnit)
