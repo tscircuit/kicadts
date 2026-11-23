@@ -51,11 +51,12 @@ export class BusEntry extends SxClass {
     const { propertyMap, arrayPropertyMap } =
       SxClass.parsePrimitivesToClassProperties(primitiveSexprs, this.token)
 
-    if (Object.keys(arrayPropertyMap).length > 0) {
-      const tokens = Object.keys(arrayPropertyMap).join(", ")
-      throw new Error(
-        `bus_entry does not support repeated child tokens: ${tokens}`,
-      )
+    for (const [token, entries] of Object.entries(arrayPropertyMap)) {
+      if (entries.length > 1) {
+        throw new Error(
+          `bus_entry does not support repeated child tokens: ${token}`,
+        )
+      }
     }
 
     const unsupportedTokens = Object.keys(propertyMap).filter(

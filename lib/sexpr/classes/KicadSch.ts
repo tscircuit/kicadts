@@ -1,7 +1,9 @@
 import { SxClass } from "../base-classes/SxClass"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
 import { Image } from "./Image"
+import { Bus } from "./Bus"
 import { BusAlias } from "./BusAlias"
+import { BusEntry } from "./BusEntry"
 import { KicadSchGenerator } from "./KicadSchGenerator"
 import { KicadSchGeneratorVersion } from "./KicadSchGeneratorVersion"
 import { KicadSchVersion } from "./KicadSchVersion"
@@ -49,6 +51,8 @@ const MULTI_CHILD_TOKENS = new Set([
   "label",
   "global_label",
   "junction",
+  "bus_entry",
+  "bus",
   "wire",
   "no_connect",
   "sheet_instances",
@@ -83,6 +87,8 @@ export interface KicadSchConstructorParams {
   texts?: SchematicText[]
   labels?: Label[]
   globalLabels?: GlobalLabel[]
+  busEntries?: BusEntry[]
+  buses?: Bus[]
   wires?: Wire[]
   junctions?: Junction[]
   noConnects?: NoConnect[]
@@ -115,6 +121,8 @@ export class KicadSch extends SxClass {
   private _texts: SchematicText[] = []
   private _labels: Label[] = []
   private _globalLabels: GlobalLabel[] = []
+  private _busEntries: BusEntry[] = []
+  private _buses: Bus[] = []
   private _wires: Wire[] = []
   private _junctions: Junction[] = []
   private _noConnects: NoConnect[] = []
@@ -203,6 +211,14 @@ export class KicadSch extends SxClass {
 
     if (params.globalLabels !== undefined) {
       this.globalLabels = params.globalLabels
+    }
+
+    if (params.busEntries !== undefined) {
+      this.busEntries = params.busEntries
+    }
+
+    if (params.buses !== undefined) {
+      this.buses = params.buses
     }
 
     if (params.wires !== undefined) {
@@ -303,6 +319,8 @@ export class KicadSch extends SxClass {
       labels: (arrayPropertyMap.label as Label[]) ?? [],
       globalLabels: (arrayPropertyMap.global_label as GlobalLabel[]) ?? [],
       junctions: (arrayPropertyMap.junction as Junction[]) ?? [],
+      busEntries: (arrayPropertyMap.bus_entry as BusEntry[]) ?? [],
+      buses: (arrayPropertyMap.bus as Bus[]) ?? [],
       wires: (arrayPropertyMap.wire as Wire[]) ?? [],
       noConnects: (arrayPropertyMap.no_connect as NoConnect[]) ?? [],
       arcs: (arrayPropertyMap.arc as SchematicArc[]) ?? [],
@@ -476,6 +494,22 @@ export class KicadSch extends SxClass {
     this._junctions = [...value]
   }
 
+  get busEntries(): BusEntry[] {
+    return [...this._busEntries]
+  }
+
+  set busEntries(busEntries: BusEntry[]) {
+    this._busEntries = [...busEntries]
+  }
+
+  get buses(): Bus[] {
+    return [...this._buses]
+  }
+
+  set buses(buses: Bus[]) {
+    this._buses = [...buses]
+  }
+
   get wires(): Wire[] {
     return [...this._wires]
   }
@@ -553,6 +587,8 @@ export class KicadSch extends SxClass {
     children.push(...this._labels)
     children.push(...this._globalLabels)
     children.push(...this._junctions)
+    children.push(...this._busEntries)
+    children.push(...this._buses)
     children.push(...this._wires)
     children.push(...this._noConnects)
     children.push(...this._arcs)
