@@ -1,4 +1,6 @@
 // s_expr_parser.ts
+import { quoteIfNeeded } from "./utils/quoteSExprString"
+
 export type PrimitiveSExpr =
   | string // symbols and string literals (distinct via `type` guard if you want)
   | number
@@ -212,20 +214,7 @@ export function printSExpr(x: PrimitiveSExpr): string {
   if (typeof x === "boolean") return x ? "#t" : "#f"
   if (typeof x === "number") return Number.isFinite(x) ? String(x) : "nan"
   if (typeof x === "string") {
-    // naive: treat as symbol if it looks like a symbol; otherwise quote
-    if (/^[^\s()"]+$/u.test(x) && x !== "nil" && x !== "#t" && x !== "#f")
-      return x
-    return `"${x.replace(/["\\\n\r\t]/g, (m) =>
-      m === '"'
-        ? '\\"'
-        : m === "\\"
-          ? "\\\\"
-          : m === "\n"
-            ? "\\n"
-            : m === "\r"
-              ? "\\r"
-              : "\\t",
-    )}"`
+    return quoteIfNeeded(x)
   }
   if (Array.isArray(x)) {
     return `(${x.map(printSExpr).join(" ")})`

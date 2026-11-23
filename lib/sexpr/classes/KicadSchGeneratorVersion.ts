@@ -1,7 +1,7 @@
 import { SxClass } from "../base-classes/SxClass"
 import { SxPrimitiveString } from "../base-classes/SxPrimitiveString"
 import type { PrimitiveSExpr } from "../parseToPrimitiveSExpr"
-import { quoteSExprString } from "../utils/quoteSExprString"
+import { quoteIfNeeded } from "../utils/quoteSExprString"
 import { toStringValue } from "../utils/toStringValue"
 
 export class KicadSchGeneratorVersion extends SxPrimitiveString {
@@ -21,10 +21,7 @@ export class KicadSchGeneratorVersion extends SxPrimitiveString {
   }
 
   override getString(): string {
-    const serialized = /^[^\s()\"]+$/.test(this.value)
-      ? this.value
-      : quoteSExprString(this.value)
-    return `(generator_version ${serialized})`
+    return `(generator_version ${quoteIfNeeded(this.value)})`
   }
 }
 SxClass.register(KicadSchGeneratorVersion)
