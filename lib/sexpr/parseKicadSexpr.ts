@@ -10,7 +10,13 @@ export const parseKicadSexpr = (sexpr: string) => {
 }
 
 export const parseKicadSch = (sexpr: string): KicadSch => {
-  const [root] = parseKicadSexpr(sexpr)
+  const roots = parseKicadSexpr(sexpr)
+  if (roots.length !== 1) {
+    throw new Error(
+      `Expected exactly one top-level expression, got ${roots.length}`,
+    )
+  }
+  const [root] = roots
   if (!(root instanceof KicadSch)) {
     throw new Error(
       `Expected KicadSch root, got ${root?.constructor.name ?? "undefined"}`,
@@ -20,7 +26,13 @@ export const parseKicadSch = (sexpr: string): KicadSch => {
 }
 
 export const parseKicadPcb = (sexpr: string): KicadPcb => {
-  const [root] = parseKicadSexpr(sexpr)
+  const roots = parseKicadSexpr(sexpr)
+  if (roots.length !== 1) {
+    throw new Error(
+      `Expected exactly one top-level expression, got ${roots.length}`,
+    )
+  }
+  const [root] = roots
   if (!(root instanceof KicadPcb)) {
     throw new Error(
       `Expected KicadPcb root, got ${root?.constructor.name ?? "undefined"}`,
@@ -30,7 +42,13 @@ export const parseKicadPcb = (sexpr: string): KicadPcb => {
 }
 
 export const parseKicadSym = (sexpr: string): KicadSymbolLib => {
-  const [root] = parseKicadSexpr(sexpr)
+  const roots = parseKicadSexpr(sexpr)
+  if (roots.length !== 1) {
+    throw new Error(
+      `Expected exactly one top-level expression, got ${roots.length}`,
+    )
+  }
+  const [root] = roots
   if (!(root instanceof KicadSymbolLib)) {
     throw new Error(
       `Expected KicadSym root, got ${root?.constructor.name ?? "undefined"}`,
@@ -40,7 +58,13 @@ export const parseKicadSym = (sexpr: string): KicadSymbolLib => {
 }
 
 export const parseKicadMod = (sexpr: string): Footprint => {
-  const [root] = parseKicadSexpr(sexpr)
+  const roots = parseKicadSexpr(sexpr)
+  if (roots.length !== 1) {
+    throw new Error(
+      `Expected exactly one top-level expression, got ${roots.length}`,
+    )
+  }
+  const [root] = roots
   if (!(root instanceof Footprint)) {
     throw new Error(
       `Expected Footprint root, got ${root?.constructor.name ?? "undefined"}`,
